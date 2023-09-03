@@ -1,16 +1,14 @@
-# This is a sample Python script.
+import subprocess
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+# Define the shell script path
+shell_script_path = './run.sh'
 
+# Loop through the range of files
+for i in range(1, 21):
+    input_file_name = f'pfile{i}'
+    output_file_path = f'report{i}.txt'
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    # Run the shell script and capture the output for each file
+    with open(output_file_path, 'w') as output_file:
+        subprocess.run([shell_script_path, input_file_name], stdout=output_file, stderr=subprocess.STDOUT)
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
