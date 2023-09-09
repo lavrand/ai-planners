@@ -1,0 +1,73 @@
+#!/usr/bin/perl -w
+
+if (scalar(@ARGV) != 2) {
+    print "Usage: getgoaltimes <ontime problem filename> <plan filename>\n";
+}
+
+$valstring = "./validate -t 0.001 -v driverlogTimed.pddl";
+
+$problem = shift(@ARGV);
+$plan = shift(@ARGV);
+
+
+# first, we open the problem, and skip to the goals
+
+open PROBLEM, "< $problem";
+
+while (<PROBLEM>) {
+    if (m/:goal/) { last; }
+}
+
+# ...then note what packages had goals, and assume these were true at time zero
+
+while (<PROBLEM>) {
+    if (m/\(at (package[^ ]+)/) {
+       $goalattime{$1} = 0; # goalattime is a hash map, the key is the package goal, the value is 0
+    }
+}
+
+close PROBLEM;
+
+# run VAL, capture its output...
+open IN, "$valstring $problem $plan |";
+
+$timenow = 0;
+
+while (<IN>) {
+    # when val gets to the next action start/end, update $timenow
+    if (m/Checking next happening \(time ([0-9\.]+)/) {
+        $timenow = $1 + 0;
+    }
+    # then, if we see that a package has arrived, make a note of when this was
+    if (m/Adding \(at (package[^ ]+)/) {
+        $goalattime{$1} = $timenow;
+    }
+}
+
+close IN;
+
+open OUT, "> withdeadlines-$problem";
+open PROBLEM, "< $problem";
+
+# write everything up to the :init line to the output file
+while (<PROBLEM>) {
+    print OUT;
+    if (m/:init/) { last; }
+}
+
+# ...then write the deadlines
+foreach $package (keys %goalattime) {
+    $achievedat = $goalattime{$package};
+    if ($achievedat == 0) {
+        print OUT "; The goal for $achievedat was achieved at time zero (in the initial state), so no deadline was generated\n";
+    } else {
+        $achievedat = $achievedat - 10; # take something off the deadline so that the default of 'not dispatching actions' can't just proceed as before
+        print OUT "(at $achievedat (not (still-on-time $package))) ; deadline on when $package got to its goal location\n"
+    }
+}
+
+# ...then write the rest
+while (<PROBLEM>) { print OUT; }
+
+close PROBLEM;
+close OUT;

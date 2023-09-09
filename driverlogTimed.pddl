@@ -9,6 +9,7 @@
 		(driving ?d - driver ?v - truck)
 		(link ?x ?y - location) (path ?x ?y - location)
 		(empty ?v - truck)
+		(still-on-time ?obj - locatable)
 )
 
 
@@ -22,7 +23,7 @@
     ?loc - location)
   :duration (= ?duration 2)
   :condition
-   (and (over all (at ?truck ?loc)) (at start (at ?obj ?loc)))
+   (and (over all (still-on-time ?obj)) (over all (at ?truck ?loc)) (at start (at ?obj ?loc)))
   :effect
    (and (at start (not (at ?obj ?loc))) (at end (in ?obj ?truck))))
 
@@ -33,7 +34,7 @@
     ?loc - location)
   :duration (= ?duration 2)
   :condition
-   (and (over all (at ?truck ?loc)) (at start (in ?obj ?truck)))
+   (and (over all (still-on-time ?obj)) (over all (at ?truck ?loc)) (at start (in ?obj ?truck)))
   :effect
    (and (at start (not (in ?obj ?truck))) (at end (at ?obj ?loc))))
 

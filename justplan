@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+
+while (<>) {
+  if (m/Solution Found/) {
+    last;
+  }
+}
+
+
+while (<>) {
+  print;
+}
