@@ -11,10 +11,10 @@ csv_file_path = 'times.csv'
 
 # Write headers to the CSV file
 with open(csv_file_path, 'w') as csv_file:
-    csv_file.write('File, Situated Temporal Planning, Offline Planning, Situated Planning\n')
+    csv_file.write('File, Online Planning, Offline Planning, Situated Planning\n')
 
 # Define the start and stop range for the loop
-__start = 15
+__start = 2
 __stop = 15
 
 # Loop through the specified range of files
