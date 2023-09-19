@@ -1,47 +1,72 @@
+import os
+import csv
 import subprocess
-import re
+from datetime import datetime
 
-# Define the shell script path, the add_initially_on_time Perl script path, and the getgoaltimes Perl script path
-shell_script_path = './run.sh'
-add_initially_on_time_script_path = './add_initially_on_time'
-getgoaltimes_script_path = './getgoaltimes'
+# Directories to parse
+directories = ['disp', 'nodisp']
 
-# Define the CSV file to store the times
-csv_file_path = 'times.csv'
+# Base filename pattern
+base_filename = "15-"
 
-# Write headers to the CSV file
-with open(csv_file_path, 'w') as csv_file:
-    csv_file.write('File, Online Planning, Offline Planning, Situated Planning\n')
+# Output CSV filename
+csv_filename = "times.csv"
 
-# Define the start and stop range for the loop
-__start = 2
-__stop = 15
 
-# Loop through the specified range of files
-for i in range(__start, __stop + 1):
-    input_file_name = f'pfile{i}'
-    ontime_file_name = f'ontime-{input_file_name}'
-    withdeadlines_file_name = f'withdeadlines-{ontime_file_name}'
-    output_file_path = f'report{i}.txt'
+# Extract time from the line
+def extract_time(line):
+    try:
+        return float(line.split()[2])
+    except:
+        return "N/A"
 
-    # Invoke the add_initially_on_time Perl script to create the ontime-pfile
-    subprocess.run([add_initially_on_time_script_path, input_file_name, ontime_file_name])
 
-    # Invoke the getgoaltimes Perl script to modify the ontime-pfile to withdeadlines-ontime-pfile
-    subprocess.run([getgoaltimes_script_path, ontime_file_name, withdeadlines_file_name])
+# Function to run a script and log its execution
+def run_script(script_name):
+    print(f"[{datetime.now()}] Starting {script_name}...")
+    result = subprocess.run(['./' + script_name], check=True)
+    print(f"[{datetime.now()}] Finished {script_name} with return code {result.returncode}")
 
-    # Run the shell script and capture the output for the withdeadlines-ontime-pfile
-    with open(output_file_path, 'w') as output_file:
-        subprocess.run([shell_script_path, withdeadlines_file_name], stdout=output_file, stderr=subprocess.STDOUT)
 
-    # Extract times from the report
-    with open(output_file_path, 'r') as report_file:
-        content = report_file.read()
-        times = re.findall(r'; Time (\d+\.\d+)', content)
+# Ensure directories exist and have the correct permissions
+for directory in directories:
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+        print(f"Created {directory} directory.")
+    os.chmod(directory, 0o755)
+    print(f"Set permissions for {directory} to 755.")
 
-        # Check if we found exactly 3 times
-        if len(times) == 3:
-            with open(csv_file_path, 'a') as csv_file:
-                csv_file.write(f'{withdeadlines_file_name}, {times[0]}, {times[1]}, {times[2]}\n')
-        else:
-            print(f"Unexpected number of times in {output_file_path}. Expected 3, found {len(times)}.")
+# Running the scripts in the specified order
+for script in ['gen', 'dispscript', 'nodispscript']:
+    run_script(script)
+
+# Main execution after scripts
+with open(csv_filename, 'w', newline='') as csvfile:
+    csvwriter = csv.writer(csvfile)
+
+    # Write header to CSV
+    csvwriter.writerow(['File', 'disp', 'nodisp'])
+
+    for i in range(1, 101):  # 1 to 100 inclusive
+        filename = base_filename + str(i)
+        times = [filename]  # Start with filename as first column
+
+        for directory in directories:
+            filepath = os.path.join(directory, filename)
+
+            if os.path.exists(filepath):
+                with open(filepath, 'r') as f:
+                    # Read the file lines and filter for the line with '; Time'
+                    line = next((l for l in f.readlines() if l.startswith("; Time")), None)
+
+                    if line:
+                        times.append(extract_time(line))
+                    else:
+                        times.append("N/A")
+            else:
+                times.append("N/A")
+
+        # Write extracted times to CSV
+        csvwriter.writerow(times)
+
+print(f"Times extracted to {csv_filename}")

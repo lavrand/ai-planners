@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 
-if (scalar(@ARGV) != 2) {
-    print "Usage: getgoaltimes <ontime problem filename> <plan filename>\n";
+if (scalar(@ARGV) != 3) {
+    print "Usage: getgoaltimes <ontime problem filename> <plan filename> <random seed>\n";
+    exit(1);
 }
 
 $valstring = "./validate -t 0.001 -v driverlogTimed.pddl";
@@ -9,6 +10,7 @@ $valstring = "./validate -t 0.001 -v driverlogTimed.pddl";
 $problem = shift(@ARGV);
 $plan = shift(@ARGV);
 
+$seed = shift(@ARGV) + 0;
 
 # first, we open the problem, and skip to the goals
 
@@ -46,7 +48,7 @@ while (<IN>) {
 
 close IN;
 
-open OUT, "> withdeadlines-$problem";
+open OUT, "> withdeadlines-$problem-$seed";
 open PROBLEM, "< $problem";
 
 # write everything up to the :init line to the output file
@@ -55,13 +57,20 @@ while (<PROBLEM>) {
     if (m/:init/) { last; }
 }
 
+my @keyarray = (keys %goalattime);
+
+my @sortedkeys = sort @keyarray;
+
+srand($seed);
+
 # ...then write the deadlines
-foreach $package (keys %goalattime) {
+foreach $package (@sortedkeys) {
     $achievedat = $goalattime{$package};
     if ($achievedat == 0) {
         print OUT "; The goal for $achievedat was achieved at time zero (in the initial state), so no deadline was generated\n";
     } else {
-        $achievedat = $achievedat - 10; # take something off the deadline so that the default of 'not dispatching actions' can't just proceed as before
+        $perturbment = rand(50) - 25;
+        $achievedat = $achievedat + $perturbment; # add something between [-25,25) to the deadline
         print OUT "(at $achievedat (not (still-on-time $package))) ; deadline on when $package got to its goal location\n"
     }
 }
