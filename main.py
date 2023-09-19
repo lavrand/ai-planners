@@ -9,8 +9,9 @@ directories = ['disp', 'nodisp']
 # Base filename pattern
 base_filename = "15-"
 
-# Output CSV filename
+# Output CSV filenames
 csv_filename = "times.csv"
+csv_filename_better = "timesDispBetter.csv"
 
 
 # Extract time from the line
@@ -41,15 +42,20 @@ for script in ['gen', 'dispscript', 'nodispscript']:
     run_script(script)
 
 # Main execution after scripts
-with open(csv_filename, 'w', newline='') as csvfile:
+with open(csv_filename, 'w', newline='') as csvfile, open(csv_filename_better, 'w', newline='') as csvbetterfile:
     csvwriter = csv.writer(csvfile)
+    csvbetterwriter = csv.writer(csvbetterfile)
 
     # Write header to CSV
     csvwriter.writerow(['File', 'disp', 'nodisp'])
+    csvbetterwriter.writerow(['File', 'disp', 'nodisp'])
 
     for i in range(1, 101):  # 1 to 100 inclusive
         filename = base_filename + str(i)
         times = [filename]  # Start with filename as first column
+
+        disp_time = "N/A"
+        nodisp_time = "N/A"
 
         for directory in directories:
             filepath = os.path.join(directory, filename)
@@ -60,7 +66,12 @@ with open(csv_filename, 'w', newline='') as csvfile:
                     line = next((l for l in f.readlines() if l.startswith("; Time")), None)
 
                     if line:
-                        times.append(extract_time(line))
+                        time_val = extract_time(line)
+                        if directory == 'disp':
+                            disp_time = time_val
+                        else:
+                            nodisp_time = time_val
+                        times.append(time_val)
                     else:
                         times.append("N/A")
             else:
@@ -69,4 +80,9 @@ with open(csv_filename, 'w', newline='') as csvfile:
         # Write extracted times to CSV
         csvwriter.writerow(times)
 
+        # If 'disp' is faster than 'nodisp', write to the better times file
+        if isinstance(disp_time, float) and isinstance(nodisp_time, float) and disp_time < nodisp_time:
+            csvbetterwriter.writerow(times)
+
 print(f"Times extracted to {csv_filename}")
+print(f"Faster 'disp' times extracted to {csv_filename_better}")
