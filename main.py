@@ -10,29 +10,28 @@ for dir_name in ['disp', 'nodisp']:
         os.makedirs(dir_name)
         os.chmod(dir_name, 0o755)
 
+base_command_common = ("./rewrite-no-lp --time-based-on-expansions-per-second 500 "
+                       "--include-metareasoning-time --multiply-TILs-by 1 "
+                       "--real-to-plan-time-multiplier 1 --calculate-Q-interval 100 "
+                       "--add-weighted-f-value-to-Q -0.000001 --min-probability-failure 0.001 "
+                       "--slack-from-heuristic --forbid-self-overlapping-actions "
+                       "--deadline-aware-open-list IJCAI --ijcai-gamma 1 --ijcai-t_u 100 "
+                       "--icaps-for-n-expansions 100 --time-aware-heuristic 1 "
+                       "--dispatch-frontier-size 10 --subtree-focus-threshold 0.025 "
+                       "--dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning driverlogTimed.pddl withdeadlines-ontime-pfile15-")
+
 # Function to run the dispscript commands
 def run_dispscript():
-    base_command_disp = ("./rewrite-no-lp --time-based-on-expansions-per-second 500 "
-                         "--include-metareasoning-time --multiply-TILs-by 1 "
-                         "--real-to-plan-time-multiplier 1 --calculate-Q-interval 100 "
-                         "--add-weighted-f-value-to-Q -0.000001 --min-probability-failure 0.001 "
-                         "--slack-from-heuristic --forbid-self-overlapping-actions "
-                         "--deadline-aware-open-list IJCAI --ijcai-gamma 1 --ijcai-t_u 100 "
-                         "--icaps-for-n-expansions 100 --use-dispatcher LPFThreshold "
-                         "--time-aware-heuristic 1 --dispatch-frontier-size 10 "
-                         "--subtree-focus-threshold 0.025 --dispatch-threshold 0.025 "
-                         "--optimistic-lst-for-dispatch-reasoning driverlogTimed.pddl withdeadlines-ontime-pfile15-")
     for i in range(1, 101):
-        command = base_command_disp + str(i) + " > disp/15-" + str(i)
+        command = base_command_common + "--use-dispatcher LPFThreshold " + str(i) + " > disp/15-" + str(i)
         print(f"[{datetime.now()}] Running disp command for file 15-{i}...")
         subprocess.run(command, shell=True, check=True)
         print(f"[{datetime.now()}] Finished disp command for file 15-{i}.")
 
 # Function to run the nodispscript commands
 def run_nodispscript():
-    base_command_nodisp = base_command_disp  # Base command is the same as disp
     for i in range(1, 101):
-        command = base_command_nodisp + str(i) + " > nodisp/15-" + str(i)
+        command = base_command_common + str(i) + " > nodisp/15-" + str(i)
         print(f"[{datetime.now()}] Running nodisp command for file 15-{i}...")
         subprocess.run(command, shell=True, check=True)
         print(f"[{datetime.now()}] Finished nodisp command for file 15-{i}.")
