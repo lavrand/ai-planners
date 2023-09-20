@@ -1,88 +1,72 @@
-import os
-import csv
 import subprocess
 from datetime import datetime
+import os
+import re
+import csv
 
-# Directories to parse
-directories = ['disp', 'nodisp']
+# Create directories and set permissions
+for dir_name in ['disp', 'nodisp']:
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
+        os.chmod(dir_name, 0o755)
 
-# Base filename pattern
-base_filename = "15-"
+# Function to run the dispscript commands
+def run_dispscript():
+    base_command_disp = ("./rewrite-no-lp --time-based-on-expansions-per-second 500 "
+                         "--include-metareasoning-time --multiply-TILs-by 1 "
+                         "--real-to-plan-time-multiplier 1 --calculate-Q-interval 100 "
+                         "--add-weighted-f-value-to-Q -0.000001 --min-probability-failure 0.001 "
+                         "--slack-from-heuristic --forbid-self-overlapping-actions "
+                         "--deadline-aware-open-list IJCAI --ijcai-gamma 1 --ijcai-t_u 100 "
+                         "--icaps-for-n-expansions 100 --use-dispatcher LPFThreshold "
+                         "--time-aware-heuristic 1 --dispatch-frontier-size 10 "
+                         "--subtree-focus-threshold 0.025 --dispatch-threshold 0.025 "
+                         "--optimistic-lst-for-dispatch-reasoning driverlogTimed.pddl withdeadlines-ontime-pfile15-")
+    for i in range(1, 101):
+        command = base_command_disp + str(i) + " > disp/15-" + str(i)
+        print(f"[{datetime.now()}] Running disp command for file 15-{i}...")
+        subprocess.run(command, shell=True, check=True)
+        print(f"[{datetime.now()}] Finished disp command for file 15-{i}.")
 
-# Output CSV filenames
-csv_filename = "times.csv"
-csv_filename_better = "timesDispBetter.csv"
+# Function to run the nodispscript commands
+def run_nodispscript():
+    base_command_nodisp = base_command_disp  # Base command is the same as disp
+    for i in range(1, 101):
+        command = base_command_nodisp + str(i) + " > nodisp/15-" + str(i)
+        print(f"[{datetime.now()}] Running nodisp command for file 15-{i}...")
+        subprocess.run(command, shell=True, check=True)
+        print(f"[{datetime.now()}] Finished nodisp command for file 15-{i}.")
 
+# Execute the scripts
+run_dispscript()
+run_nodispscript()
 
-# Extract time from the line
-def extract_time(line):
-    try:
-        return float(line.split()[2])
-    except:
-        return "N/A"
+# Extract execution time data and write to CSV
+def extract_time_and_write_csv(folder_name):
+    regex_pattern = re.compile(r"Total time: ([\d.]+)s|Killed|Time limit exceeded")
+    with open(f"{folder_name}.csv", "w") as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(["File", "Time (s)"])
+        for i in range(1, 101):
+            file_path = f"{folder_name}/15-{i}"
+            if os.path.exists(file_path):
+                with open(file_path, 'r') as file:
+                    content = file.read()
+                    matches = regex_pattern.findall(content)
+                    if matches:
+                        match = matches[0]
+                        time_value = match[0] if match[0] else "60"
+                        csvwriter.writerow([f"15-{i}", time_value])
 
+extract_time_and_write_csv('disp')
+extract_time_and_write_csv('nodisp')
 
-# Function to run a script and log its execution
-def run_script(script_name):
-    print(f"[{datetime.now()}] Starting {script_name}...")
-    result = subprocess.run(['./' + script_name], check=True)
-    print(f"[{datetime.now()}] Finished {script_name} with return code {result.returncode}")
-
-
-# Ensure directories exist and have the correct permissions
-for directory in directories:
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-        print(f"Created {directory} directory.")
-    os.chmod(directory, 0o755)
-    print(f"Set permissions for {directory} to 755.")
-
-# Running the scripts in the specified order
-for script in ['gen', 'dispscript', 'nodispscript']:
-    run_script(script)
-
-# Main execution after scripts
-with open(csv_filename, 'w', newline='') as csvfile, open(csv_filename_better, 'w', newline='') as csvbetterfile:
-    csvwriter = csv.writer(csvfile)
-    csvbetterwriter = csv.writer(csvbetterfile)
-
-    # Write header to CSV
-    csvwriter.writerow(['File', 'disp', 'nodisp'])
-    csvbetterwriter.writerow(['File', 'disp', 'nodisp'])
-
-    for i in range(1, 101):  # 1 to 100 inclusive
-        filename = base_filename + str(i)
-        times = [filename]  # Start with filename as first column
-
-        disp_time = "N/A"
-        nodisp_time = "N/A"
-
-        for directory in directories:
-            filepath = os.path.join(directory, filename)
-
-            if os.path.exists(filepath):
-                with open(filepath, 'r') as f:
-                    # Read the file lines and filter for the line with '; Time'
-                    line = next((l for l in f.readlines() if l.startswith("; Time")), None)
-
-                    if line:
-                        time_val = extract_time(line)
-                        if directory == 'disp':
-                            disp_time = time_val
-                        else:
-                            nodisp_time = time_val
-                        times.append(time_val)
-                    else:
-                        times.append("N/A")
-            else:
-                times.append("N/A")
-
-        # Write extracted times to CSV
-        csvwriter.writerow(times)
-
-        # If 'disp' is faster than 'nodisp', write to the better times file
-        if isinstance(disp_time, float) and isinstance(nodisp_time, float) and disp_time < nodisp_time:
-            csvbetterwriter.writerow(times)
-
-print(f"Times extracted to {csv_filename}")
-print(f"Faster 'disp' times extracted to {csv_filename_better}")
+# Generate the timesDispBetter file
+with open('disp.csv', 'r') as dispfile, open('nodisp.csv', 'r') as nodispfile, open('timesDispBetter', 'w') as outfile:
+    dispreader = csv.reader(dispfile)
+    nodispreader = csv.reader(nodispfile)
+    next(dispreader)  # skip headers
+    next(nodispreader)  # skip headers
+    for disp_row, nodisp_row in zip(dispreader, nodispreader):
+        if float(disp_row[1]) < float(nodisp_row[1]):
+            outfile.write(f"{disp_row[0]}: {disp_row[1]}s < {nodisp_row[1]}s\n")
