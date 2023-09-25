@@ -5,7 +5,7 @@ import re
 import csv
 import signal
 
-__EXPERIMENTS = 100
+__EXPERIMENTS = 2
 
 # Create directories and set permissions
 for dir_name in ['disp', 'nodisp']:
@@ -126,18 +126,24 @@ def extract_time_and_write_csv():
 
                 if os.path.exists(filepath):
                     with open(filepath, 'r') as f:
-                        # Read the file lines and filter for the line with '; Time'
-                        line = next((l for l in f.readlines() if l.startswith("; Time")), None)
 
-                        if line:
-                            time_val = extract_time(line)
-                            if directory == 'disp':
-                                disp_time = time_val
+                        # ;;;; Problem Unsolvable
+                        line_unsolvable = next((l for l in f.readlines() if l.startswith(";;;; Problem Unsolvable")), None)
+                        if not line_unsolvable:
+                            # Read the file lines and filter for the line with '; Time'
+                            line = next((l for l in f.readlines() if l.startswith("; Time")), None)
+
+                            if line:
+                                time_val = extract_time(line)
+                                if directory == 'disp':
+                                    disp_time = time_val
+                                else:
+                                    nodisp_time = time_val
+                                times.append(time_val)
                             else:
-                                nodisp_time = time_val
-                            times.append(time_val)
+                                times.append(999)
                         else:
-                            times.append(999)
+                            times.append(9999)
                 else:
                     times.append(999)
 
