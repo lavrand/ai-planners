@@ -18,12 +18,14 @@ base_command_common = ("./rewrite-no-lp --time-based-on-expansions-per-second 50
                        "--deadline-aware-open-list IJCAI --ijcai-gamma 1 --ijcai-t_u 100 "
                        "--icaps-for-n-expansions 100 --time-aware-heuristic 1 "
                        "--dispatch-frontier-size 10 --subtree-focus-threshold 0.025 "
-                       "--dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning driverlogTimed.pddl withdeadlines-ontime-pfile15-")
+                       "--dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning ")
+
+base_command_end = (" driverlogTimed.pddl withdeadlines-ontime-pfile15-")
 
 # Function to run the dispscript commands
 def run_dispscript():
     for i in range(1, 101):
-        command = base_command_common + "--use-dispatcher LPFThreshold " + str(i) + " > disp/15-" + str(i)
+        command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(i) + " > disp/15-" + str(i)
         print(f"[{datetime.now()}] Running disp command for file 15-{i}...")
         subprocess.run(command, shell=True, check=True)
         print(f"[{datetime.now()}] Finished disp command for file 15-{i}.")
@@ -31,7 +33,7 @@ def run_dispscript():
 # Function to run the nodispscript commands
 def run_nodispscript():
     for i in range(1, 101):
-        command = base_command_common + str(i) + " > nodisp/15-" + str(i)
+        command = base_command_common + base_command_end + str(i) + " > nodisp/15-" + str(i)
         print(f"[{datetime.now()}] Running nodisp command for file 15-{i}...")
         subprocess.run(command, shell=True, check=True)
         print(f"[{datetime.now()}] Finished nodisp command for file 15-{i}.")
