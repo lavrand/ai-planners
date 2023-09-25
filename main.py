@@ -27,8 +27,21 @@ def run_dispscript():
     for i in range(1, 101):
         command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(i) + " > disp/15-" + str(i)
         print(f"[{datetime.now()}] Running disp command for file 15-{i}...")
-        subprocess.run(command, shell=True, check=True)
+        run_subprocess(command, i)
         print(f"[{datetime.now()}] Finished disp command for file 15-{i}.")
+
+
+def run_subprocess(command, i):
+    try:
+        subprocess.run(command, shell=True, check=True, timeout=60)
+    except subprocess.TimeoutExpired:
+        print(f"Command #{i} took longer than 60 seconds!")
+    except subprocess.CalledProcessError:
+        print(f"Command #{i} failed!")
+    else:
+        # Continue with the rest of your code if the command was successful and didn't time out
+        print(f"Command #{i} completed successfully!")
+
 
 # Function to run the nodispscript commands
 def run_nodispscript():
