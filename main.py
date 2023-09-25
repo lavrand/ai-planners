@@ -45,7 +45,7 @@ def run_dispscript():
 
 # Function to run the nodispscript commands
 def run_nodispscript():
-    for i in range(78, 101):
+    for i in range(1, 101):
         command = base_command_common + base_command_end + str(i) + " > nodisp/15-" + str(i)
         print(f"[{datetime.now()}] Running nodisp command for file 15-{i}...")
         run_subprocess(command, i)
@@ -77,8 +77,8 @@ def run_subprocess(command, i):
     return stdout, stderr, process.returncode
 
 # Execute the scripts
-# run_dispscript()
-# run_nodispscript()
+run_dispscript()
+run_nodispscript()
 
 # Extract time from the line
 def extract_time(line):
@@ -99,8 +99,8 @@ def extract_time_and_write_csv():
             filename = base_filename + str(i)
             times = [filename]  # Start with filename as first column
 
-            disp_time = "N/A"
-            nodisp_time = "N/A"
+            disp_time = 999
+            nodisp_time = 999
 
             for directory in directories:
                 filepath = os.path.join(directory, filename)
@@ -118,9 +118,9 @@ def extract_time_and_write_csv():
                                 nodisp_time = time_val
                             times.append(time_val)
                         else:
-                            times.append("N/A")
+                            times.append(999)
                 else:
-                    times.append("N/A")
+                    times.append(999)
 
             # Write extracted times to CSV
             csvwriter.writerow(times)
