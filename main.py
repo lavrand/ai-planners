@@ -5,7 +5,7 @@ import re
 import csv
 import signal
 
-__EXPERIMENTS = 101
+__EXPERIMENTS = 100
 
 # Create directories and set permissions
 for dir_name in ['disp', 'nodisp']:
@@ -36,6 +36,23 @@ base_command_common = ("./rewrite-no-lp --time-based-on-expansions-per-second 50
                        "--dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning ")
 
 base_command_end = (" driverlogTimed.pddl withdeadlines-ontime-pfile15-")
+
+
+def invoke_gen_script():
+    # The command to invoke the generic script
+    gen_script_command = "./gen"
+
+    print(f"[{datetime.now()}] Running the generation script...")
+
+    result = subprocess.run(gen_script_command, shell=True, check=True)
+
+    if result.returncode != 0:
+        print(f"Error running the generation script! Exiting.")
+        exit(1)
+
+    print(f"[{datetime.now()}] Finished running the generation script.")
+
+invoke_gen_script()
 
 # Function to run the dispscript commands
 def run_dispscript():
