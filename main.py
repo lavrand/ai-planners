@@ -32,16 +32,24 @@ def run_dispscript():
 
 
 def run_subprocess(command, i):
-    try:
-        subprocess.run(command, shell=True, check=True, timeout=60)
-    except subprocess.TimeoutExpired:
-        print(f"Command #{i} took longer than 60 seconds!")
-    except subprocess.CalledProcessError:
-        print(f"Command #{i} failed!")
-    else:
-        # Continue with the rest of your code if the command was successful and didn't time out
-        print(f"Command #{i} completed successfully!")
+    stdout, stderr = None, None  # Initialize these to avoid UnboundLocalError
 
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        # communicate() waits for the process to complete or for the timeout to expire
+        stdout, stderr = process.communicate(timeout=60)
+    except subprocess.TimeoutExpired:
+        # If the timeout expires, the process is still running, so we'll kill it
+        process.kill()
+        print(f"Command #{i} took longer than 60 seconds and was killed!")
+    else:
+        if process.returncode != 0:
+            print(f"Command #{i} failed!")
+        else:
+            print(f"Command #{i} completed successfully!")
+
+    # Return stdout, stderr, and returncode
+    return stdout, stderr, process.returncode
 
 # Function to run the nodispscript commands
 def run_nodispscript():
