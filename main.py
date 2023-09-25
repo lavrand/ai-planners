@@ -31,6 +31,14 @@ def run_dispscript():
         run_subprocess(command, i)
         print(f"[{datetime.now()}] Finished disp command for file 15-{i}.")
 
+# Function to run the nodispscript commands
+def run_nodispscript():
+    for i in range(1, 101):
+        command = base_command_common + base_command_end + str(i) + " > nodisp/15-" + str(i)
+        print(f"[{datetime.now()}] Running nodisp command for file 15-{i}...")
+        run_subprocess(command, i)
+        print(f"[{datetime.now()}] Finished nodisp command for file 15-{i}.")
+
 
 def run_subprocess(command, i):
     stdout, stderr = None, None  # Initialize these to avoid UnboundLocalError
@@ -55,13 +63,6 @@ def run_subprocess(command, i):
 
     # Return stdout, stderr, and returncode
     return stdout, stderr, process.returncode
-# Function to run the nodispscript commands
-def run_nodispscript():
-    for i in range(1, 101):
-        command = base_command_common + base_command_end + str(i) + " > nodisp/15-" + str(i)
-        print(f"[{datetime.now()}] Running nodisp command for file 15-{i}...")
-        subprocess.run(command, shell=True, check=True)
-        print(f"[{datetime.now()}] Finished nodisp command for file 15-{i}.")
 
 # Execute the scripts
 run_dispscript()
