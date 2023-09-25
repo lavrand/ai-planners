@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 import re
 import csv
+import signal
 
 # Create directories and set permissions
 for dir_name in ['disp', 'nodisp']:
@@ -34,13 +35,17 @@ def run_dispscript():
 def run_subprocess(command, i):
     stdout, stderr = None, None  # Initialize these to avoid UnboundLocalError
 
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # Start the process in a new session
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=os.setsid)
     try:
         # communicate() waits for the process to complete or for the timeout to expire
         stdout, stderr = process.communicate(timeout=60)
     except subprocess.TimeoutExpired:
-        # If the timeout expires, the process is still running, so we'll kill it
-        process.kill()
+        # If the timeout expires, kill the entire process group
+        os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # try to terminate the process group gracefully
+        process.wait(timeout=10)  # give it 10 seconds to terminate gracefully
+        if process.poll() is None:  # if the process is still running after 10 seconds
+            os.killpg(os.getpgid(process.pid), signal.SIGKILL)  # forcibly kill the process group
         print(f"Command #{i} took longer than 60 seconds and was killed!")
     else:
         if process.returncode != 0:
@@ -50,7 +55,6 @@ def run_subprocess(command, i):
 
     # Return stdout, stderr, and returncode
     return stdout, stderr, process.returncode
-
 # Function to run the nodispscript commands
 def run_nodispscript():
     for i in range(1, 101):
