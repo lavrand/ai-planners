@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
-if (scalar(@ARGV) != 3) {
-    print "Usage: getgoaltimes <ontime problem filename> <plan filename> <random seed>\n";
+if (scalar(@ARGV) != 4) {
+    print "Usage: getgoaltimes <ontime problem filename> <plan filename> <i> <random seed>\n";
     exit(1);
 }
 
@@ -9,7 +9,7 @@ $valstring = "./validate -t 0.001 -v driverlogTimed.pddl";
 
 $problem = shift(@ARGV);
 $plan = shift(@ARGV);
-
+$i = shift(@ARGV) + 0;
 $seed = shift(@ARGV) + 0;
 
 # first, we open the problem, and skip to the goals
@@ -48,7 +48,7 @@ while (<IN>) {
 
 close IN;
 
-open OUT, "> withdeadlines-$problem-$seed";
+open OUT, "> withdeadlines-$problem-$i";
 open PROBLEM, "< $problem";
 
 # write everything up to the :init line to the output file
