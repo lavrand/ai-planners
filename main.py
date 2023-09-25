@@ -45,7 +45,7 @@ def remove_folders_and_files():
     print(f"[{datetime.now()}] Removed specified folders and files.")
 
 
-__EXPERIMENTS = 2
+__EXPERIMENTS = 100
 
 # Main loop to run everything in an infinite cycle
 while True:
