@@ -16,10 +16,14 @@ def create_archive():
     # List of directories and files to archive
     items_to_archive = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
 
+    # Adding files withdeadlines-ontime-pfile15-1 to withdeadlines-ontime-pfile15-100
+    items_to_archive.extend([f"withdeadlines-ontime-pfile15-{i}" for i in range(1, 101)])
+
     # Create the archive
     with tarfile.open(archive_name, 'w:gz') as archive:
         for item in items_to_archive:
-            archive.add(item)
+            if os.path.exists(item):  # Check if the item exists before adding
+                archive.add(item)
 
     print(f"[{datetime.now()}] Created archive: {archive_name}")
 
@@ -27,6 +31,10 @@ def create_archive():
 def remove_folders_and_files():
     """Deletes the specified directories and files."""
     items_to_delete = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
+
+    # Adding files withdeadlines-ontime-pfile15-1 to withdeadlines-ontime-pfile15-100
+    items_to_delete.extend([f"withdeadlines-ontime-pfile15-{i}" for i in range(1, 101)])
+
     for item in items_to_delete:
         if os.path.exists(item):
             if os.path.isdir(item):
@@ -36,11 +44,12 @@ def remove_folders_and_files():
 
     print(f"[{datetime.now()}] Removed specified folders and files.")
 
-__EXPERIMENTS = 2
+
+__EXPERIMENTS = 100
 
 # Main loop to run everything in an infinite cycle
 while True:
-
+    print(f"[{datetime.now()}] Starting a new set of experiments...")
     # Create directories and set permissions
     for dir_name in ['disp', 'nodisp']:
         if not os.path.exists(dir_name):
@@ -210,7 +219,12 @@ while True:
             if float(disp_row[1]) < float(nodisp_row[1]):
                 outfile.write(f"{disp_row[0]}: {disp_row[1]}s < {nodisp_row[1]}s\n")
 
+    print(f"[{datetime.now()}] Finished current set of experiments. Starting archiving...")
+
     # Once the script finishes its run
     create_archive()
-    remove_folders_and_files()
+    print(f"[{datetime.now()}] Finished archiving.")
 
+    print(f"[{datetime.now()}] Starting removing cache folder and files.")
+    remove_folders_and_files()
+    print(f"[{datetime.now()}] Finished removing cache folder and files.")
