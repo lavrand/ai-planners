@@ -7,6 +7,8 @@ import csv
 import signal
 import shutil
 
+PLAN_SEARCH_TIMEOUT_SECONDS = 120
+
 
 def create_archive():
     """Archives specified directories and files."""
@@ -124,7 +126,7 @@ while True:
                                    preexec_fn=os.setsid)
         try:
             # communicate() waits for the process to complete or for the timeout to expire
-            stdout, stderr = process.communicate(timeout=60)
+            stdout, stderr = process.communicate(timeout=PLAN_SEARCH_TIMEOUT_SECONDS)
         except subprocess.TimeoutExpired:
             # If the timeout expires, kill the entire process group
             os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # try to terminate the process group gracefully
