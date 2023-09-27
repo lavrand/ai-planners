@@ -193,11 +193,14 @@ while True:
                                         nodisp_time = time_val
                                     times.append(time_val)
                                 else:
-                                    times.append(999)
+                                    # no line for time code
+                                    times.append(9999)
                             else:
-                                times.append(9999)
+                                # unsolvable code
+                                times.append(99999)
                     else:
-                        times.append(99999)
+                        # filepath doesn't exist code
+                        times.append(999999)
 
                 # Write extracted times to CSV
                 csvwriter.writerow(times)
