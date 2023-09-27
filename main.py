@@ -154,7 +154,7 @@ while True:
             return float(line.split()[2])
         except:
             # parsing code error
-            return "88888"
+            return "9999999"
 
 
     # Extract execution time data and write to CSV
@@ -170,8 +170,8 @@ while True:
                 filename = base_filename + str(i)
                 times = [filename]  # Start with filename as first column
 
-                disp_time = 99
-                nodisp_time = 99
+                disp_time = 0
+                nodisp_time = 0
 
                 for directory in directories:
                     filepath = os.path.join(directory, filename)
@@ -179,12 +179,13 @@ while True:
                     if os.path.exists(filepath):
                         with open(filepath, 'r') as f:
 
+                            lines = f.readlines()
+
                             # ;;;; Problem Unsolvable
-                            line_unsolvable = next(
-                                (l for l in f.readlines() if l.startswith(";;;; Problem Unsolvable")), None)
+                            line_unsolvable = next((l for l in lines if l.startswith(";;;; Problem Unsolvable")), None)
                             if not line_unsolvable:
-                                # Read the file lines and filter for the line with '; Time'
-                                line = next((l for l in f.readlines() if l.startswith("; Time")), None)
+                                # Search in the stored lines for the line with '; Time'
+                                line = next((l for l in lines if l.startswith("; Time")), None)
 
                                 if line:
                                     time_val = extract_time(line)
@@ -219,7 +220,7 @@ while True:
 
         # Extract headers and rows
         headers = next(reader)
-        rows = [row for row in reader if int(row[1]) < int(row[2])]
+        rows = [row for row in reader if float(row[1]) < float(row[2])]
 
     # Write the filtered rows to timesDispBetter.csv
     with open('timesDispBetter.csv', 'w', newline='') as file:
