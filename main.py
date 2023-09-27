@@ -132,7 +132,7 @@ while True:
             process.wait(timeout=10)  # give it 10 seconds to terminate gracefully
             if process.poll() is None:  # if the process is still running after 10 seconds
                 os.killpg(os.getpgid(process.pid), signal.SIGKILL)  # forcibly kill the process group
-            print(f"Command #{i} took longer than 60 seconds and was killed!")
+            print(f"Command #{i} took longer than timeout seconds and was killed!")
         else:
             if process.returncode != 0:
                 print(f"Command #{i} failed!")
