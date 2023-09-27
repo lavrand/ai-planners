@@ -8,6 +8,7 @@ import signal
 import shutil
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 1800
+EXPERIMENTS = 100
 
 
 def create_archive():
@@ -46,8 +47,6 @@ def remove_folders_and_files():
 
     print(f"[{datetime.now()}] Removed specified folders and files.")
 
-
-__EXPERIMENTS = 100
 
 # Main loop to run everything in an infinite cycle
 while True:
@@ -101,7 +100,7 @@ while True:
 
     # Function to run the dispscript commands
     def run_dispscript():
-        for i in range(1, __EXPERIMENTS + 1):
+        for i in range(1, EXPERIMENTS + 1):
             command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
                 i) + " > disp/15-" + str(i)
             print(f"[{datetime.now()}] Running disp command for file 15-{i}...")
@@ -111,7 +110,7 @@ while True:
 
     # Function to run the nodispscript commands
     def run_nodispscript():
-        for i in range(1, __EXPERIMENTS + 1):
+        for i in range(1, EXPERIMENTS + 1):
             command = base_command_common + base_command_end + str(i) + " > nodisp/15-" + str(i)
             print(f"[{datetime.now()}] Running nodisp command for file 15-{i}...")
             run_subprocess(command, i)
@@ -166,7 +165,7 @@ while True:
             csvwriter.writerow(['File', 'disp', 'nodisp'])
             csvbetterwriter.writerow(['File', 'disp', 'nodisp'])
 
-            for i in range(1, __EXPERIMENTS + 1):  # 1 to 100 inclusive
+            for i in range(1, EXPERIMENTS + 1):  # 1 to 100 inclusive
                 filename = base_filename + str(i)
                 times = [filename]  # Start with filename as first column
 
