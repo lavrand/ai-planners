@@ -153,7 +153,8 @@ while True:
         try:
             return float(line.split()[2])
         except:
-            return "8888"
+            # parsing code error
+            return "88888"
 
 
     # Extract execution time data and write to CSV
