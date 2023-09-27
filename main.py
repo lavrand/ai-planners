@@ -210,16 +210,19 @@ while True:
 
     extract_time_and_write_csv()
 
-    # Generate the timesDispBetter file
-    with open('disp.csv', 'r') as dispfile, open('nodisp.csv', 'r') as nodispfile, open('timesDispBetter.csv',
-                                                                                        'w') as outfile:
-        dispreader = csv.reader(dispfile)
-        nodispreader = csv.reader(nodispfile)
-        next(dispreader)  # skip headers
-        next(nodispreader)  # skip headers
-        for disp_row, nodisp_row in zip(dispreader, nodispreader):
-            if float(disp_row[1]) < float(nodisp_row[1]):
-                outfile.write(f"{disp_row[0]}: {disp_row[1]}s < {nodisp_row[1]}s\n")
+    # Read the times.csv file
+    with open('times.csv', 'r') as file:
+        reader = csv.reader(file)
+
+        # Extract headers and rows
+        headers = next(reader)
+        rows = [row for row in reader if int(row[1]) < int(row[2])]
+
+    # Write the filtered rows to timesDispBetter.csv
+    with open('timesDispBetter.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(headers)
+        writer.writerows(rows)
 
     print(f"[{datetime.now()}] Finished current set of experiments. Starting archiving...")
 
