@@ -9,13 +9,15 @@ with open('output_full.csv', 'r') as f:
     data = list(csv_reader)
 
 # Process the data
-both_solved = [row for row in data if row[1] != '9999' and row[2] != '99999']
-disp_only = [row for row in data if row[1] != '9999' and row[2] == '99999']
-nodisp_only = [row for row in data if row[1] == '9999' and row[2] != '99999']
+both_solved = [row for row in data if row[1] not in ['9999', '99999'] and row[2] not in ['9999', '99999']]
+disp_only = [row for row in data if row[1] not in ['9999', '99999'] and row[2] in ['9999', '99999']]
+nodisp_only = [row for row in data if row[1] in ['9999', '99999'] and row[2] not in ['9999', '99999']]
 
-avg_disp = sum(float(row[1]) for row in both_solved) / len(both_solved)
-avg_nodisp = sum(float(row[2]) for row in both_solved) / len(both_solved)
-avg_ratio = sum(float(row[1]) / float(row[2]) for row in both_solved) / len(both_solved)
+
+avg_disp = round(sum(float(row[1]) for row in both_solved) / len(both_solved), 2)
+avg_nodisp = round(sum(float(row[2]) for row in both_solved) / len(both_solved), 2)
+avg_ratio = round(sum(float(row[1]) / float(row[2]) for row in both_solved) / len(both_solved), 2)
+
 
 # Determine the parent folder (two levels up)
 folder_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath("output_full.csv"))))
