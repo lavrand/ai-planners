@@ -7,7 +7,7 @@ import csv
 import signal
 import shutil
 
-PLAN_SEARCH_TIMEOUT_SECONDS = 1800
+PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
 
 
