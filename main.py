@@ -19,8 +19,7 @@ def create_archive():
     # List of directories and files to archive
     items_to_archive = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
 
-    # Adding files withdeadlines-ontime-pfile15-1 to withdeadlines-ontime-pfile15-100
-    items_to_archive.extend([f"withdeadlines-ontime-pfile15-{i}" for i in range(1, 101)])
+    items_to_archive.extend([f"withdeadlines-ontime-pfile7-{i}" for i in range(1, 101)])
 
     # Create the archive
     with tarfile.open(archive_name, 'w:gz') as archive:
@@ -35,8 +34,7 @@ def remove_folders_and_files():
     """Deletes the specified directories and files."""
     items_to_delete = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
 
-    # Adding files withdeadlines-ontime-pfile15-1 to withdeadlines-ontime-pfile15-100
-    items_to_delete.extend([f"withdeadlines-ontime-pfile15-{i}" for i in range(1, 101)])
+    items_to_delete.extend([f"withdeadlines-ontime-pfile7-{i}" for i in range(1, 101)])
 
     for item in items_to_delete:
         if os.path.exists(item):
@@ -65,7 +63,7 @@ while True:
     csv_filename_better = "timesDispBetter.csv"
 
     # Base filename pattern
-    base_filename = "15-"
+    base_filename = "7-"
 
     base_command_common = ("./rewrite-no-lp --time-based-on-expansions-per-second 500 "
                            "--include-metareasoning-time --multiply-TILs-by 1 "
@@ -77,7 +75,7 @@ while True:
                            "--dispatch-frontier-size 10 --subtree-focus-threshold 0.025 "
                            "--dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning ")
 
-    base_command_end = (" DepotsTime.pddl withdeadlines-ontime-pfile15-")
+    base_command_end = (" DepotsTime.pddl withdeadlines-ontime-pfile7-")
 
 
     def invoke_gen_script():
@@ -102,19 +100,19 @@ while True:
     def run_dispscript():
         for i in range(1, EXPERIMENTS + 1):
             command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
-                i) + " > disp/15-" + str(i)
-            print(f"[{datetime.now()}] Running disp command for file 15-{i}...")
+                i) + " > disp/7-" + str(i)
+            print(f"[{datetime.now()}] Running disp command for file 7-{i}...")
             run_subprocess(command, i)
-            print(f"[{datetime.now()}] Finished disp command for file 15-{i}.")
+            print(f"[{datetime.now()}] Finished disp command for file 7-{i}.")
 
 
     # Function to run the nodispscript commands
     def run_nodispscript():
         for i in range(1, EXPERIMENTS + 1):
-            command = base_command_common + base_command_end + str(i) + " > nodisp/15-" + str(i)
-            print(f"[{datetime.now()}] Running nodisp command for file 15-{i}...")
+            command = base_command_common + base_command_end + str(i) + " > nodisp/7-" + str(i)
+            print(f"[{datetime.now()}] Running nodisp command for file 7-{i}...")
             run_subprocess(command, i)
-            print(f"[{datetime.now()}] Finished nodisp command for file 15-{i}.")
+            print(f"[{datetime.now()}] Finished nodisp command for file 7-{i}.")
 
 
     def run_subprocess(command, i):
