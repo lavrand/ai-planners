@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+
+$fn = shift(@ARGV);
+
+open IN, "< $fn";
+open OUT, "> ontime-$fn";
+
+while (<IN>) {
+
+  print OUT;
+
+  if (m/:init/) { last; }
+
+}
+
+while (<IN>) {
+  print OUT;
+  if (m/:goal/) { last; }
+
+  if (m/on crate([^ ]+)/) {
+    print OUT "\t(still-on-time crate$1)\n";
+  }
+}
+
+while (<IN>) {
+   print OUT;
+}
+
+close IN;
+close OUT;
+

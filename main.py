@@ -77,7 +77,7 @@ while True:
                            "--dispatch-frontier-size 10 --subtree-focus-threshold 0.025 "
                            "--dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning ")
 
-    base_command_end = (" driverlogTimed.pddl withdeadlines-ontime-pfile15-")
+    base_command_end = (" DepotsTime.pddl withdeadlines-ontime-pfile15-")
 
 
     def invoke_gen_script():
