@@ -13,7 +13,7 @@ if os.path.exists(output_file_name):
 # Write header to output file
 with open(output_file_name, "w", newline='') as csvfile:
     csv_writer = csv.writer(csvfile)
-    csv_writer.writerow(["experiment", "File", "disp", "nodisp"] + [f"deadline{i}" for i in range(1, 6)])
+    csv_writer.writerow(["experiment", "File", "disp", "nodisp"] + [f"deadline{i}" for i in range(1, 11)])
 
 def extract_deadlines(file_content):
     deadlines = []
