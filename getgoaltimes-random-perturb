@@ -1,15 +1,22 @@
 #!/usr/bin/perl -w
 
-if (scalar(@ARGV) != 4) {
-    print "Usage: getgoaltimes <ontime problem filename> <plan filename> <i> <random seed>\n";
+if (scalar(@ARGV) != 3) {
+    print "Usage: getgoaltimes <ontime problem filename> <plan filename> <random seed>\n";
     exit(1);
 }
 
-$valstring = "./validate -t 0.001 -v driverlogTimed.pddl";
+$domainfile = "DepotsTime.pddl";
+
+if (!(-e $domainfile)) {
+    print "$domainfile does not exist\n";
+    exit(2);
+}
+
+$valstring = "./validate -t 0.001 -v $domainfile";
 
 $problem = shift(@ARGV);
 $plan = shift(@ARGV);
-$i = shift(@ARGV) + 0;
+
 $seed = shift(@ARGV) + 0;
 
 # first, we open the problem, and skip to the goals
@@ -20,11 +27,11 @@ while (<PROBLEM>) {
     if (m/:goal/) { last; }
 }
 
-# ...then note what packages had goals, and assume these were true at time zero
+# ...then note what crates had goals, and assume these were true at time zero
 
 while (<PROBLEM>) {
-    if (m/\(at (package[^ ]+)/) {
-       $goalattime{$1} = 0; # goalattime is a hash map, the key is the package goal, the value is 0
+    if (m/\(on (crate[^ ]+)/) {
+       $goalattime{$1} = 0; # goalattime is a hash map, the key is the crate goal, the value is 0
     }
 }
 
@@ -40,15 +47,15 @@ while (<IN>) {
     if (m/Checking next happening \(time ([0-9\.]+)/) {
         $timenow = $1 + 0;
     }
-    # then, if we see that a package has arrived, make a note of when this was
-    if (m/Adding \(at (package[^ ]+)/) {
+    # then, if we see that a crate has arrived, make a note of when this was
+    if (m/Adding \(on (crate[^ ]+)/ && exists($goalattime{$1})) {
         $goalattime{$1} = $timenow;
     }
 }
 
 close IN;
 
-open OUT, "> withdeadlines-$problem-$i";
+open OUT, "> withdeadlines-$problem-$seed";
 open PROBLEM, "< $problem";
 
 # write everything up to the :init line to the output file
@@ -64,14 +71,14 @@ my @sortedkeys = sort @keyarray;
 srand($seed);
 
 # ...then write the deadlines
-foreach $package (@sortedkeys) {
-    $achievedat = $goalattime{$package};
+foreach $crate (@sortedkeys) {
+    $achievedat = $goalattime{$crate};
     if ($achievedat == 0) {
         print OUT "; The goal for $achievedat was achieved at time zero (in the initial state), so no deadline was generated\n";
     } else {
         $perturbment = rand(50) - 25;
         $achievedat = $achievedat + $perturbment; # add something between [-25,25) to the deadline
-        print OUT "(at $achievedat (not (still-on-time $package))) ; deadline on when $package got to its goal location\n"
+        print OUT "(at $achievedat (not (still-on-time $crate))) ; deadline on when $crate got to its goal location\n"
     }
 }
 
