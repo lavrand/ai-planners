@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
 # Load the data
-data = pd.read_csv('output_full.csv')
+data = pd.read_csv('output_full_norm.csv')
 
 # Separate the features and target variables
 X = data[['deadline1', 'deadline2', 'deadline3', 'deadline4', 'deadline5']]
