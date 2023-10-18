@@ -13,12 +13,12 @@ if os.path.exists(output_file_name):
 # Write header to output file
 with open(output_file_name, "w", newline='') as csvfile:
     csv_writer = csv.writer(csvfile)
-    csv_writer.writerow(["experiment", "File", "disp", "nodisp"] + [f"deadline{i}" for i in range(1, 9)])
+    csv_writer.writerow(["experiment", "File", "disp", "nodisp"] + [f"deadline{i}" for i in range(1, 6)])
 
 def extract_deadlines(file_content):
     deadlines = []
     for line in file_content.splitlines():
-        match = re.search(r'at (\d+\.\d+) \(not \(still-on-time package\d+\)\)', line)
+        match = re.search(r'at (\d+\.\d+) \(not \(still-on-time (package|crate)\d+\)\)', line)
         if match:
             deadlines.append(round(float(match.group(1)), 2))
     return deadlines
@@ -28,6 +28,7 @@ def process_tar_file(filepath, experiment_name):
     deadlines_dict = {}  # Holds extracted deadlines for each File
 
     with tarfile.open(filepath, "r:gz") as archive:
+        # First, let's extract all the deadlines
         for member in archive.getmembers():  # Use getmembers to ensure it's iterable
             if member.isreg():  # Ensure it's a regular file, not a folder
                 file_name = os.path.basename(member.name)
@@ -37,26 +38,26 @@ def process_tar_file(filepath, experiment_name):
                     with archive.extractfile(member) as f:
                         content = f.read().decode("utf-8")
                         deadlines = extract_deadlines(content)
-                        file_key = "-".join(file_name.split("-")[3:5])  # Extracting X-Y from pfileX-Y
+                        file_key = "-".join(file_name.split("-")[3:5])  # Extracting Y from pfileX-Y
                         deadlines_dict[file_key] = deadlines
 
-                # Process times.csv
-                elif member.name.endswith("times.csv"):
-                    with archive.extractfile(member) as f:
-                        file_content = f.read().decode("utf-8")
-                        csv_reader = csv.reader(file_content.splitlines())
-                        headers = next(csv_reader)  # Read the header row
+        # Now, process times.csv
+        for member in archive.getmembers():
+            if member.isreg() and member.name.endswith("times.csv"):
+                with archive.extractfile(member) as f:
+                    file_content = f.read().decode("utf-8")
+                    csv_reader = csv.reader(file_content.splitlines())
+                    headers = next(csv_reader)  # Read the header row
 
-                        if headers[:3] == ["File", "disp", "nodisp"]:
-                            for row in csv_reader:
-                                file_name, disp, nodisp = row
-                                file_key = file_name.split(" ")[0]  # Extracting X-Y from 7-1 format
-                                deadlines = deadlines_dict.get(file_key,
-                                                               [None] * 8)  # Fill with None if no deadlines exist
+                    if headers[:3] == ["File", "disp", "nodisp"]:
+                        for row in csv_reader:
+                            file_name, disp, nodisp = row
+                            file_key = file_name.split("-")[1]
+                            deadlines = deadlines_dict.get(file_key, [])
 
-                                with open(output_file_name, "a", newline='') as csvfile:
-                                    csv_writer = csv.writer(csvfile)
-                                    csv_writer.writerow([experiment_name, file_name, disp, nodisp] + deadlines)
+                            with open(output_file_name, "a", newline='') as csvfile:
+                                csv_writer = csv.writer(csvfile)
+                                csv_writer.writerow([experiment_name, file_name, disp, nodisp] + deadlines)
 
 
 # Start the traversal from specified directories
