@@ -13,11 +13,11 @@ if os.path.exists(output_file_name):
 # Write header to output file
 with open(output_file_name, "w", newline='') as csvfile:
     csv_writer = csv.writer(csvfile)
-    csv_writer.writerow(["File", "disp", "nodisp"])
+    csv_writer.writerow(["experiment", "File", "disp", "nodisp"])
 
 
 # Function to process tar.gz files
-def process_tar_file(filepath):
+def process_tar_file(filepath, experiment_name):
     with tarfile.open(filepath, "r:gz") as archive:
         for member in archive.getmembers():  # Use getmembers to ensure it's iterable
             if member.isreg():  # Ensure it's a regular file, not a folder
@@ -34,7 +34,7 @@ def process_tar_file(filepath):
                                 file_name, disp, nodisp = row
                                 with open(output_file_name, "a", newline='') as csvfile:
                                     csv_writer = csv.writer(csvfile)
-                                    csv_writer.writerow([file_name, disp, nodisp])
+                                    csv_writer.writerow([experiment_name, file_name, disp, nodisp])
                         else:
                             print(f"Unexpected columns in {member.name} within {filepath}")
 
@@ -46,7 +46,8 @@ for base in base_dirs:
         for file in files:
             match = re.match(r"(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.tar\.gz$", file)
             if match:
+                experiment_name = match.group(1)
                 full_file_path = os.path.join(root, file)
-                process_tar_file(full_file_path)
+                process_tar_file(full_file_path, experiment_name)
 
 print(f"Data has been written to {output_file_name}")
