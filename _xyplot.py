@@ -28,17 +28,26 @@ nodisp_times = [time if time not in [9999, 99999] else max_nodisp for time in no
 plt.figure(figsize=(10, 8))
 plt.scatter(disp_times, nodisp_times, color='blue', marker='o', alpha=0.5)
 
-# Settings for the plot
-plt.title("Disp vs NoDisp Times")
-plt.xlabel("Disp Time")
-plt.ylabel("NoDisp Time")
+# Plot the line y=x, setting the color to red and increasing the line width.
+max_limit = max(max_disp, max_nodisp)  # Ensuring the line spans the entire graph.
+plt.plot([0, max_limit], [0, max_limit], color='red', linewidth=2)
+
+# Settings for the plot with larger fonts.
+font_size = 14  # You can adjust the size to your preference.
+plt.title("Disp vs NoDisp Times", fontsize=font_size + 2)
+plt.xlabel("Disp Time", fontsize=font_size)
+plt.ylabel("NoDisp Time", fontsize=font_size)
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+# Increase tick label size
+plt.xticks(fontsize=font_size)
+plt.yticks(fontsize=font_size)
 
 # Set axes limits
 plt.xlim(0, max_disp)
 plt.ylim(0, max_nodisp)
 
-# Save plot to file
+# Save plot to file ensuring the layout is adjusted to include the bigger text.
 plt.tight_layout()
 plt.savefig("disp_vs_nodisp_plot.png")
 
