@@ -9,5 +9,8 @@ data = data[(data['disp'] != 9999) & (data['nodisp'] != 9999)]
 # Remove rows where 'disp' or 'nodisp' is greater than 100
 data = data[(data['disp'] <= 100) & (data['nodisp'] <= 100)]
 
+# Remove rows where 'disp' or 'nodisp' is less than 3
+data = data[(data['disp'] >= 3) & (data['nodisp'] >= 3)]
+
 # Save the cleaned data back to the CSV file
-data.to_csv('output_full_cleaned.csv', index=False)
+data.to_csv('output_full_norm.csv', index=False)
