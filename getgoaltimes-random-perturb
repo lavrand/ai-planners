@@ -68,7 +68,12 @@ my @keyarray = (keys %goalattime);
 
 my @sortedkeys = sort @keyarray;
 
-srand($seed);
+open my $fh, '<', '/dev/urandom' or die "Unable to open /dev/urandom: $!";
+read $fh, my $raw_seed, 4 or die "Unable to read from /dev/urandom: $!";
+close $fh;
+
+my $rseed = unpack 'L', $raw_seed; # 'L' is for a 32-bit unsigned integer
+srand($rseed);
 
 # ...then write the deadlines
 foreach $crate (@sortedkeys) {
