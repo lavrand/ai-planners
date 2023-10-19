@@ -76,8 +76,8 @@ foreach $crate (@sortedkeys) {
     if ($achievedat == 0) {
         print OUT "; The goal for $achievedat was achieved at time zero (in the initial state), so no deadline was generated\n";
     } else {
-        $perturbment = rand(50) - 25;
-        $achievedat = $achievedat + $perturbment; # add something between [-25,25) to the deadline
+        $perturbment = rand(100) - 50;
+        $achievedat = $achievedat + $perturbment; # add something between [-50,50) to the deadline
         print OUT "(at $achievedat (not (still-on-time $crate))) ; deadline on when $crate got to its goal location\n"
     }
 }
