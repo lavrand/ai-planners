@@ -1,6 +1,12 @@
 import csv
 import os
 
+NODISP_ROW = 3
+
+DISP_ROW = 2
+
+ROUND = 2
+
 # Load the data from output_full.csv
 data = []
 with open('output_full.csv', 'r') as f:
@@ -9,14 +15,14 @@ with open('output_full.csv', 'r') as f:
     data = list(csv_reader)
 
 # Process the data
-both_solved = [row for row in data if row[1] not in ['9999', '99999'] and row[2] not in ['9999', '99999']]
-disp_only = [row for row in data if row[1] not in ['9999', '99999'] and row[2] in ['9999', '99999']]
-nodisp_only = [row for row in data if row[1] in ['9999', '99999'] and row[2] not in ['9999', '99999']]
+both_solved = [row for row in data if row[DISP_ROW] not in ['9999', '99999'] and row[NODISP_ROW] not in ['9999', '99999']]
+disp_only = [row for row in data if row[DISP_ROW] not in ['9999', '99999'] and row[NODISP_ROW] in ['9999', '99999']]
+nodisp_only = [row for row in data if row[DISP_ROW] in ['9999', '99999'] and row[NODISP_ROW] not in ['9999', '99999']]
 
 
-avg_disp = round(sum(float(row[1]) for row in both_solved) / len(both_solved), 2)
-avg_nodisp = round(sum(float(row[2]) for row in both_solved) / len(both_solved), 2)
-avg_ratio = round(sum(float(row[1]) / float(row[2]) for row in both_solved) / len(both_solved), 2)
+avg_disp = round(sum(float(row[DISP_ROW]) for row in both_solved) / len(both_solved), ROUND)
+avg_nodisp = round(sum(float(row[NODISP_ROW]) for row in both_solved) / len(both_solved), ROUND)
+avg_ratio = round(sum(float(row[DISP_ROW]) / float(row[NODISP_ROW]) for row in both_solved) / len(both_solved), ROUND)
 
 
 # Determine the parent folder (two levels up)
