@@ -6,9 +6,11 @@ import re
 import csv
 import signal
 import shutil
+from _replace_deadlines import replace_deadlines
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
+FOREST_DEADLINES_ENABLED = True
 
 
 def create_archive():
@@ -89,6 +91,10 @@ while True:
         if result.returncode != 0:
             print(f"Error running the generation script! Exiting.")
             exit(1)
+
+        if FOREST_DEADLINES_ENABLED:
+            replace_deadlines()
+            print(f"Deadlines replaced successfully with random forest model prediction deadlines..")
 
         print(f"[{datetime.now()}] Finished running the generation script.")
 
