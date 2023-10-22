@@ -62,14 +62,15 @@ def process_tar_file(filepath, experiment_name):
                                 csv_writer.writerow([experiment_name, file_name, disp, nodisp] + deadlines)
 
 
-# Start the traversal from specified directories
-base_dirs = ["PC1", "PC2"]
-for base in base_dirs:
-    for root, dirs, files in os.walk(base):
-        for file in files:
-            match = re.match(r"(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.tar\.gz)$", file)
-            if match:
-                experiment_name = match.group(1).split(".")[0]  # Extract the experiment name from the filename
-                process_tar_file(os.path.join(root, file), experiment_name)
+# Specify the directory you want to traverse (root directory in this case)
+base_dir = "./"  # or specify a certain directory path: base_dir = "/path/to/directory"
+
+# Start the traversal from the root directory or a certain directory
+for root, dirs, files in os.walk(base_dir):
+    for file in files:
+        match = re.match(r"(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.tar\.gz)$", file)
+        if match:
+            experiment_name = match.group(1).split(".")[0]  # Extract the experiment name from the filename
+            process_tar_file(os.path.join(root, file), experiment_name)
 
 print(f"Data has been written to {output_file_name}")
