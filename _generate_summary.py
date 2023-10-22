@@ -26,7 +26,7 @@ avg_ratio = round(sum(float(row[DISP_ROW]) / float(row[NODISP_ROW]) for row in b
 
 
 # Determine the parent folder (two levels up)
-folder_name = os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath("output_full.csv"))))
+folder_name = os.path.basename(os.path.dirname(os.path.abspath("output_full.csv")))
 
 # Create the new CSV
 output_filename = "summary.csv"
