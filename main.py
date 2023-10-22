@@ -6,11 +6,17 @@ import re
 import csv
 import signal
 import shutil
+
+from _execute_command import execute_command
+from _execute_command_args import execute_command_args
 from _replace_deadlines import replace_deadlines
+
+DOMAIN = 'DepotsTime.pddl'
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
-FOREST_DEADLINES_ENABLED = True
+PFILEN = 10
+FOREST_DEADLINES_ENABLED = False
 
 
 def create_archive():
@@ -21,7 +27,7 @@ def create_archive():
     # List of directories and files to archive
     items_to_archive = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
 
-    items_to_archive.extend([f"withdeadlines-ontime-pfile7-{i}" for i in range(1, 101)])
+    items_to_archive.extend([f"withdeadlines-ontime-pfile{PFILEN}-{i}" for i in range(1, 101)])
 
     # Create the archive
     with tarfile.open(archive_name, 'w:gz') as archive:
@@ -36,7 +42,7 @@ def remove_folders_and_files():
     """Deletes the specified directories and files."""
     items_to_delete = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
 
-    items_to_delete.extend([f"withdeadlines-ontime-pfile7-{i}" for i in range(1, 101)])
+    items_to_delete.extend([f"withdeadlines-ontime-pfile{PFILEN}-{i}" for i in range(1, 101)])
 
     for item in items_to_delete:
         if os.path.exists(item):
@@ -65,7 +71,13 @@ while True:
     csv_filename_better = "timesDispBetter.csv"
 
     # Base filename pattern
-    base_filename = "7-"
+    base_filename = f"{PFILEN}-"
+
+    execute_command("./add_initially_on_time", f"pfile{PFILEN}")
+
+    execute_command("./run-planner-to-get-initial-plan", f"ontime-pfile{PFILEN}")
+
+    execute_command_args('./gen', [f'{PFILEN}', ('%s' % DOMAIN)])
 
     base_command_common = ("./rewrite-no-lp --time-based-on-expansions-per-second 500 "
                            "--include-metareasoning-time --multiply-TILs-by 1 "
@@ -77,7 +89,7 @@ while True:
                            "--dispatch-frontier-size 10 --subtree-focus-threshold 0.025 "
                            "--dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning ")
 
-    base_command_end = (" DepotsTime.pddl withdeadlines-ontime-pfile7-")
+    base_command_end = (f" %s withdeadlines-ontime-pfile{PFILEN}-" % DOMAIN)
 
 
     def invoke_gen_script():
@@ -106,19 +118,19 @@ while True:
     def run_dispscript():
         for i in range(1, EXPERIMENTS + 1):
             command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
-                i) + " > disp/7-" + str(i)
-            print(f"[{datetime.now()}] Running disp command for file 7-{i}...")
+                i) + f" > disp/{PFILEN}-" + str(i)
+            print(f"[{datetime.now()}] Running disp command for file {PFILEN}-{i}...")
             run_subprocess(command, i)
-            print(f"[{datetime.now()}] Finished disp command for file 7-{i}.")
+            print(f"[{datetime.now()}] Finished disp command for file {PFILEN}-{i}.")
 
 
     # Function to run the nodispscript commands
     def run_nodispscript():
         for i in range(1, EXPERIMENTS + 1):
-            command = base_command_common + base_command_end + str(i) + " > nodisp/7-" + str(i)
-            print(f"[{datetime.now()}] Running nodisp command for file 7-{i}...")
+            command = base_command_common + base_command_end + str(i) + f" > nodisp/{PFILEN}-" + str(i)
+            print(f"[{datetime.now()}] Running nodisp command for file {PFILEN}-{i}...")
             run_subprocess(command, i)
-            print(f"[{datetime.now()}] Finished nodisp command for file 7-{i}.")
+            print(f"[{datetime.now()}] Finished nodisp command for file {PFILEN}-{i}.")
 
 
     def run_subprocess(command, i):

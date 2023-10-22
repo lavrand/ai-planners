@@ -1,0 +1,41 @@
+;;;; Solution Found
+; Time 9.38
+; Discounted time: 2.760
+; Metareasoning time (not discounted): 3.89045
+; Dispatch metareasoning time (not discounted): 0
+; Peak memory 266564kb
+; Nodes Generated: 11443
+; Nodes Expanded:  1380
+; Nodes Evaluated: 11441
+; Nodes Tunneled:  0
+; Nodes memoised with open actions: 0
+; Nodes memoised without open actions: 21150
+; Nodes pruned by memoisation: 9707
+2.760: (drive truck0 depot1 depot0) [1.000] ; (0)
+2.760: (lift hoist0 crate1 pallet0 depot0) [1.000] ; (91)
+2.760: (lift hoist3 crate5 pallet3 distributor0) [1.000] ; (203)
+2.760: (lift hoist5 crate3 crate2 distributor2) [1.000] ; (252)
+2.760: (lift hoist2 crate4 pallet2 depot2) [1.000] ; (166)
+2.760: (lift hoist1 crate0 pallet1 depot1) [1.000] ; (126)
+3.761: (load hoist0 crate1 truck0 depot0) [72.000] ; (493)
+3.761: (load hoist2 crate4 truck1 depot2) [3.833] ; (526)
+7.594: (drive truck1 depot2 depot1) [1.500] ; (13)
+9.094: (load hoist1 crate0 truck1 depot1) [16.000] ; (510)
+25.094: (drive truck1 depot1 distributor2) [1.500] ; (53)
+75.761: (drive truck0 depot0 distributor0) [2.000] ; (30)
+77.761: (load hoist3 crate5 truck0 distributor0) [42.000] ; (533)
+119.761: (drive truck0 distributor0 distributor2) [1.000] ; (56)
+120.761: (load hoist5 crate3 truck0 distributor2) [4.000] ; (555)
+124.761: (drive truck0 distributor2 depot0) [2.333] ; (8)
+124.762: (lift hoist5 crate2 pallet5 distributor2) [1.000] ; (272)
+127.094: (unload hoist0 crate3 truck0 depot0) [16.000] ; (567)
+143.094: (drive truck0 depot0 distributor2) [2.333] ; (50)
+143.095: (drop hoist0 crate3 pallet0 depot0) [1.000] ; (309)
+145.427: (load hoist5 crate2 truck0 distributor2) [18.500] ; (554)
+163.927: (drive truck0 distributor2 distributor0) [2.000] ; (38)
+163.928: (unload hoist5 crate4 truck1 distributor2) [5.750] ; (634)
+165.927: (unload hoist3 crate2 truck0 distributor0) [74.000] ; (602)
+169.679: (drop hoist5 crate4 pallet5 distributor2) [1.000] ; (490)
+170.680: (unload hoist5 crate0 truck1 distributor2) [24.000] ; (630)
+194.681: (drop hoist5 crate0 crate4 distributor2) [1.000] ; (476)
+239.928: (drop hoist3 crate2 pallet3 distributor0) [1.000] ; (416)
