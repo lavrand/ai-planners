@@ -10,8 +10,8 @@ with open('output_full.csv', 'r') as f:
     data = list(csv_reader)
 
 # Extract disp and nodisp times, and set large values for '9999' and '99999'
-disp_times_raw = [float(row[1]) for row in data]
-nodisp_times_raw = [float(row[2]) for row in data]
+disp_times_raw = [float(row[2]) for row in data]
+nodisp_times_raw = [float(row[3]) for row in data]
 
 valid_disp_times = [time for time in disp_times_raw if time not in [9999, 99999]]
 valid_nodisp_times = [time for time in nodisp_times_raw if time not in [9999, 99999]]
