@@ -77,7 +77,7 @@ while True:
 
     execute_command("./run-planner-to-get-initial-plan", f"ontime-pfile{PFILEN}")
 
-    execute_command_args('./gen', [f'{PFILEN}', ('%s' % DOMAIN)])
+    execute_command_args('./gen', [('%s' % PFILEN), ('%s' % DOMAIN)])
 
     base_command_common = ("./rewrite-no-lp --time-based-on-expansions-per-second 500 "
                            "--include-metareasoning-time --multiply-TILs-by 1 "
@@ -92,26 +92,26 @@ while True:
     base_command_end = (f" %s withdeadlines-ontime-pfile{PFILEN}-" % DOMAIN)
 
 
-    def invoke_gen_script():
-        # The command to invoke the generic script
-        gen_script_command = "./gen"
-
-        print(f"[{datetime.now()}] Running the generation script...")
-
-        result = subprocess.run(gen_script_command, shell=True, check=True)
-
-        if result.returncode != 0:
-            print(f"Error running the generation script! Exiting.")
-            exit(1)
-
-        if FOREST_DEADLINES_ENABLED:
-            replace_deadlines()
-            print(f"Deadlines replaced successfully with random forest model prediction deadlines..")
-
-        print(f"[{datetime.now()}] Finished running the generation script.")
-
-
-    invoke_gen_script()
+    # def invoke_gen_script():
+    #     # The command to invoke the generic script
+    #     gen_script_command = "./gen"
+    #
+    #     print(f"[{datetime.now()}] Running the generation script...")
+    #
+    #     result = subprocess.run(gen_script_command, shell=True, check=True)
+    #
+    #     if result.returncode != 0:
+    #         print(f"Error running the generation script! Exiting.")
+    #         exit(1)
+    #
+    #     if FOREST_DEADLINES_ENABLED:
+    #         replace_deadlines()
+    #         print(f"Deadlines replaced successfully with random forest model prediction deadlines..")
+    #
+    #     print(f"[{datetime.now()}] Finished running the generation script.")
+    #
+    #
+    # invoke_gen_script()
 
 
     # Function to run the dispscript commands
