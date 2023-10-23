@@ -396,8 +396,8 @@
 	(= (time-to-drive s3 s11) 5)
 )
 	(:goal (and
-;		(at driver3 s8); commented out
-;		(at truck3 s8); commented out
+	;	(at driver3 s8); commented out
+	;	(at truck3 s8); commented out
 	(at package1 s2)
 	(at package2 s5)
 	(at package3 s1)

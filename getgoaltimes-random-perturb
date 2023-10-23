@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
 
-if (scalar(@ARGV) != 3) {
-    print "Usage: getgoaltimes <ontime problem filename> <plan filename> <random seed>\n";
+if (scalar(@ARGV) != 4) {
+    print "Usage: getgoaltimes <domainfile> <ontime problem filename> <plan filename>  <random seed>\n";
     exit(1);
 }
 
-$domainfile = "DepotsTime.pddl";
+$domainfile = shift(@ARGV);
 
 if (!(-e $domainfile)) {
     print "$domainfile does not exist\n";

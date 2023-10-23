@@ -11,11 +11,11 @@ from _execute_command import execute_command
 from _execute_command_args import execute_command_args
 from _replace_deadlines import replace_deadlines
 
-DOMAIN = 'DepotsTime.pddl'
+DOMAIN = 'driverlogTimed.pddl'
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
-PFILEN = 10
+PFILEN = 15
 FOREST_DEADLINES_ENABLED = False
 
 
@@ -75,7 +75,7 @@ while True:
 
     execute_command("./add_initially_on_time", f"pfile{PFILEN}")
 
-    execute_command("./run-planner-to-get-initial-plan", f"ontime-pfile{PFILEN}")
+    execute_command_args("./run-planner-to-get-initial-plan", [('%s' % DOMAIN), f"ontime-pfile{PFILEN}"])
 
     execute_command_args('./gen', [('%s' % PFILEN), ('%s' % DOMAIN)])
 

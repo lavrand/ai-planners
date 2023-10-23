@@ -17,14 +17,31 @@ while (<IN>) {
   print OUT;
   if (m/:goal/) { last; }
 
-  if (m/on crate([^ ]+)/) {
-    print OUT "\t(still-on-time crate$1)\n";
+  # 1. driverLog
+  if (m/at package([^ ]+)/) {
+    print OUT "\t(still-on-time package$1)\n";
+  }
+
+  # 2. Depots
+  #if (m/on crate([^ ]+)/) {
+  #  print OUT "\t(still-on-time crate$1)\n";
+  #}
+}
+
+# 1. driverLog
+while (<IN>) {
+  if (m/at driver/ || m/at truck/) {
+    chomp;
+    print OUT "\t;$_; commented out\n";
+  } else {
+    print OUT;
   }
 }
 
-while (<IN>) {
-   print OUT;
-}
+# 2. Depots
+# while (<IN>) {
+#    print OUT;
+# }
 
 close IN;
 close OUT;

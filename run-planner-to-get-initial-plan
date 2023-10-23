@@ -1,8 +1,13 @@
 #!/usr/bin/perl -w
 
+if (scalar(@ARGV) != 2) {
+    print "Usage: run-planner-to-get-initial-plan <domainfile> <ontime problem filename>\n";
+    exit(1);
+}
+$domainfile = shift(@ARGV);
 $problem = shift(@ARGV);
 
-$cmdstring = "./rewrite-no-lp --time-based-on-expansions-per-second 500 --include-metareasoning-time --multiply-TILs-by 1 --real-to-plan-time-multiplier 1 --calculate-Q-interval 100  --add-weighted-f-value-to-Q -0.000001 --min-probability-failure 0.001 --slack-from-heuristic --forbid-self-overlapping-actions --deadline-aware-open-list IJCAI --ijcai-gamma 1 --ijcai-t_u 100 --icaps-for-n-expansions 100 --time-aware-heuristic 1 DepotsTime.pddl $problem";
+$cmdstring = "./rewrite-no-lp --time-based-on-expansions-per-second 500 --include-metareasoning-time --multiply-TILs-by 1 --real-to-plan-time-multiplier 1 --calculate-Q-interval 100  --add-weighted-f-value-to-Q -0.000001 --min-probability-failure 0.001 --slack-from-heuristic --forbid-self-overlapping-actions --deadline-aware-open-list IJCAI --ijcai-gamma 1 --ijcai-t_u 100 --icaps-for-n-expansions 100 --time-aware-heuristic 1 $domainfile $problem";
 
 open IN, "$cmdstring |";
 
