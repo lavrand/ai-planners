@@ -6,6 +6,8 @@ import re
 import csv
 import signal
 import shutil
+import multiprocessing
+from functools import partial
 
 from _execute_command import execute_command
 from _execute_command_args import execute_command_args
@@ -21,6 +23,8 @@ PFILEN = 10
 PFILE = f"pfile{PFILEN}"
 FOREST_DEADLINES_ENABLED = False
 
+# Flag to enable or disable parallel processing
+ENABLE_PARALLEL = True
 
 def create_archive():
     """Archives specified directories and files."""
@@ -96,22 +100,19 @@ while True:
 
 
     # Function to run the dispscript commands
-    def run_dispscript():
-        for i in range(1, EXPERIMENTS + 1):
-            command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
-                i) + f" > disp/{PFILEN}-" + str(i)
-            print(f"[{datetime.now()}] Running disp command for file {PFILEN}-{i}...")
-            run_subprocess(command, i)
-            print(f"[{datetime.now()}] Finished disp command for file {PFILEN}-{i}.")
+    def run_dispscript(i):
+        command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
+            i) + f" > disp/{PFILEN}-" + str(i)
+        print(f"[{datetime.now()}] Running disp command for file {PFILEN}-{i}...")
+        run_subprocess(command, i)
+        print(f"[{datetime.now()}] Finished disp command for file {PFILEN}-{i}.")
 
 
-    # Function to run the nodispscript commands
-    def run_nodispscript():
-        for i in range(1, EXPERIMENTS + 1):
-            command = base_command_common + base_command_end + str(i) + f" > nodisp/{PFILEN}-" + str(i)
-            print(f"[{datetime.now()}] Running nodisp command for file {PFILEN}-{i}...")
-            run_subprocess(command, i)
-            print(f"[{datetime.now()}] Finished nodisp command for file {PFILEN}-{i}.")
+    def run_nodispscript(i):
+        command = base_command_common + base_command_end + str(i) + f" > nodisp/{PFILEN}-" + str(i)
+        print(f"[{datetime.now()}] Running nodisp command for file {PFILEN}-{i}...")
+        run_subprocess(command, i)
+        print(f"[{datetime.now()}] Finished nodisp command for file {PFILEN}-{i}.")
 
 
     def run_subprocess(command, i):
@@ -139,11 +140,19 @@ while True:
         # Return stdout, stderr, and returncode
         return stdout, stderr, process.returncode
 
+    # Define the number of processes to spawn. Ideally, this is the number of cores available.
+    num_processes = multiprocessing.cpu_count() if ENABLE_PARALLEL else 1
 
     # Execute the scripts
-    run_dispscript()
-    run_nodispscript()
-
+    if ENABLE_PARALLEL:
+        with multiprocessing.Pool(processes=num_processes) as pool:
+            pool.map(run_dispscript, range(1, EXPERIMENTS + 1))  # This will distribute the list of indexes to the available processes
+            pool.map(run_nodispscript, range(1, EXPERIMENTS + 1))
+    else:
+        # Non-parallel execution as fallback
+        for i in range(1, EXPERIMENTS + 1):
+            run_dispscript(i)
+            run_nodispscript(i)
 
     # Extract time from the line
     def extract_time(line):
