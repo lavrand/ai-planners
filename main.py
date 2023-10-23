@@ -11,11 +11,11 @@ from _execute_command import execute_command
 from _execute_command_args import execute_command_args
 from _replace_deadlines import replace_deadlines
 
-DOMAIN = 'driverlogTimed.pddl'
+DOMAIN = 'zenotravelTandN.pddl'
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
-PFILEN = 15
+PFILEN = 12
 FOREST_DEADLINES_ENABLED = False
 
 
