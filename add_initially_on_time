@@ -18,30 +18,40 @@ while (<IN>) {
   if (m/:goal/) { last; }
 
   # 1. driverLog
-  if (m/at package([^ ]+)/) {
-    print OUT "\t(still-on-time package$1)\n";
-  }
+  #if (m/at package([^ ]+)/) {
+  #  print OUT "\t(still-on-time package$1)\n";
+  #}
 
   # 2. Depots
   #if (m/on crate([^ ]+)/) {
   #  print OUT "\t(still-on-time crate$1)\n";
   #}
+  
+  # 3. zenoTravel
+  if (m/at plane([^ ]+)/) {
+    print OUT "\t(still-on-time plane$1)\n";
+  }
 }
 
 # 1. driverLog
-while (<IN>) {
-  if (m/at driver/ || m/at truck/) {
-    chomp;
-    print OUT "\t;$_; commented out\n";
-  } else {
-    print OUT;
-  }
-}
+#while (<IN>) {
+#  if (m/at driver/ || m/at truck/) {
+#    chomp;
+#    print OUT "\t;$_; commented out\n";
+#  } else {
+#    print OUT;
+#  }
+#}
 
 # 2. Depots
 # while (<IN>) {
 #    print OUT;
 # }
+
+# 3. ZenoTravel
+ while (<IN>) {
+    print OUT;
+ }
 
 close IN;
 close OUT;

@@ -27,11 +27,11 @@ while (<PROBLEM>) {
     if (m/:goal/) { last; }
 }
 
-# ...then note what crates had goals, and assume these were true at time zero
+# ...then note what deadline Flag object had goals, and assume these were true at time zero
 
 while (<PROBLEM>) {
-    if (m/\(on (crate[^ ]+)/) {
-       $goalattime{$1} = 0; # goalattime is a hash map, the key is the crate goal, the value is 0
+    if (m/\(at (person[^ ]+)/) {
+       $goalattime{$1} = 0; # goalattime is a hash map, the key is the deadline Flag object goal, the value is 0
     }
 }
 
@@ -47,8 +47,8 @@ while (<IN>) {
     if (m/Checking next happening \(time ([0-9\.]+)/) {
         $timenow = $1 + 0;
     }
-    # then, if we see that a crate has arrived, make a note of when this was
-    if (m/Adding \(on (crate[^ ]+)/ && exists($goalattime{$1})) {
+    # then, if we see that a deadline Flag object has arrived, make a note of when this was
+    if (m/Adding \(at (person[^ ]+)/ && exists($goalattime{$1})) {
         $goalattime{$1} = $timenow;
     }
 }
@@ -76,14 +76,14 @@ my $rseed = unpack 'L', $raw_seed; # 'L' is for a 32-bit unsigned integer
 srand($rseed);
 
 # ...then write the deadlines
-foreach $crate (@sortedkeys) {
-    $achievedat = $goalattime{$crate};
+foreach $flag (@sortedkeys) {
+    $achievedat = $goalattime{$flag};
     if ($achievedat == 0) {
         print OUT "; The goal for $achievedat was achieved at time zero (in the initial state), so no deadline was generated\n";
     } else {
         $perturbment = rand(100) - 50;
         $achievedat = $achievedat + $perturbment; # add something between [-50,50) to the deadline
-        print OUT "(at $achievedat (not (still-on-time $crate))) ; deadline on when $crate got to its goal location\n"
+        print OUT "(at $achievedat (not (still-on-time $flag))) ; deadline on when $flag got to its goal location\n"
     }
 }
 
