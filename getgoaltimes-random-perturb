@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
-if (scalar(@ARGV) != 4) {
-    print "Usage: getgoaltimes <domainfile> <ontime problem filename> <plan filename>  <random seed>\n";
+if (scalar(@ARGV) != 6) {
+    print "Usage: getgoaltimes <domainfile> <ontime problem filename> <plan filename> <random seed> <at> <object>\n";
     exit(1);
 }
 
@@ -16,8 +16,9 @@ $valstring = "./validate -t 0.001 -v $domainfile";
 
 $problem = shift(@ARGV);
 $plan = shift(@ARGV);
-
 $seed = shift(@ARGV) + 0;
+$at = shift(@ARGV);
+$object = shift(@ARGV);
 
 # first, we open the problem, and skip to the goals
 
@@ -30,7 +31,7 @@ while (<PROBLEM>) {
 # ...then note what deadline Flag object had goals, and assume these were true at time zero
 
 while (<PROBLEM>) {
-    if (m/\(at (person[^ ]+)/) {
+    if (m/\($at ($object[^ ]+)/) {
        $goalattime{$1} = 0; # goalattime is a hash map, the key is the deadline Flag object goal, the value is 0
     }
 }
@@ -48,7 +49,7 @@ while (<IN>) {
         $timenow = $1 + 0;
     }
     # then, if we see that a deadline Flag object has arrived, make a note of when this was
-    if (m/Adding \(at (person[^ ]+)/ && exists($goalattime{$1})) {
+    if (m/Adding \($at ($object[^ ]+)/ && exists($goalattime{$1})) {
         $goalattime{$1} = $timenow;
     }
 }

@@ -11,11 +11,14 @@ from _execute_command import execute_command
 from _execute_command_args import execute_command_args
 from _replace_deadlines import replace_deadlines
 
-DOMAIN = 'zenotravelTandN.pddl'
+DOMAIN = 'DepotsTime.pddl'
+AT = 'on'
+OBJECT = 'crate'
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
-PFILEN = 12
+PFILEN = 10
+PFILE = f"pfile{PFILEN}"
 FOREST_DEADLINES_ENABLED = False
 
 
@@ -73,11 +76,11 @@ while True:
     # Base filename pattern
     base_filename = f"{PFILEN}-"
 
-    execute_command("./add_initially_on_time", f"pfile{PFILEN}")
+    execute_command_args("./add_initially_on_time", [('%s' % PFILE), ('%s' % AT), ('%s' % OBJECT)])
 
-    execute_command_args("./run-planner-to-get-initial-plan", [('%s' % DOMAIN), f"ontime-pfile{PFILEN}"])
+    execute_command_args("./run-planner-to-get-initial-plan", [('%s' % DOMAIN), f"ontime-pfile{PFILE}"])
 
-    execute_command_args('./gen', [('%s' % PFILEN), ('%s' % DOMAIN)])
+    execute_command_args('./gen', [('%s' % PFILEN), ('%s' % DOMAIN), ('%s' % AT), ('%s' % OBJECT)])
 
     base_command_common = ("./rewrite-no-lp --time-based-on-expansions-per-second 500 "
                            "--include-metareasoning-time --multiply-TILs-by 1 "
@@ -90,28 +93,6 @@ while True:
                            "--dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning ")
 
     base_command_end = (f" %s withdeadlines-ontime-pfile{PFILEN}-" % DOMAIN)
-
-
-    # def invoke_gen_script():
-    #     # The command to invoke the generic script
-    #     gen_script_command = "./gen"
-    #
-    #     print(f"[{datetime.now()}] Running the generation script...")
-    #
-    #     result = subprocess.run(gen_script_command, shell=True, check=True)
-    #
-    #     if result.returncode != 0:
-    #         print(f"Error running the generation script! Exiting.")
-    #         exit(1)
-    #
-    #     if FOREST_DEADLINES_ENABLED:
-    #         replace_deadlines()
-    #         print(f"Deadlines replaced successfully with random forest model prediction deadlines..")
-    #
-    #     print(f"[{datetime.now()}] Finished running the generation script.")
-    #
-    #
-    # invoke_gen_script()
 
 
     # Function to run the dispscript commands

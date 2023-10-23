@@ -1,12 +1,14 @@
 #!/usr/bin/perl -w
 
-if (scalar(@ARGV) != 2) {
-    print "Usage: gen <problem number> <domain filename> \n";
+if (scalar(@ARGV) != 4) {
+    print "Usage: gen <problem number> <domain filename> <at> <object>\n";
     exit(1);
 }
 
 $pnumber = shift(@ARGV);
 $domain = shift(@ARGV);
+$at = shift(@ARGV);
+$object = shift(@ARGV);
 
 open DISP, "> dispscript";
 open NODISP, "> nodispscript";
@@ -15,7 +17,7 @@ print DISP "#!/bin/bash\nulimit -t 60\n";
 print NODISP "#!/bin/bash\nulimit -t 60\n";
 
 for ($i = 1; $i <= 100; $i++) {
-   system("./getgoaltimes-random-perturb $domain ontime-pfile$pnumber 500plan-ontime-pfile$pnumber $i");
+   system("./getgoaltimes-random-perturb $domain ontime-pfile$pnumber 500plan-ontime-pfile$pnumber $i $at $object");
    print DISP "./rewrite-no-lp --time-based-on-expansions-per-second 500 --include-metareasoning-time --multiply-TILs-by 1 --real-to-plan-time-multiplier 1 --calculate-Q-interval 100  --add-weighted-f-value-to-Q -0.000001 --min-probability-failure 0.001 --slack-from-heuristic --forbid-self-overlapping-actions --deadline-aware-open-list IJCAI --ijcai-gamma 1 --ijcai-t_u 100 --icaps-for-n-expansions 100 --use-dispatcher LPFThreshold --time-aware-heuristic 1 --dispatch-frontier-size 10 --subtree-focus-threshold 0.025 --dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning $domain withdeadlines-ontime-pfile$pnumber-$i > disp/$pnumber-$i\n";
    print NODISP "./rewrite-no-lp --time-based-on-expansions-per-second 500 --include-metareasoning-time --multiply-TILs-by 1 --real-to-plan-time-multiplier 1 --calculate-Q-interval 100  --add-weighted-f-value-to-Q -0.000001 --min-probability-failure 0.001 --slack-from-heuristic --forbid-self-overlapping-actions --deadline-aware-open-list IJCAI --ijcai-gamma 1 --ijcai-t_u 100 --icaps-for-n-expansions 100 --time-aware-heuristic 1 --dispatch-frontier-size 10 --subtree-focus-threshold 0.025 --dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning $domain withdeadlines-ontime-pfile$pnumber-$i > nodisp/$pnumber-$i\n";
 }

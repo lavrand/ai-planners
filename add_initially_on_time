@@ -1,6 +1,13 @@
 #!/usr/bin/perl -w
 
+if (scalar(@ARGV) != 3) {
+    print "Usage: add_initially_on_time <domainfile> <at> <object>\n";
+    exit(1);
+}
+
 $fn = shift(@ARGV);
+$at = shift(@ARGV);
+$object = shift(@ARGV);
 
 open IN, "< $fn";
 open OUT, "> ontime-$fn";
@@ -23,14 +30,14 @@ while (<IN>) {
   #}
 
   # 2. Depots
-  #if (m/on crate([^ ]+)/) {
-  #  print OUT "\t(still-on-time crate$1)\n";
-  #}
+  if (m/$at $object([^ ]+)/) {
+   print OUT "\t(still-on-time $object$1)\n";
+  }
   
   # 3. zenoTravel
-  if (m/at plane([^ ]+)/) {
-    print OUT "\t(still-on-time plane$1)\n";
-  }
+  # if (m/at plane([^ ]+)/) {
+  #   print OUT "\t(still-on-time plane$1)\n";
+  # }
 }
 
 # 1. driverLog
@@ -44,14 +51,14 @@ while (<IN>) {
 #}
 
 # 2. Depots
-# while (<IN>) {
-#    print OUT;
-# }
+while (<IN>) {
+   print OUT;
+}
 
 # 3. ZenoTravel
- while (<IN>) {
-    print OUT;
- }
+#  while (<IN>) {
+#     print OUT;
+#  }
 
 close IN;
 close OUT;
