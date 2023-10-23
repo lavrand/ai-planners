@@ -35,13 +35,13 @@ def process_file(file_path, new_values):
     with open(file_path, 'w') as file:
         file.writelines(new_file_lines)
 
-def replace_deadlines():
+def replace_deadlines(pfile_n=None):
     csv_file = 'top_100_predicted_nodisp_disp.csv'
     replacement_values_list = get_replacement_values(csv_file)
 
     # Process each file with its corresponding replacement values
     for i, new_values in enumerate(replacement_values_list, start=1):
-        file_name = f'withdeadlines-ontime-pfile7-{i}'
+        file_name = f'withdeadlines-ontime-pfile{pfile_n}-{i}'
         try:
             process_file(file_name, new_values)
             print(f'Processed {file_name}')
@@ -49,4 +49,4 @@ def replace_deadlines():
             print(f'Could not process {file_name}: {e}')
 
 if __name__ == "__main__":
-    replace_deadlines()
+    replace_deadlines(7)

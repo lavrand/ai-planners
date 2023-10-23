@@ -19,8 +19,8 @@ OBJECT = 'crate'
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
-PFILEN = 10
-PFILE = f"pfile{PFILEN}"
+PFILE_N = 10
+PFILE = f"pfile{PFILE_N}"
 FOREST_DEADLINES_ENABLED = False
 
 # Flag to enable or disable parallel processing
@@ -34,7 +34,7 @@ def create_archive():
     # List of directories and files to archive
     items_to_archive = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
 
-    items_to_archive.extend([f"withdeadlines-ontime-pfile{PFILEN}-{i}" for i in range(1, 101)])
+    items_to_archive.extend([f"withdeadlines-ontime-pfile{PFILE_N}-{i}" for i in range(1, 101)])
 
     # Create the archive
     with tarfile.open(archive_name, 'w:gz') as archive:
@@ -49,7 +49,7 @@ def remove_folders_and_files():
     """Deletes the specified directories and files."""
     items_to_delete = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
 
-    items_to_delete.extend([f"withdeadlines-ontime-pfile{PFILEN}-{i}" for i in range(1, 101)])
+    items_to_delete.extend([f"withdeadlines-ontime-pfile{PFILE_N}-{i}" for i in range(1, 101)])
 
     for item in items_to_delete:
         if os.path.exists(item):
@@ -78,13 +78,19 @@ while True:
     csv_filename_better = "timesDispBetter.csv"
 
     # Base filename pattern
-    base_filename = f"{PFILEN}-"
+    base_filename = f"{PFILE_N}-"
 
     execute_command_args("./add_initially_on_time", [('%s' % PFILE), ('%s' % AT), ('%s' % OBJECT)])
 
-    execute_command_args("./run-planner-to-get-initial-plan", [('%s' % DOMAIN), f"ontime-pfile{PFILEN}"])
+    execute_command_args("./run-planner-to-get-initial-plan", [('%s' % DOMAIN), f"ontime-pfile{PFILE_N}"])
 
-    execute_command_args('./gen', [('%s' % PFILEN), ('%s' % DOMAIN), ('%s' % AT), ('%s' % OBJECT)])
+    execute_command_args('./gen', [('%s' % PFILE_N), ('%s' % DOMAIN), ('%s' % AT), ('%s' % OBJECT)])
+
+    if FOREST_DEADLINES_ENABLED:
+        replace_deadlines(PFILE_N)
+        print(f"Deadlines replaced successfully with random forest model prediction deadlines..")
+
+    print(f"[{datetime.now()}] Finished running the generation script.")
 
     base_command_common = ("./rewrite-no-lp --time-based-on-expansions-per-second 500 "
                            "--include-metareasoning-time --multiply-TILs-by 1 "
@@ -96,23 +102,23 @@ while True:
                            "--dispatch-frontier-size 10 --subtree-focus-threshold 0.025 "
                            "--dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning ")
 
-    base_command_end = (f" %s withdeadlines-ontime-pfile{PFILEN}-" % DOMAIN)
+    base_command_end = (f" %s withdeadlines-ontime-pfile{PFILE_N}-" % DOMAIN)
 
 
     # Function to run the dispscript commands
     def run_dispscript(i):
         command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
-            i) + f" > disp/{PFILEN}-" + str(i)
-        print(f"[{datetime.now()}] Running disp command for file {PFILEN}-{i}...")
+            i) + f" > disp/{PFILE_N}-" + str(i)
+        print(f"[{datetime.now()}] Running disp command for file {PFILE_N}-{i}...")
         run_subprocess(command, i)
-        print(f"[{datetime.now()}] Finished disp command for file {PFILEN}-{i}.")
+        print(f"[{datetime.now()}] Finished disp command for file {PFILE_N}-{i}.")
 
 
     def run_nodispscript(i):
-        command = base_command_common + base_command_end + str(i) + f" > nodisp/{PFILEN}-" + str(i)
-        print(f"[{datetime.now()}] Running nodisp command for file {PFILEN}-{i}...")
+        command = base_command_common + base_command_end + str(i) + f" > nodisp/{PFILE_N}-" + str(i)
+        print(f"[{datetime.now()}] Running nodisp command for file {PFILE_N}-{i}...")
         run_subprocess(command, i)
-        print(f"[{datetime.now()}] Finished nodisp command for file {PFILEN}-{i}.")
+        print(f"[{datetime.now()}] Finished nodisp command for file {PFILE_N}-{i}.")
 
 
     def run_subprocess(command, i):
