@@ -82,7 +82,7 @@ while True:
 
     execute_command_args("./add_initially_on_time", [('%s' % PFILE), ('%s' % AT), ('%s' % OBJECT)])
 
-    execute_command_args("./run-planner-to-get-initial-plan", [('%s' % DOMAIN), f"ontime-pfile{PFILE}"])
+    execute_command_args("./run-planner-to-get-initial-plan", [('%s' % DOMAIN), f"ontime-pfile{PFILEN}"])
 
     execute_command_args('./gen', [('%s' % PFILEN), ('%s' % DOMAIN), ('%s' % AT), ('%s' % OBJECT)])
 
