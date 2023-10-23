@@ -31,23 +31,30 @@ FOREST_DEADLINES_ENABLED = True
 # Flag to enable or disable parallel processing
 ENABLE_PARALLEL = True
 
-def create_archive():
-    """Archives specified directories and files."""
+def create_archive(current_pfile_n):
+    """Archives specified directories and files into a folder specific to the current PFILE_N."""
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     archive_name = f"{timestamp}.tar.gz"
 
+    # Define the directory based on the current PFILE_N
+    archive_dir = f"archive_pfile_{current_pfile_n}"
+    if not os.path.exists(archive_dir):
+        os.makedirs(archive_dir)  # Create directory if it doesn't exist
+
+    # Full path for the archive file
+    archive_path = os.path.join(archive_dir, archive_name)
+
     # List of directories and files to archive
     items_to_archive = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
-
-    items_to_archive.extend([f"withdeadlines-ontime-pfile{PFILE_N}-{i}" for i in range(1, 101)])
+    items_to_archive.extend([f"withdeadlines-ontime-pfile{current_pfile_n}-{i}" for i in range(1, 101)])
 
     # Create the archive
-    with tarfile.open(archive_name, 'w:gz') as archive:
+    with tarfile.open(archive_path, 'w:gz') as archive:
         for item in items_to_archive:
             if os.path.exists(item):  # Check if the item exists before adding
                 archive.add(item)
 
-    print(f"[{datetime.now()}] Created archive: {archive_name}")
+    print(f"[{datetime.now()}] Created archive: {archive_path}")
 
 
 def remove_folders_and_files():
@@ -255,8 +262,9 @@ while True:
 
         print(f"[{datetime.now()}] Finished current set of experiments. Starting archiving...")
 
-        # Once the script finishes its run
-        create_archive()
+        # Call the modified function with the current PFILE_N
+        create_archive(PFILE_N)
+
         print(f"[{datetime.now()}] Finished archiving.")
 
         print(f"[{datetime.now()}] Starting removing cache folder and files.")
