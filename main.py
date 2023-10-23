@@ -142,6 +142,8 @@ while True:
 
     # Define the number of processes to spawn. Ideally, this is the number of cores available.
     num_processes = multiprocessing.cpu_count() if ENABLE_PARALLEL else 1
+    # Log the number of processes
+    print(f"[{datetime.now()}] Running with {num_processes} parallel processes.")
 
     # Execute the scripts
     if ENABLE_PARALLEL:
