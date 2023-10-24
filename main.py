@@ -106,6 +106,34 @@ while True:
                 ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}'])
             ]
 
+            # TODO rewrite Perl to Python or fix invocation of Perl from Python with timeout
+
+            def run_subprocess(command, i, timeout=60, is_out_checked=True):
+                stdout, stderr = None, None  # Initialize these to avoid UnboundLocalError
+
+                # Start the process in a new session
+                process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                           preexec_fn=os.setsid)
+                try:
+                    # communicate() waits for the process to complete or for the timeout to expire
+                    stdout, stderr = process.communicate(timeout=PLAN_SEARCH_TIMEOUT_SECONDS)
+                except subprocess.TimeoutExpired:
+                    # If the timeout expires, kill the entire process group
+                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # try to terminate the process group gracefully
+                    process.wait(timeout=timeout)  # give it 60 seconds to terminate gracefully
+                    if process.poll() is None:  # if the process is still running after 10 seconds
+                        os.killpg(os.getpgid(process.pid), signal.SIGKILL)  # forcibly kill the process group
+                    print(f"Command #{i} took longer than timeout seconds and was killed!")
+                else:
+                    if is_out_checked:
+                        if process.returncode != 0:
+                            print(f"Command #{i} failed!")
+                        else:
+                            print(f"Command #{i} completed successfully!")
+
+                # Return stdout, stderr, and returncode
+                return stdout, stderr, process.returncode
+
             def run_subprocess_args(command, args):
                 """
                 Run a command with arguments and handle exceptions.
@@ -118,7 +146,7 @@ while True:
                 cmd = [command] + args
 
                 try:
-                    run_subprocess(cmd, cmd)
+                    run_subprocess(cmd, cmd, 120, False)
                     # Execute the command with arguments, and wait for it to complete.
                     # result = subprocess.run(cmd, check=True, text=True, capture_output=True)
                     #
@@ -180,30 +208,7 @@ while True:
 
 
 
-            def run_subprocess(command, i):
-                stdout, stderr = None, None  # Initialize these to avoid UnboundLocalError
 
-                # Start the process in a new session
-                process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                           preexec_fn=os.setsid)
-                try:
-                    # communicate() waits for the process to complete or for the timeout to expire
-                    stdout, stderr = process.communicate(timeout=PLAN_SEARCH_TIMEOUT_SECONDS)
-                except subprocess.TimeoutExpired:
-                    # If the timeout expires, kill the entire process group
-                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # try to terminate the process group gracefully
-                    process.wait(timeout=60)  # give it 60 seconds to terminate gracefully
-                    if process.poll() is None:  # if the process is still running after 10 seconds
-                        os.killpg(os.getpgid(process.pid), signal.SIGKILL)  # forcibly kill the process group
-                    print(f"Command #{i} took longer than timeout seconds and was killed!")
-                else:
-                    if process.returncode != 0:
-                        print(f"Command #{i} failed!")
-                    else:
-                        print(f"Command #{i} completed successfully!")
-
-                # Return stdout, stderr, and returncode
-                return stdout, stderr, process.returncode
 
             # Define the number of processes to spawn. Ideally, this is the number of cores available.
             num_processes = multiprocessing.cpu_count() if ENABLE_PARALLEL else 1
