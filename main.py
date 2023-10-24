@@ -19,14 +19,14 @@ OBJECT = 'crate'
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
-PFILE_N = 10
 
 # Define the range for PFILE_N
 PFILE_START = 1
-PFILE_END = 21  # This allows the loop to go up to PFILE_N = 21
+PFILE_N = PFILE_START
+PFILE_END = 22  # This allows the loop to go up to PFILE_N = 21
 
 PFILE = f"pfile{PFILE_N}"
-FOREST_DEADLINES_ENABLED = True
+FOREST_DEADLINES_ENABLED = False  # DOUBLECHECK THIS IS DISABLED
 
 # Flag to enable or disable parallel processing
 ENABLE_PARALLEL = True
