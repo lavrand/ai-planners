@@ -118,16 +118,17 @@ while True:
                 cmd = [command] + args
 
                 try:
+                    run_subprocess(cmd, cmd)
                     # Execute the command with arguments, and wait for it to complete.
-                    result = subprocess.run(cmd, check=True, text=True, capture_output=True)
-
-                    # If there's output(stdout or stderr), print it
-                    if result.stdout:
-                        print("Output:", result.stdout)
-                    if result.stderr:
-                        print("Error:", result.stderr)
-
-                    return result.stdout  # Or you might want to return a combination of both output and error info.
+                    # result = subprocess.run(cmd, check=True, text=True, capture_output=True)
+                    #
+                    # # If there's output(stdout or stderr), print it
+                    # if result.stdout:
+                    #     print("Output:", result.stdout)
+                    # if result.stderr:
+                    #     print("Error:", result.stderr)
+                    #
+                    # return result.stdout  # Or you might want to return a combination of both output and error info.
 
                 except subprocess.CalledProcessError as e:
                     print(f"The command failed: {str(e)}")
