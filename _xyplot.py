@@ -2,6 +2,8 @@ import csv
 import os
 import matplotlib.pyplot as plt
 
+MAX = 60
+
 # Load the data from output_full.csv
 data = []
 with open('output_full.csv', 'r') as f:
@@ -17,8 +19,9 @@ valid_disp_times = [time for time in disp_times_raw if time not in [9999, 99999]
 valid_nodisp_times = [time for time in nodisp_times_raw if time not in [9999, 99999]]
 
 # Calculate limits
-max_disp = max(valid_disp_times)
-max_nodisp = max(valid_nodisp_times)
+# Check if valid_disp_times is empty, and use 60 as the default value if it is
+max_disp = MAX if not valid_disp_times else max(valid_disp_times)
+max_nodisp = MAX if not valid_nodisp_times else max(valid_nodisp_times)
 
 # Replace 9999 and 99999 with the determined max values for plotting
 disp_times = [time if time not in [9999, 99999] else max_disp for time in disp_times_raw]
