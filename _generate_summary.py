@@ -22,7 +22,7 @@ nodisp_only = [row for row in data if row[DISP_ROW] in ['9999', '99999'] and row
 
 avg_disp = round(sum(float(row[DISP_ROW]) for row in both_solved) / len(both_solved), ROUND)
 avg_nodisp = round(sum(float(row[NODISP_ROW]) for row in both_solved) / len(both_solved), ROUND)
-avg_ratio = round(sum(float(row[DISP_ROW]) / float(row[NODISP_ROW]) for row in both_solved) / len(both_solved), ROUND+2)
+avg_ratio = round(sum(0 if float(row[NODISP_ROW]) == 0 else float(row[DISP_ROW]) / float(row[NODISP_ROW]) for row in both_solved) / len(both_solved), ROUND+2)
 
 
 # Determine the parent folder (two levels up)
