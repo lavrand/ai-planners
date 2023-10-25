@@ -13,9 +13,12 @@ from _execute_command import execute_command
 from _execute_command_args import execute_command_args
 from _replace_deadlines import replace_deadlines
 
-DOMAIN = 'DepotsTime.pddl'
-AT = 'on'
-OBJECT = 'crate'
+# DOMAIN = 'DepotsTime.pddl'
+DOMAIN = 'zenotravelTandN.pddl'
+# AT = 'on'
+AT = 'at'
+# OBJECT = 'crate'
+OBJECT = 'person'
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
@@ -23,7 +26,8 @@ EXPERIMENTS = 100
 # Define the range for PFILE_N
 PFILE_START = 1
 PFILE_N = PFILE_START
-PFILE_END = 22  # This allows the loop to go up to PFILE_N = 21
+# PFILE_END = 22  # This allows the loop to go up to PFILE_N = 22 'DepotsTime.pddl'
+PFILE_END = 20  # This allows the loop to go up to PFILE_N = 20 'zenotravelTandN.pddl'
 
 PFILE = f"pfile{PFILE_N}"
 FOREST_DEADLINES_ENABLED = False  # DOUBLECHECK THIS IS DISABLED
