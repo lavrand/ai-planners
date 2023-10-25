@@ -122,21 +122,21 @@ while True:
                 cmd = [command] + args
 
                 try:
-                    # Execute the command with arguments, and wait for it to complete.
-                    result = subprocess.run(cmd, check=True, text=True, capture_output=True)
+                    # Execute the command with arguments, and wait for it to complete, but not longer than 120 seconds
+                    result = subprocess.run(cmd, check=True, text=True, capture_output=True, timeout=120)
 
-                    # If there's output(stdout or stderr), print it
-                    if result.stdout:
-                        print("Output:", result.stdout)
-                    if result.stderr:
-                        print("Error:", result.stderr)
+                    # If the command was successful, result.stdout will contain the output
+                    print(result.stdout)
 
-                    return result.stdout  # Or you might want to return a combination of both output and error info.
+                except subprocess.TimeoutExpired:
+                    # Handle the timeout exception as you see fit
+                    print("The command did not complete within 120 seconds.")
+                    # Here you might choose to try the command again, or perhaps record the timeout in a log file
 
                 except subprocess.CalledProcessError as e:
-                    print(f"The command failed: {str(e)}")
-                    print("Error output:", e.stderr)
-                    return None  # You can also return the error message if needed.
+                    # Handle the exception for a non-zero exit code if check=True
+                    print(f"The command failed because: {e.stderr}")
+                    # Here you can do additional handling of the error, like retrying the command or logging the error
 
                 except Exception as e:
                     print(f"An error occurred: {str(e)}")
