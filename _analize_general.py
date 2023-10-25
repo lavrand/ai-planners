@@ -1,7 +1,10 @@
 import os
 import shutil
 import subprocess
-
+import pandas as pd
+from docx import Document
+from docx.shared import Inches
+import matplotlib.pyplot as plt
 # Get the total number of archive folders (assuming they are sequentially named and start from 1)
 N = 22  # Set this to the actual number of archive folders you have
 
@@ -48,3 +51,36 @@ for i in range(1, N + 1):
     # Copy generated files to the new folders in the summary directory
     for file_name in ['disp_vs_nodisp_plot.png', 'summary.csv']:
         shutil.copy(os.path.join(folder_name, file_name), os.path.join(new_folder_path, file_name))
+
+
+def generate_doc(summary_dir):
+    doc = Document()
+
+    for i in range(1, N + 1):
+        new_folder_name = f'pfile_{i}'
+        new_folder_path = os.path.join(summary_dir, new_folder_name)
+
+        # Add CSV data to document
+        csv_file = os.path.join(new_folder_path, 'summary.csv')
+        df = pd.read_csv(csv_file)
+        table = doc.add_table(df.shape[0] + 1, df.shape[1])
+        for j, (index, row) in enumerate(df.iterrows()):
+            for k, value in enumerate(row):
+                table.cell(j + 1, k).text = str(value)
+        for k, name in enumerate(df.columns):
+            table.cell(0, k).text = name
+
+        # Add plot to document
+        plot_file = os.path.join(new_folder_path, 'disp_vs_nodisp_plot.png')
+        doc.add_picture(plot_file, width=Inches(6))
+
+    doc_path = os.path.join(summary_dir, 'summary.docx')
+    doc.save(doc_path)
+
+    return doc_path
+
+# After copying files to the new folders in the summary directory
+doc_path = generate_doc(summary_dir)
+
+# Open the document
+os.system(f'xdg-open {doc_path}')
