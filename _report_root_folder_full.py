@@ -3,7 +3,7 @@ import csv
 import tarfile
 import re
 
-DEADLINES_COUNT = 5
+DEADLINES_COUNT = 10
 
 # Define the output file name
 output_file_name = "output_full.csv"
