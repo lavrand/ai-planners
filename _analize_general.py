@@ -4,7 +4,8 @@ import subprocess
 import pandas as pd
 from docx import Document
 from docx.shared import Inches
-import matplotlib.pyplot as plt
+import subprocess
+
 # Get the total number of archive folders (assuming they are sequentially named and start from 1)
 N = 22  # Set this to the actual number of archive folders you have
 
@@ -84,3 +85,32 @@ doc_path = generate_doc(summary_dir)
 
 # Open the document
 os.system(f'xdg-open {doc_path}')
+
+def generate_summary_csv(summary_dir):
+    all_data = []  # List to hold data from all CSV files
+
+    for i in range(1, N + 1):
+        new_folder_name = f'pfile_{i}'
+        new_folder_path = os.path.join(summary_dir, new_folder_name)
+
+        # Read CSV data
+        csv_file = os.path.join(new_folder_path, 'summary.csv')
+        df = pd.read_csv(csv_file, index_col=0)  # Assuming the descriptions are in the first column
+        df_transposed = df.T  # Transpose the DataFrame
+        df_transposed.index = [new_folder_name]  # Set the index to the pfile name
+        all_data.append(df_transposed)
+
+    # Concatenate all data into one DataFrame along rows
+    summary_df = pd.concat(all_data)
+
+    # Write summary data to a new CSV file
+    summary_csv_path = os.path.join(summary_dir, 'summary_table.csv')
+    summary_df.to_csv(summary_csv_path)
+
+    return summary_csv_path
+
+# After processing all folders or at the end of your script
+summary_csv_path = generate_summary_csv(summary_dir)
+
+# Optionally, open the summary CSV file
+subprocess.run(['xdg-open', summary_csv_path])
