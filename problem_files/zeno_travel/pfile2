@@ -33,6 +33,8 @@
 	(= (total-fuel-used) 0)
 	(= (boarding-time) 0.3)
 	(= (debarking-time) 0.6)
+    (still-on-time person1)
+    (still-on-time person3)
 )
 (:goal (and
 	(at plane1 city2)
