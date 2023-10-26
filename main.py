@@ -13,17 +13,17 @@ from _execute_command import execute_command
 from _execute_command_args import execute_command_args
 from _replace_deadlines import replace_deadlines
 
-DOMAIN = 'driverlogTimed.pddl'
-AT = 'at'
-OBJECT = 'package'
+# DOMAIN = 'driverlogTimed.pddl'
+# AT = 'at'
+# OBJECT = 'package'
 
 # DOMAIN = 'DepotsTime.pddl'
 # AT = 'on'
 # OBJECT = 'crate'
 
-# DOMAIN = 'zenotravelTandN.pddl'
-# AT = 'at'
-# OBJECT = 'person'
+DOMAIN = 'zenotravelTandN.pddl'
+AT = 'at'
+OBJECT = 'person'
 
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
