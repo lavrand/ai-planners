@@ -41,19 +41,19 @@ while (<IN>) {
 }
 
 # 1. driverLog
-#while (<IN>) {
-#  if (m/at driver/ || m/at truck/) {
-#    chomp;
-#    print OUT "\t;$_; commented out\n";
-#  } else {
-#    print OUT;
-#  }
-#}
+while (<IN>) {
+ if (m/at driver/ || m/at truck/) {
+   chomp;
+   print OUT "\t;$_; commented out\n";
+ } else {
+   print OUT;
+ }
+}
 
 # 2. Depots
-while (<IN>) {
-   print OUT;
-}
+# while (<IN>) {
+#    print OUT;
+# }
 
 # 3. ZenoTravel
 #  while (<IN>) {
