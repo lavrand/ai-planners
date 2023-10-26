@@ -34,6 +34,7 @@
         :effect (and
             (at start (not (at ?p ?c)))
             (at end (in ?p ?a))
+            ; We assume boarding does not affect the on-time status.
         )
     )
 
@@ -48,53 +49,47 @@
         :effect (and
             (at start (not (in ?p ?a)))
             (at end (at ?p ?c))
+            ; We assume debarking does not affect the on-time status.
         )
     )
 
     (:durative-action fly
-        :parameters (?a - aircraft ?c1 ?c2 - city)
+        :parameters (?a - aircraft ?c1 ?c2 - city ?p - person)
         :duration (= ?duration (/ (distance ?c1 ?c2) (slow-speed ?a)))
         :condition (and
             (at start (at ?a ?c1))
             (at start (>= (fuel ?a) (* (distance ?c1 ?c2) (slow-burn ?a))))
+            (at start (in ?p ?a))  ; the person must be in the aircraft
+            (at start (still-on-time ?p))  ; the person is initially still on time
         )
         :effect (and
             (at start (not (at ?a ?c1)))
             (at end (at ?a ?c2))
             (at end (increase (total-fuel-used) (* (distance ?c1 ?c2) (slow-burn ?a))))
             (at end (decrease (fuel ?a) (* (distance ?c1 ?c2) (slow-burn ?a))))
-            ; Assuming that flying may affect the on-time status based on some criteria
-            (forall (?p - person)
-                (when (in ?p ?a)
-                    ; Here you might want to include conditions under which a person remains or does not remain "on time"
-                    ; This example assumes they're no longer on time if they fly slowly
-                    (not (still-on-time ?p))
-                )
-            )
+            (at end (not (still-on-time ?p)))  ; the person is no longer on time after flying
         )
     )
 
     (:durative-action zoom
-        :parameters (?a - aircraft ?c1 ?c2 - city)
+        :parameters (?a - aircraft ?c1 ?c2 - city ?p - person)
         :duration (= ?duration (/ (distance ?c1 ?c2) (fast-speed ?a)))
         :condition (and
             (at start (at ?a ?c1))
             (at start (>= (fuel ?a) (* (distance ?c1 ?c2) (fast-burn ?a))))
+            (at start (in ?p ?a))  ; the person must be in the aircraft
+            (at start (not (still-on-time ?p)))  ; the person is initially not on time
         )
         :effect (and
             (at start (not (at ?a ?c1)))
             (at end (at ?a ?c2))
             (at end (increase (total-fuel-used) (* (distance ?c1 ?c2) (fast-burn ?a))))
             (at end (decrease (fuel ?a) (* (distance ?c1 ?c2) (fast-burn ?a))))
-            ; Zooming might improve the chances of remaining on time due to faster travel
-            (forall (?p - person)
-                (when (in ?p ?a)
-                    ; Similar to flying, you need specific conditions here. We assume they're still on time if they zoom.
-                    (still-on-time ?p)
-                )
-            )
+            (at end (still-on-time ?p))  ; the person is now on time after zooming
         )
     )
+
+
 
     (:durative-action refuel
         :parameters (?a - aircraft ?c - city)
@@ -105,6 +100,7 @@
         )
         :effect (and
             (at end (assign (fuel ?a) (capacity ?a)))
+            ; Refueling might be a neutral action regarding time status. It neither improves nor worsens the on-time condition.
         )
     )
 )
