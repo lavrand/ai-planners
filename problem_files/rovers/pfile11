@@ -186,6 +186,9 @@
 	(visible_from objective2 waypoint4)
 	(visible_from objective2 waypoint5)
 	(visible_from objective2 waypoint6)
+	(still-on-time objective0) ; Assuming that objectives have a time constraint.
+    (still-on-time objective1) ; These objectives are considered as still within the time limit at the start.
+    (still-on-time objective2) ; These objectives are considered as still within the time limit at the start.
 )
 
 (:goal (and
@@ -198,6 +201,7 @@
 (communicated_rock_data waypoint4)
 (communicated_rock_data waypoint7)
 (communicated_image_data objective1 high_res)
+(still-on-time objective1) ; The goal needs to be achieved while it's still on time.
 	)
 )
 

@@ -20,7 +20,7 @@ with open(output_file_name, "w", newline='') as csvfile:
 def extract_deadlines(file_content):
     deadlines = []
     for line in file_content.splitlines():
-        match = re.search(r'at (\d+\.\d+) \(not \(still-on-time (package|crate)\d+\)\)', line)
+        match = re.search(r'at (\d+\.\d+) \(not \(still-on-time (package|crate|person|objective)\d+\)\)', line)
         if match:
             deadlines.append(round(float(match.group(1)), 2))
     return deadlines
