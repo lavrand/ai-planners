@@ -58,10 +58,6 @@
         (visible_from objective1 waypoint1)
         (visible_from objective1 waypoint2)
         (visible_from objective1 waypoint3)
-        (still-on-time waypoint0)  ;; Assuming waypoints can also have time constraints.
-        (still-on-time waypoint1)
-        (still-on-time waypoint2)
-        (still-on-time waypoint3)
         (still-on-time objective0)
         (still-on-time objective1)
     )
