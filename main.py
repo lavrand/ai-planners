@@ -21,10 +21,13 @@ from _replace_deadlines import replace_deadlines
 # AT = 'on'
 # OBJECT = 'crate'
 
-DOMAIN = 'zenotravelTandN.pddl'
-AT = 'at'
-OBJECT = 'person'
+# DOMAIN = 'zenotravelTandN.pddl'
+# AT = 'at'
+# OBJECT = 'person'
 
+DOMAIN = 'CTRover.pddl'
+AT = 'at'
+OBJECT = 'rover'
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
