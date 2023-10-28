@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 if (scalar(@ARGV) != 6) {
-    print "Usage: getgoaltimes <domainfile> <ontime problem filename> <plan filename> <random seed> <at> <object>\n";
+    print "Usage: getgoaltimes <domainfile> <ontime problem filename> <plan filename> <random seed> <at> <object> <perturb_rnd> <perturb_minus>\n";
     exit(1);
 }
 
@@ -19,6 +19,8 @@ $plan = shift(@ARGV);
 $seed = shift(@ARGV) + 0;
 $at = shift(@ARGV);
 $object = shift(@ARGV);
+$perturb_rnd = shift(@ARGV)+ 0;
+$perturb_minus = shift(@ARGV) + 0;
 
 # first, we open the problem, and skip to the goals
 
@@ -82,7 +84,12 @@ foreach $flag (@sortedkeys) {
     if ($achievedat == 0) {
         print OUT "; The goal for $achievedat was achieved at time zero (in the initial state), so no deadline was generated\n";
     } else {
-        $perturbment = rand(100) - 50;
+        if ($perturb_rnd == 0) {
+            $perturbment = - $perturb_minus;
+        } else {
+            $perturbment = rand($perturb_rnd) - $perturb_minus;
+        }
+
         $achievedat = $achievedat + $perturbment; # add something between [-50,50) to the deadline
         print OUT "(at $achievedat (not (still-on-time $flag))) ; deadline on when $flag got to its goal location\n"
     }

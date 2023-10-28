@@ -1,85 +1,78 @@
-(define (problem roverprob3726) (:domain Rover)
-(:objects
-	general - Lander
-	colour high_res low_res - Mode
-	rover0 rover1 - Rover
-	rover0store rover1store - Store
-	waypoint0 waypoint1 waypoint2 waypoint3 - Waypoint
-	camera0 camera1 - Camera
-	objective0 objective1 - Objective
+(define (problem DLOG-2-2-4)
+	(:domain driverlog)
+	(:objects
+	driver1 - driver
+	driver2 - driver
+	truck1 - truck
+	truck2 - truck
+	package1 - obj
+	package2 - obj
+	package3 - obj
+	package4 - obj
+	s0 - location
+	s1 - location
+	s2 - location
+	p0-1 - location
+	p2-0 - location
+	p2-1 - location
 	)
-(:init
-	(visible waypoint0 waypoint1)
-	(visible waypoint1 waypoint0)
-	(visible waypoint0 waypoint3)
-	(visible waypoint3 waypoint0)
-	(visible waypoint1 waypoint2)
-	(visible waypoint2 waypoint1)
-	(visible waypoint1 waypoint3)
-	(visible waypoint3 waypoint1)
-	(visible waypoint2 waypoint0)
-	(visible waypoint0 waypoint2)
-	(visible waypoint3 waypoint2)
-	(visible waypoint2 waypoint3)
-	(at_rock_sample waypoint0)
-	(in_sun waypoint0)
-	(at_rock_sample waypoint1)
-	(in_sun waypoint1)
-	(at_soil_sample waypoint2)
-	(at_rock_sample waypoint2)
-	(at_lander general waypoint0)
-	(channel_free general)
-	(= (energy rover0) 50)
-	(= (recharge-rate rover0) 15)
-	(at rover0 waypoint1)
-	(available rover0)
-	(store_of rover0store rover0)
-	(empty rover0store)
-	(equipped_for_soil_analysis rover0)
-	(equipped_for_rock_analysis rover0)
-	(equipped_for_imaging rover0)
-	(can_traverse rover0 waypoint1 waypoint0)
-	(can_traverse rover0 waypoint0 waypoint1)
-	(can_traverse rover0 waypoint1 waypoint3)
-	(can_traverse rover0 waypoint3 waypoint1)
-	(= (energy rover1) 50)
-	(= (recharge-rate rover1) 16)
-	(at rover1 waypoint3)
-	(available rover1)
-	(store_of rover1store rover1)
-	(empty rover1store)
-	(equipped_for_soil_analysis rover1)
-	(equipped_for_rock_analysis rover1)
-	(equipped_for_imaging rover1)
-	(can_traverse rover1 waypoint3 waypoint0)
-	(can_traverse rover1 waypoint0 waypoint3)
-	(can_traverse rover1 waypoint3 waypoint2)
-	(can_traverse rover1 waypoint2 waypoint3)
-	(can_traverse rover1 waypoint0 waypoint1)
-	(can_traverse rover1 waypoint1 waypoint0)
-	(on_board camera0 rover0)
-	(calibration_target camera0 objective1)
-	(supports camera0 low_res)
-	(on_board camera1 rover1)
-	(calibration_target camera1 objective0)
-	(supports camera1 colour)
-	(supports camera1 high_res)
-	(supports camera1 low_res)
-	(visible_from objective0 waypoint0)
-	(visible_from objective0 waypoint1)
-	(visible_from objective1 waypoint0)
-	(visible_from objective1 waypoint1)
-	(still-on-time objective0) ; Assuming that objectives have a time constraint.
-    (still-on-time objective1) ; These objectives are considered as still within the time limit at the start.
+	(:init
+	(at driver1 s1)
+	(at driver2 s0)
+	(at truck1 s1)
+	(empty truck1)
+	(at truck2 s2)
+	(empty truck2)
+	(at package1 s0)
+	(at package2 s0)
+	(at package3 s1)
+	(at package4 s1)
+	(path s0 p0-1)
+	(path p0-1 s0)
+	(path s1 p0-1)
+	(path p0-1 s1)
+	(= (time-to-walk s0 p0-1) 50)
+	(= (time-to-walk p0-1 s0) 50)
+	(= (time-to-walk s1 p0-1) 92)
+	(= (time-to-walk p0-1 s1) 92)
+	(path s2 p2-0)
+	(path p2-0 s2)
+	(path s0 p2-0)
+	(path p2-0 s0)
+	(= (time-to-walk s2 p2-0) 73)
+	(= (time-to-walk p2-0 s2) 73)
+	(= (time-to-walk s0 p2-0) 100)
+	(= (time-to-walk p2-0 s0) 100)
+	(path s2 p2-1)
+	(path p2-1 s2)
+	(path s1 p2-1)
+	(path p2-1 s1)
+	(= (time-to-walk s2 p2-1) 8)
+	(= (time-to-walk p2-1 s2) 8)
+	(= (time-to-walk s1 p2-1) 71)
+	(= (time-to-walk p2-1 s1) 71)
+	(link s1 s0)
+	(link s0 s1)
+	(= (time-to-drive s1 s0) 42)
+	(= (time-to-drive s0 s1) 42)
+	(link s1 s2)
+	(link s2 s1)
+	(= (time-to-drive s1 s2) 55)
+	(= (time-to-drive s2 s1) 55)
+	(link s2 s0)
+	(link s0 s2)
+	(= (time-to-drive s2 s0) 23)
+	(= (time-to-drive s0 s2) 23)
 )
-
-(:goal (and
-(communicated_soil_data waypoint2)
-(communicated_rock_data waypoint0)
-(communicated_image_data objective0 colour)
-(still-on-time objective1) ; The goal needs to be achieved while it's still on time.
-	)
-)
+	(:goal (and
+	(at driver2 s2)
+	(at truck1 s1)
+	(at truck2 s2)
+	(at package1 s1)
+	(at package2 s1)
+	(at package3 s2)
+	))
 
 (:metric minimize (total-time))
+
 )

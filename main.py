@@ -13,9 +13,9 @@ from _execute_command import execute_command
 from _execute_command_args import execute_command_args
 from _replace_deadlines import replace_deadlines
 
-# DOMAIN = 'driverlogTimed.pddl'
-# AT = 'at'
-# OBJECT = 'package'
+DOMAIN = 'driverlogTimed.pddl'
+AT = 'at'
+OBJECT = 'package'
 
 # DOMAIN = 'DepotsTime.pddl'
 # AT = 'on'
@@ -25,18 +25,23 @@ from _replace_deadlines import replace_deadlines
 # AT = 'at'
 # OBJECT = 'person'
 
-DOMAIN = 'CTRover.pddl'
-AT = 'at'
-OBJECT = 'rover'
+# DOMAIN = 'CTRover.pddl'
+# AT = 'at'
+# OBJECT = 'rover'
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
 
 # Define the range for PFILE_N
-PFILE_START = 1
+PFILE_START = 15
 PFILE_N = PFILE_START
 # PFILE_END = 22  # This allows the loop to go up to PFILE_N = 22 'DepotsTime.pddl'
-PFILE_END = 20  # This allows the loop to go up to PFILE_N = 20 'driverlogTimed.pddl' 'zenotravelTandN.pddl'
+PFILE_END = 15 # This allows the loop to go up to PFILE_N = 20 'driverlogTimed.pddl' 'zenotravelTandN.pddl'
+
+PERTURB_RND = 0
+PERTURB_MINUS = 19
+
+MULTIPROCESSING_CPU_COUNT_MINUS = 0
 
 PFILE = f"pfile{PFILE_N}"
 FOREST_DEADLINES_ENABLED = False  # DOUBLECHECK THIS IS DISABLED
@@ -218,7 +223,7 @@ while True:
                 return stdout, stderr, process.returncode
 
             # Define the number of processes to spawn. Ideally, this is the number of cores available.
-            num_processes = multiprocessing.cpu_count() if ENABLE_PARALLEL else 1
+            num_processes = multiprocessing.cpu_count() - MULTIPROCESSING_CPU_COUNT_MINUS if ENABLE_PARALLEL else 1
             # Log the number of processes
             print(f"[{datetime.now()}] Running with {num_processes} parallel processes.")
 
