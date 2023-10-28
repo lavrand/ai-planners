@@ -39,7 +39,7 @@ PFILE_N = PFILE_START
 PFILE_END = 15 # This allows the loop to go up to PFILE_N = 20 'driverlogTimed.pddl' 'zenotravelTandN.pddl'
 
 PERTURB_RND = 5
-PERTURB_MINUS = 10
+PERTURB_MINUS = 5
 
 MULTIPROCESSING_CPU_COUNT_MINUS = 0
 
