@@ -4,6 +4,10 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 import pandas as pd
+import joblib  # for saving the model
+from sklearn.tree import export_graphviz  # for tree visualization
+import os  # for path operations and checking
+import subprocess
 
 # Load the data
 data = pd.read_csv('output_full_norm_pressure.csv')
@@ -96,4 +100,50 @@ output_path = 'top_100_predicted_nodisp_disp.csv'
 # Save the top 100 entries to a CSV file
 top_100_entries.to_csv(output_path, index=False)  # The index is excluded from the saved file
 
+# Save the model to a separate file
+model_filename = 'random_forest_regressor_model.pkl'
+joblib.dump(model, model_filename)
+print(f"Model saved as {model_filename}")
+
+# Extract the nth tree from the forest
+n = 0  # You can choose which tree you want to visualize by changing this value
+nth_tree = model.estimators_[n]
+
+# Export as dot file
+tree_export_filename = 'tree_from_random_forest.dot'
+export_graphviz(nth_tree, out_file=tree_export_filename,
+                feature_names = features,
+                rounded = True, proportion = False,
+                precision = 2, filled = True)
+
+
+# Check if Graphviz is installed and in PATH
+try:
+    subprocess.run(['dot', '-V'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+except subprocess.CalledProcessError:
+    raise Exception("Graphviz not installed or not in PATH. Please install Graphviz and ensure 'dot' is available in your PATH.")
+
+# Export as dot file
+tree_export_filename = 'tree_from_random_forest.dot'
+export_graphviz(nth_tree, out_file=tree_export_filename,
+                feature_names = features,
+                rounded = True, proportion = False,
+                precision = 2, filled = True)
+
+# Convert the dot file to a PNG image
+output_image_filename = 'tree_from_random_forest.png'
+subprocess.run(['dot', '-Tpng', tree_export_filename, '-o', output_image_filename], check=True)
+
+print(f"Tree visualization saved as {output_image_filename}. You can view this image directly.")
+
+try:
+    subprocess.run(['xdg-open', output_image_filename], check=True)
+except subprocess.CalledProcessError:
+    print(f"Could not open the image. Please manually open '{output_image_filename}' to view the tree visualization.")
+
+print(f"Tree visualization saved as {tree_export_filename}. You can convert it to PNG or PDF using external utilities.")
+
 print(f"Finished successfully")
+
+# visualize
+# dot -Tpng tree_from_random_forest.dot -o tree_from_random_forest.png
