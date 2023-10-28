@@ -32,6 +32,12 @@ OBJECT = 'crate'
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 EXPERIMENTS = 100
 
+# Flag to determine whether to use specific PFILE_N values or a range
+USE_SPECIFIC_PFILE_VALUES = True  # Set to False to use the PFILE_START to PFILE_END range
+
+# Specific values for PFILE_N, used if USE_SPECIFIC_PFILE_VALUES is True
+SPECIFIC_PFILE_VALUES = [7, 10]
+
 # Define the range for PFILE_N
 PFILE_START = 10
 PFILE_N = PFILE_START
@@ -93,6 +99,12 @@ def remove_folders_and_files():
 
 # Main loop to run everything in an infinite cycle
 while True:
+    # Determine which PFILE_N values to use based on the flag
+    if USE_SPECIFIC_PFILE_VALUES:
+        pfile_values = SPECIFIC_PFILE_VALUES  # use the specific values
+    else:
+        pfile_values = range(PFILE_START, PFILE_END + 1)  # use the range
+
     for current_pfile in range(PFILE_START, PFILE_END + 1):  # Looping over the defined range
         try:  # Add a try block to catch any exceptions that occur for a single PFILE_N.
             PFILE_N = current_pfile  # Updating the PFILE_N value for this iteration
