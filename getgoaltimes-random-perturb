@@ -85,10 +85,10 @@ foreach $flag (@sortedkeys) {
         print OUT "; The goal for $achievedat was achieved at time zero (in the initial state), so no deadline was generated\n";
     } else {
         if ($perturb_rnd == 0) {
-            $perturbment = - $perturb_minus;
+            $perturbment = $perturb_minus;
             print OUT "; perturbment is $perturbment , perturb_minus is $perturb_minus \n";
         } else {
-            $perturbment = rand($perturb_rnd) - $perturb_minus;
+            $perturbment = rand($perturb_rnd) + $perturb_minus;
             print OUT "; perturbment is $perturbment , perturb_rnd is $perturb_rnd , perturb_minus is $perturb_minus \n";
         }
 

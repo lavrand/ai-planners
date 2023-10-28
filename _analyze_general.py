@@ -6,10 +6,10 @@ from docx import Document
 from docx.shared import Inches
 import matplotlib.pyplot as plt
 
-__START = 15
+__START = 7
 
 # Get the total number of archive folders (assuming they are sequentially named and start from 1)
-N = 15  # Set this to the actual number of archive folders you have
+N = 7  # Set this to the actual number of archive folders you have
 
 # List of scripts to copy
 scripts = [
