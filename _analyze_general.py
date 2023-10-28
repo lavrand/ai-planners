@@ -6,8 +6,10 @@ from docx import Document
 from docx.shared import Inches
 import matplotlib.pyplot as plt
 
+__START = 15
+
 # Get the total number of archive folders (assuming they are sequentially named and start from 1)
-N = 20  # Set this to the actual number of archive folders you have
+N = 15  # Set this to the actual number of archive folders you have
 
 # List of scripts to copy
 scripts = [
@@ -35,7 +37,7 @@ def process_folder(folder_name):
 root_dir = os.getcwd()  # Assuming scripts are located in the current working directory
 
 # Process each archive folder
-for i in range(1, N + 1):
+for i in range(__START, N + 1):
     folder_name = f'archive_pfile_{i}'
     process_folder(folder_name)
 
@@ -43,7 +45,7 @@ for i in range(1, N + 1):
 summary_dir = os.path.join(root_dir, 'summary')
 os.makedirs(summary_dir, exist_ok=True)
 
-for i in range(1, N + 1):
+for i in range(__START, N + 1):
     folder_name = f'archive_pfile_{i}'
     new_folder_name = f'pfile_{i}'
     new_folder_path = os.path.join(summary_dir, new_folder_name)
@@ -105,7 +107,7 @@ def generate_doc(summary_dir):
     doc.add_picture('plot1.png', width=Inches(6))
     doc.add_picture('plot2.png', width=Inches(6))
 
-    for i in range(1, N + 1):
+    for i in range(__START, N + 1):
         new_folder_name = f'pfile_{i}'
         new_folder_path = os.path.join(summary_dir, new_folder_name)
 
@@ -131,7 +133,7 @@ def generate_doc(summary_dir):
 def generate_summary_csv(summary_dir):
     all_data = []  # List to hold data from all CSV files
 
-    for i in range(1, N + 1):
+    for i in range(__START, N + 1):
         new_folder_name = f'pfile_{i}'
         new_folder_path = os.path.join(summary_dir, new_folder_name)
 
