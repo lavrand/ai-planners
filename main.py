@@ -38,8 +38,8 @@ PFILE_N = PFILE_START
 # PFILE_END = 22  # This allows the loop to go up to PFILE_N = 22 'DepotsTime.pddl'
 PFILE_END = 15 # This allows the loop to go up to PFILE_N = 20 'driverlogTimed.pddl' 'zenotravelTandN.pddl'
 
-PERTURB_RND = 0
-PERTURB_MINUS = 19
+PERTURB_RND = 5
+PERTURB_MINUS = 10
 
 MULTIPROCESSING_CPU_COUNT_MINUS = 0
 
@@ -121,7 +121,7 @@ while True:
             commands_to_run = [
                 ("./add_initially_on_time", [f'{PFILE}', f'{AT}', f'{OBJECT}']),
                 ("./run-planner-to-get-initial-plan", [f'{DOMAIN}', f"ontime-pfile{PFILE_N}"]),
-                ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}'])
+                ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS}'])
             ]
 
             def run_subprocess_args(command, args):

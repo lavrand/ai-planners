@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-if (scalar(@ARGV) != 4) {
+if (scalar(@ARGV) != 6) {
     print "Usage: gen <problem number> <domain filename> <at> <object> <perturb_rnd> <perturb_minus>\n";
     exit(1);
 }
@@ -9,8 +9,8 @@ $pnumber = shift(@ARGV);
 $domain = shift(@ARGV);
 $at = shift(@ARGV);
 $object = shift(@ARGV);
-$perturb_rnd = shift(@ARGV);
-$perturb_minus = shift(@ARGV);
+$perturb_rnd = shift(@ARGV) + 0;
+$perturb_minus = shift(@ARGV) + 0;
 
 open DISP, "> dispscript";
 open NODISP, "> nodispscript";
