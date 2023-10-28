@@ -107,7 +107,7 @@ while True:
     else:
         pfile_values = range(PFILE_START, PFILE_END + 1)  # use the range
 
-    for current_pfile in range(PFILE_START, PFILE_END + 1):  # Looping over the defined range
+    for current_pfile in pfile_values:  # Looping over the defined range
         try:  # Add a try block to catch any exceptions that occur for a single PFILE_N.
             PFILE_N = current_pfile  # Updating the PFILE_N value for this iteration
             PFILE = f"pfile{PFILE_N}"
