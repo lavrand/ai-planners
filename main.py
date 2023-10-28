@@ -209,7 +209,7 @@ while True:
                 except subprocess.TimeoutExpired:
                     # If the timeout expires, kill the entire process group
                     os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # try to terminate the process group gracefully
-                    process.wait(timeout=60)  # give it 60 seconds to terminate gracefully
+                    process.wait(timeout=10)  # give it 10 seconds to terminate gracefully
                     if process.poll() is None:  # if the process is still running after 10 seconds
                         os.killpg(os.getpgid(process.pid), signal.SIGKILL)  # forcibly kill the process group
                     print(f"Command #{i} took longer than timeout seconds and was killed!")
