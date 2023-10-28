@@ -46,6 +46,8 @@ PFILE_END = 10 # This allows the loop to go up to PFILE_N = 20 'driverlogTimed.p
 
 PERTURB_RND = 0
 PERTURB_MINUS = -50
+PERTURB_PLUS = 50
+__STEP = 5
 
 MULTIPROCESSING_CPU_COUNT_MINUS = 2
 
@@ -110,7 +112,7 @@ while True:
             PFILE_N = current_pfile  # Updating the PFILE_N value for this iteration
             PFILE = f"pfile{PFILE_N}"
 
-            for current_perturb_minus in range(-50, 51, 10):  # Iterating from -50 to 50 inclusive with step 10
+            for current_perturb_minus in range(PERTURB_MINUS, PERTURB_PLUS + 1, __STEP):  # Iterating from -50 to 50 inclusive with step 10
                 PERTURB_MINUS = current_perturb_minus  # Updating the PERTURB_MINUS value for this iteration
 
                 print(f"[{datetime.now()}] Starting a new set of experiments for PFILE_N = {PFILE_N} with PERTURB_MINUS = {PERTURB_MINUS} ...")
