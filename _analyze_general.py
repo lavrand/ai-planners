@@ -5,11 +5,7 @@ import pandas as pd
 from docx import Document
 from docx.shared import Inches
 import matplotlib.pyplot as plt
-
-__START = 10
-
-# Get the total number of archive folders (assuming they are sequentially named and start from 1)
-N = 10  # Set this to the actual number of archive folders you have
+import glob
 
 # List of scripts to copy
 scripts = [
@@ -32,22 +28,24 @@ def process_folder(folder_name):
     subprocess.run(['python3', '_analyze.py'])
     os.chdir(root_dir)  # Change back to root directory
 
-
 # Main process
 root_dir = os.getcwd()  # Assuming scripts are located in the current working directory
 
+# Automatically get all folders starting with "archive_pfile"
+archive_folders = glob.glob('archive_pfile_*')  # This will return a list of all folders starting with "archive_pfile"
+
 # Process each archive folder
-for i in range(__START, N + 1):
-    folder_name = f'archive_pfile_{i}'
+for folder_name in archive_folders:
     process_folder(folder_name)
 
 # Create summary folder and process each archive folder again to move generated files
 summary_dir = os.path.join(root_dir, 'summary')
 os.makedirs(summary_dir, exist_ok=True)
 
-for i in range(__START, N + 1):
-    folder_name = f'archive_pfile_{i}'
-    new_folder_name = f'pfile_{i}'
+# Moving generated files to a summary directory
+for folder_name in archive_folders:
+    # Here, you don't create a new folder name based on the index, but rather use the existing folder name
+    new_folder_name = folder_name.replace('archive_', '')  # Optional: remove 'archive_' prefix for summary folder names
     new_folder_path = os.path.join(summary_dir, new_folder_name)
     os.makedirs(new_folder_path, exist_ok=True)
 
@@ -107,8 +105,8 @@ def generate_doc(summary_dir):
     doc.add_picture('plot1.png', width=Inches(6))
     doc.add_picture('plot2.png', width=Inches(6))
 
-    for i in range(__START, N + 1):
-        new_folder_name = f'pfile_{i}'
+    for folder_name in archive_folders:
+        new_folder_name = folder_name.replace('archive_', '')  # Same modification as above
         new_folder_path = os.path.join(summary_dir, new_folder_name)
 
         # Add CSV data to document
@@ -133,8 +131,8 @@ def generate_doc(summary_dir):
 def generate_summary_csv(summary_dir):
     all_data = []  # List to hold data from all CSV files
 
-    for i in range(__START, N + 1):
-        new_folder_name = f'pfile_{i}'
+    for folder_name in archive_folders:
+        new_folder_name = folder_name.replace('archive_', '')  # Same modification as above
         new_folder_path = os.path.join(summary_dir, new_folder_name)
 
         # Read CSV data
