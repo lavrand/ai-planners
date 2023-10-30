@@ -7,6 +7,7 @@ import csv
 import signal
 import shutil
 import multiprocessing
+import itertools
 from functools import partial
 
 from _execute_command import execute_command
@@ -17,13 +18,13 @@ from _replace_deadlines import replace_deadlines
 # AT = 'at'
 # OBJECT = 'package'
 
-DOMAIN = 'DepotsTime.pddl'
-AT = 'on'
-OBJECT = 'crate'
+# DOMAIN = 'DepotsTime.pddl'
+# AT = 'on'
+# OBJECT = 'crate'
 
-# DOMAIN = 'zenotravelTandN.pddl'
-# AT = 'at'
-# OBJECT = 'person'
+DOMAIN = 'zenotravelTandN.pddl'
+AT = 'at'
+OBJECT = 'person'
 
 # DOMAIN = 'CTRover.pddl'
 # AT = 'at'
@@ -36,13 +37,13 @@ EXPERIMENTS = 100
 USE_SPECIFIC_PFILE_VALUES = True  # Set to False to use the PFILE_START to PFILE_END range
 
 # Specific values for PFILE_N, used if USE_SPECIFIC_PFILE_VALUES is True
-SPECIFIC_PFILE_VALUES = [7, 10]
+SPECIFIC_PFILE_VALUES = [6, 8, 11]
 
 # Define the range for PFILE_N
-PFILE_START = 10
+PFILE_START = 6
 PFILE_N = PFILE_START
 # PFILE_END = 22  # This allows the loop to go up to PFILE_N = 22 'DepotsTime.pddl'
-PFILE_END = 10 # This allows the loop to go up to PFILE_N = 20 'driverlogTimed.pddl' 'zenotravelTandN.pddl'
+PFILE_END = 11 # This allows the loop to go up to PFILE_N = 20 'driverlogTimed.pddl' 'zenotravelTandN.pddl'
 
 PERTURB_RND = 0
 PERTURB_MINUS = -50
@@ -99,11 +100,15 @@ def remove_folders_and_files():
     print(f"[{datetime.now()}] Removed specified folders and files.")
 
 
+# Create an infinite iterator over the specific PFILE values
+pfile_cycle = itertools.cycle(SPECIFIC_PFILE_VALUES) if USE_SPECIFIC_PFILE_VALUES else None
+
+
 # Main loop to run everything in an infinite cycle
 while True:
     # Determine which PFILE_N values to use based on the flag
     if USE_SPECIFIC_PFILE_VALUES:
-        pfile_values = SPECIFIC_PFILE_VALUES  # use the specific values
+        pfile_values = [next(pfile_cycle)]   # use the specific values
     else:
         pfile_values = range(PFILE_START, PFILE_END + 1)  # use the range
 

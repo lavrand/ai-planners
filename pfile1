@@ -1,52 +1,44 @@
-(define (problem depotprob1818) (:domain Depot)
+(define (problem ZTRAVEL-1-2)
+(:domain zeno-travel)
 (:objects
-	depot0 - Depot
-	distributor0 distributor1 - Distributor
-	truck0 truck1 - Truck
-	pallet0 pallet1 pallet2 - Pallet
-	crate0 crate1 - Crate
-	hoist0 hoist1 hoist2 - Hoist)
-(:init
-	(at pallet0 depot0)
-	(clear crate1)
-	(at pallet1 distributor0)
-	(clear crate0)
-	(at pallet2 distributor1)
-	(clear pallet2)
-	(at truck0 distributor1)
-	(= (speed truck0) 4)
-	(at truck1 depot0)
-	(= (speed truck1) 8)
-	(at hoist0 depot0)
-	(available hoist0)
-	(= (power hoist0) 2)
-	(at hoist1 distributor0)
-	(available hoist1)
-	(= (power hoist1) 9)
-	(at hoist2 distributor1)
-	(available hoist2)
-	(= (power hoist2) 6)
-	(at crate0 distributor0)
-	(on crate0 pallet1)
-	(= (weight crate0) 11)
-	(at crate1 depot0)
-	(on crate1 pallet0)
-	(= (weight crate1) 86)
-	(= (distance depot0 depot0) 0)
-	(= (distance depot0 distributor0) 5)
-	(= (distance depot0 distributor1) 7)
-	(= (distance distributor0 depot0) 5)
-	(= (distance distributor0 distributor0) 0)
-	(= (distance distributor0 distributor1) 5)
-	(= (distance distributor1 depot0) 4)
-	(= (distance distributor1 distributor0) 4)
-	(= (distance distributor1 distributor1) 0)
-)
-
-(:goal (and
-		(on crate0 pallet2)
-		(on crate1 pallet1)
+	plane1 - aircraft
+	person1 - person
+	person2 - person
+	city0 - city
+	city1 - city
+	city2 - city
 	)
+(:init
+	(at plane1 city0)
+	(= (slow-speed plane1) 198)
+	(= (fast-speed plane1) 449)
+	(= (capacity plane1) 10232)
+	(= (fuel plane1) 3956)
+	(= (slow-burn plane1) 4)
+	(= (fast-burn plane1) 15)
+	(= (refuel-rate plane1) 2904)
+	(at person1 city0)
+	(at person2 city2)
+	(= (distance city0 city0) 0)
+	(= (distance city0 city1) 678)
+	(= (distance city0 city2) 775)
+	(= (distance city1 city0) 678)
+	(= (distance city1 city1) 0)
+	(= (distance city1 city2) 810)
+	(= (distance city2 city0) 775)
+	(= (distance city2 city1) 810)
+	(= (distance city2 city2) 0)
+	(= (total-fuel-used) 0)
+	(= (boarding-time) 0.3)
+	(= (debarking-time) 0.6)
+    (still-on-time person1)
+    (still-on-time person2)
 )
+(:goal (and
+	(at plane1 city1)
+	(at person1 city0)
+	(at person2 city2)
+	))
 
-(:metric minimize (total-time)))
+(:metric minimize (+ (* 4 (total-time))  (* 0.005 (total-fuel-used))))
+)
