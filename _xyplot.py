@@ -1,8 +1,15 @@
 import csv
 import os
 import matplotlib.pyplot as plt
+import sys
 
-MAX = 60
+# Check if a command line argument has been provided
+if len(sys.argv) < 2:
+    print("Usage: python _xyplot.py <timeout>")
+    sys.exit(1)
+
+# The second command line argument is expected to be the config file name
+MAX = sys.argv[1]
 
 # Load the data from output_full.csv
 data = []

@@ -1,4 +1,13 @@
 import subprocess
+import sys
+
+# Check if a command line argument has been provided
+if len(sys.argv) < 2:
+    print("Usage: python _analyze.py <timeout>")
+    sys.exit(1)
+
+# The second command line argument is expected to be the config file name
+MAX = sys.argv[1]
 
 def run_script(script_name):
     """
@@ -29,6 +38,7 @@ def main():
 
     script_dir = os.getcwd() # script_dir = '/home/andrey/analysis/Depots/22.10.23 00-49'
     # Define the scripts to run in order
+
     scripts = [
         '_report_root_folder_full.py',
         '_normalize.py',
@@ -36,6 +46,19 @@ def main():
         '_generate_summary.py',
         '_xyplot.py'
     ]
+
+    # Define a function to run scripts with optional parameters
+    def run_script(script_name, param=None):
+        if param:
+            # If there is a parameter, include it in the command
+            command = f"python {script_name} {param}"
+        else:
+            # If no parameter, just run the script without any
+            command = f"python {script_name}"
+
+        # Execute the command
+        os.system(command)
+
 
     # Change the current working directory to the script directory
     try:
@@ -46,7 +69,13 @@ def main():
 
     # Execute each script in sequence
     for script in scripts:
-        run_script(script)
+        if script == '_xyplot.py':
+            # If the script is _xyplot.py, pass MAX as a parameter
+            run_script(script, MAX)
+        else:
+            # Otherwise, run the script without any parameters
+            run_script(script)
+
 
 if __name__ == "__main__":
     import os

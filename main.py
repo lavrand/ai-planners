@@ -143,7 +143,7 @@ while True:
                 commands_to_run = [
                     ("./add_initially_on_time", [f'{PFILE}', f'{AT}', f'{OBJECT}']),
                     ("./run-planner-to-get-initial-plan", [f'{DOMAIN}', f"ontime-pfile{PFILE_N}"]),
-                    ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS}', f'{EXPERIMENTS}'])
+                    ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS}', f'{EXPERIMENTS}', f'{PLAN_SEARCH_TIMEOUT_SECONDS}'])
                 ]
 
                 def run_subprocess_args(command, args):
@@ -158,15 +158,15 @@ while True:
                     cmd = [command] + args
 
                     try:
-                        # Execute the command with arguments, and wait for it to complete, but not longer than 120 seconds
-                        result = subprocess.run(cmd, check=True, text=True, capture_output=True, timeout=120)
+                        # Execute the command with arguments, and wait for it to complete, but not longer than PLAN_SEARCH_TIMEOUT_SECONDS * 2
+                        result = subprocess.run(cmd, check=True, text=True, capture_output=True, timeout=PLAN_SEARCH_TIMEOUT_SECONDS * 2)
 
                         # If the command was successful, result.stdout will contain the output
                         print(result.stdout)
 
                     except subprocess.TimeoutExpired:
                         # Handle the timeout exception as you see fit
-                        print("The command did not complete within 120 seconds.")
+                        print("The command did not complete within timeout seconds.")
                         # Here you might choose to try the command again, or perhaps record the timeout in a log file
 
                     except subprocess.CalledProcessError as e:

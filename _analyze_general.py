@@ -6,6 +6,24 @@ from docx import Document
 from docx.shared import Inches
 import matplotlib.pyplot as plt
 import glob
+import sys
+import configparser
+
+# Check if a command line argument has been provided
+if len(sys.argv) < 2:
+    print("Usage: python _analyze_general.py <config_file>")
+    sys.exit(1)
+
+# The second command line argument is expected to be the config file name
+config_file = sys.argv[1]
+
+# Initialize the configparser
+config = configparser.ConfigParser()
+
+# Read the configuration file passed as a command line argument
+config.read(config_file)
+
+MAX = config.getint('DEFAULT', 'PLAN_SEARCH_TIMEOUT_SECONDS')
 
 # List of scripts to copy
 scripts = [
@@ -25,7 +43,7 @@ def process_folder(folder_name):
 
     # Change to the target folder to run _analyze.py
     os.chdir(folder_name)
-    subprocess.run(['python3', '_analyze.py'])
+    subprocess.run(['python3', '_analyze.py', str(MAX)])
     os.chdir(root_dir)  # Change back to root directory
 
 # Main process

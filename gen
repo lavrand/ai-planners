@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
-if (scalar(@ARGV) != 7) {
-    print "Usage: gen <problem number> <domain filename> <at> <object> <perturb_rnd> <perturb_minus> <count>\n";
+if (scalar(@ARGV) != 8) {
+    print "Usage: gen <problem number> <domain filename> <at> <object> <perturb_rnd> <perturb_minus> <count> <timeout>\n";
     exit(1);
 }
 
@@ -12,12 +12,13 @@ $object = shift(@ARGV);
 $perturb_rnd = shift(@ARGV) + 0;
 $perturb_minus = shift(@ARGV) + 0;
 $count = shift(@ARGV) + 0;
+$timeout = shift(@ARGV) + 0;
 
 open DISP, "> dispscript";
 open NODISP, "> nodispscript";
 
-print DISP "#!/bin/bash\nulimit -t 60\n";
-print NODISP "#!/bin/bash\nulimit -t 60\n";
+print DISP "#!/bin/bash\nulimit -t $timeout\n";
+print NODISP "#!/bin/bash\nulimit -t $timeout\n";
 
 for ($i = 1; $i <= $count; $i++) {
    system("./getgoaltimes-random-perturb $domain ontime-pfile$pnumber 500plan-ontime-pfile$pnumber $i $at $object $perturb_rnd $perturb_minus");
