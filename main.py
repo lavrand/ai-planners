@@ -42,6 +42,7 @@ SPECIFIC_PFILE_VALUES = [int(x.strip()) for x in config.get('DEFAULT', 'SPECIFIC
 
 PFILE_START = config.getint('DEFAULT', 'PFILE_START')
 PFILE_END = config.getint('DEFAULT', 'PFILE_END')
+# PERTURB in %
 PERTURB_RND = config.getint('DEFAULT', 'PERTURB_RND')
 PERTURB_MINUS = config.getint('DEFAULT', 'PERTURB_MINUS')
 PERTURB_PLUS = config.getint('DEFAULT', 'PERTURB_PLUS')
