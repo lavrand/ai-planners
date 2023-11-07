@@ -86,13 +86,13 @@ foreach $flag (@sortedkeys) {
     } else {
         if ($perturb_rnd == 0) {
             $perturbment = $perturb_minus;
-            print OUT "; perturbment is $perturbment , perturb_minus is $perturb_minus \n";
+            print OUT "; perturbment is $perturbment %, perturb_minus is $perturb_minus %\n";
         } else {
             $perturbment = rand($perturb_rnd) + $perturb_minus;
-            print OUT "; perturbment is $perturbment , perturb_rnd is $perturb_rnd , perturb_minus is $perturb_minus \n";
+            print OUT "; perturbment is $perturbment %, perturb_rnd is $perturb_rnd %, perturb_minus is $perturb_minus %\n";
         }
 
-        $achievedat = $achievedat + $perturbment; # add something between [-50,50) to the deadline
+        $achievedat += $achievedat * $perturbment / 100; # add percentage perturbation to the deadline
         print OUT "(at $achievedat (not (still-on-time $flag))) ; deadline on when $flag got to its goal location\n"
     }
 }

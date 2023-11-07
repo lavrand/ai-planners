@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-if (scalar(@ARGV) != 6) {
+if (scalar(@ARGV) != 7) {
     print "Usage: gen <problem number> <domain filename> <at> <object> <perturb_rnd> <perturb_minus> <count>\n";
     exit(1);
 }

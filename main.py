@@ -116,7 +116,7 @@ while True:
             PFILE_N = current_pfile  # Updating the PFILE_N value for this iteration
             PFILE = f"pfile{PFILE_N}"
 
-            for current_perturb_minus in range(PERTURB_MINUS, PERTURB_PLUS + 1, __STEP):  # Iterating from -50 to 50 inclusive with step 10
+            for current_perturb_minus in range(PERTURB_MINUS, PERTURB_PLUS + 1, __STEP):  # Iterating from -PERTURB_MINUS to PERTURB_PLUS inclusive with step 10
                 PERTURB_MINUS = current_perturb_minus  # Updating the PERTURB_MINUS value for this iteration
 
                 print(f"[{datetime.now()}] Starting a new set of experiments for PFILE_N = {PFILE_N} with PERTURB_MINUS = {PERTURB_MINUS} ...")
