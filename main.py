@@ -9,48 +9,38 @@ import shutil
 import multiprocessing
 import itertools
 from functools import partial
-
 from _execute_command import execute_command
 from _execute_command_args import execute_command_args
 from _replace_deadlines import replace_deadlines
+import configparser
 
-# DOMAIN = 'driverlogTimed.pddl'
-# AT = 'at'
-# OBJECT = 'package'
+# Initialize the configparser
+config = configparser.ConfigParser()
 
-# DOMAIN = 'DepotsTime.pddl'
-# AT = 'on'
-# OBJECT = 'crate'
+# Read the configuration file
+config.read('config.ini')
 
-DOMAIN = 'zenotravelTandN.pddl'
-AT = 'at'
-OBJECT = 'person'
+# Retrieve the values from the config file
+DOMAIN = config.get('DEFAULT', 'DOMAIN')
+AT = config.get('DEFAULT', 'AT')
+OBJECT = config.get('DEFAULT', 'OBJECT')
+PLAN_SEARCH_TIMEOUT_SECONDS = config.getint('DEFAULT', 'PLAN_SEARCH_TIMEOUT_SECONDS')
+EXPERIMENTS = config.getint('DEFAULT', 'EXPERIMENTS')
+USE_SPECIFIC_PFILE_VALUES = config.getboolean('DEFAULT', 'USE_SPECIFIC_PFILE_VALUES')
 
-# DOMAIN = 'CTRover.pddl'
-# AT = 'at'
-# OBJECT = 'rover'
+# For list of values, such as SPECIFIC_PFILE_VALUES, convert from comma-separated string to list of ints
+SPECIFIC_PFILE_VALUES = [int(x.strip()) for x in config.get('DEFAULT', 'SPECIFIC_PFILE_VALUES').split(',')]
 
-PLAN_SEARCH_TIMEOUT_SECONDS = 60
-EXPERIMENTS = 100
+PFILE_START = config.getint('DEFAULT', 'PFILE_START')
+PFILE_END = config.getint('DEFAULT', 'PFILE_END')
+PERTURB_RND = config.getint('DEFAULT', 'PERTURB_RND')
+PERTURB_MINUS = config.getint('DEFAULT', 'PERTURB_MINUS')
+PERTURB_PLUS = config.getint('DEFAULT', 'PERTURB_PLUS')
+__STEP = config.getint('DEFAULT', '__STEP')
+MULTIPROCESSING_CPU_COUNT_MINUS = config.getint('DEFAULT', 'MULTIPROCESSING_CPU_COUNT_MINUS')
 
-# Flag to determine whether to use specific PFILE_N values or a range
-USE_SPECIFIC_PFILE_VALUES = True  # Set to False to use the PFILE_START to PFILE_END range
-
-# Specific values for PFILE_N, used if USE_SPECIFIC_PFILE_VALUES is True
-SPECIFIC_PFILE_VALUES = [6, 8, 11]
-
-# Define the range for PFILE_N
-PFILE_START = 6
 PFILE_N = PFILE_START
-# PFILE_END = 22  # This allows the loop to go up to PFILE_N = 22 'DepotsTime.pddl'
-PFILE_END = 11 # This allows the loop to go up to PFILE_N = 20 'driverlogTimed.pddl' 'zenotravelTandN.pddl'
 
-PERTURB_RND = 0
-PERTURB_MINUS = -50
-PERTURB_PLUS = 50
-__STEP = 5
-
-MULTIPROCESSING_CPU_COUNT_MINUS = 2
 
 PFILE = f"pfile{PFILE_N}"
 FOREST_DEADLINES_ENABLED = False  # DOUBLECHECK THIS IS DISABLED
