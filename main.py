@@ -13,12 +13,21 @@ from _execute_command import execute_command
 from _execute_command_args import execute_command_args
 from _replace_deadlines import replace_deadlines
 import configparser
+import sys
+
+# Check if a command line argument has been provided
+if len(sys.argv) < 2:
+    print("Usage: python main.py <config_file>")
+    sys.exit(1)
+
+# The second command line argument is expected to be the config file name
+config_file = sys.argv[1]
 
 # Initialize the configparser
 config = configparser.ConfigParser()
 
-# Read the configuration file
-config.read('config.ini')
+# Read the configuration file passed as a command line argument
+config.read(config_file)
 
 # Retrieve the values from the config file
 DOMAIN = config.get('DEFAULT', 'DOMAIN')
