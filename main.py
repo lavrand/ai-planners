@@ -142,7 +142,7 @@ while True:
                 commands_to_run = [
                     ("./add_initially_on_time", [f'{PFILE}', f'{AT}', f'{OBJECT}']),
                     ("./run-planner-to-get-initial-plan", [f'{DOMAIN}', f"ontime-pfile{PFILE_N}"]),
-                    ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS}'])
+                    ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS}', f'{EXPERIMENTS}'])
                 ]
 
                 def run_subprocess_args(command, args):
@@ -277,7 +277,7 @@ while True:
                         csvwriter.writerow(['File', 'disp', 'nodisp'])
                         csvbetterwriter.writerow(['File', 'disp', 'nodisp'])
 
-                        for i in range(1, EXPERIMENTS + 1):  # 1 to 100 inclusive
+                        for i in range(1, EXPERIMENTS + 1):  # 1 to EXPERIMENTS inclusive
                             filename = base_filename + str(i)
                             times = [filename]  # Start with filename as first column
 
