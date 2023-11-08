@@ -49,6 +49,26 @@ PERTURB_PLUS = config.getint('DEFAULT', 'PERTURB_PLUS')
 __STEP = config.getint('DEFAULT', '__STEP')
 MULTIPROCESSING_CPU_COUNT_MINUS = config.getint('DEFAULT', 'MULTIPROCESSING_CPU_COUNT_MINUS')
 
+time_based_on_expansions_per_second = config.getint('DEFAULT', 'time_based_on_expansions_per_second')
+include_metareasoning_time = config.getboolean('DEFAULT', 'include_metareasoning_time')
+multiply_TILs_by = config.getint('DEFAULT', 'multiply_TILs_by')
+real_to_plan_time_multiplier = config.getint('DEFAULT', 'real_to_plan_time_multiplier')
+calculate_Q_interval = config.getint('DEFAULT', 'calculate_Q_interval')
+add_weighted_f_value_to_Q = config.getfloat('DEFAULT', 'add_weighted_f_value_to_Q')
+min_probability_failure = config.getfloat('DEFAULT', 'min_probability_failure')
+slack_from_heuristic = config.getboolean('DEFAULT', 'slack_from_heuristic')
+forbid_self_overlapping_actions = config.getboolean('DEFAULT', 'forbid_self_overlapping_actions')
+deadline_aware_open_list = config.get('DEFAULT', 'deadline_aware_open_list')
+ijcai_gamma = config.getfloat('DEFAULT', 'ijcai_gamma')
+ijcai_t_u = config.getint('DEFAULT', 'ijcai_t_u')
+icaps_for_n_expansions = config.getint('DEFAULT', 'icaps_for_n_expansions')
+time_aware_heuristic = config.getint('DEFAULT', 'time_aware_heuristic')
+dispatch_frontier_size = config.getint('DEFAULT', 'dispatch_frontier_size')
+subtree_focus_threshold = config.getfloat('DEFAULT', 'subtree_focus_threshold')
+dispatch_threshold = config.getfloat('DEFAULT', 'dispatch_threshold')
+optimistic_lst_for_dispatch_reasoning = config.getboolean('DEFAULT', 'optimistic_lst_for_dispatch_reasoning')
+
+
 PFILE_N = PFILE_START
 
 
@@ -189,15 +209,17 @@ while True:
 
                 print(f"[{datetime.now()}] Finished running the generation script.")
 
-                base_command_common = ("./rewrite-no-lp --time-based-on-expansions-per-second 500 "
-                                       "--include-metareasoning-time --multiply-TILs-by 1 "
-                                       "--real-to-plan-time-multiplier 1 --calculate-Q-interval 100 "
-                                       "--add-weighted-f-value-to-Q -0.000001 --min-probability-failure 0.001 "
-                                       "--slack-from-heuristic --forbid-self-overlapping-actions "
-                                       "--deadline-aware-open-list IJCAI --ijcai-gamma 1 --ijcai-t_u 100 "
-                                       "--icaps-for-n-expansions 100 --time-aware-heuristic 1 "
-                                       "--dispatch-frontier-size 10 --subtree-focus-threshold 0.025 "
-                                       "--dispatch-threshold 0.025 --optimistic-lst-for-dispatch-reasoning ")
+                base_command_common = (
+                    f"./rewrite-no-lp --time-based-on-expansions-per-second {time_based_on_expansions_per_second} "
+                    f"--include-metareasoning-time {include_metareasoning_time} --multiply-TILs-by {multiply_TILs_by} "
+                    f"--real-to-plan-time-multiplier {real_to_plan_time_multiplier} --calculate-Q-interval {calculate_Q_interval} "
+                    f"--add-weighted-f-value-to-Q {add_weighted_f_value_to_Q} --min-probability-failure {min_probability_failure} "
+                    f"--slack-from-heuristic {slack_from_heuristic} --forbid-self-overlapping-actions {forbid_self_overlapping_actions} "
+                    f"--deadline-aware-open-list {deadline_aware_open_list} --ijcai-gamma {ijcai_gamma} --ijcai-t_u {ijcai_t_u} "
+                    f"--icaps-for-n-expansions {icaps_for_n_expansions} --time-aware-heuristic {time_aware_heuristic} "
+                    f"--dispatch-frontier-size {dispatch_frontier_size} --subtree-focus-threshold {subtree_focus_threshold} "
+                    f"--dispatch-threshold {dispatch_threshold} --optimistic-lst-for-dispatch-reasoning {optimistic_lst_for_dispatch_reasoning} "
+                )
 
                 base_command_end = (f" %s withdeadlines-ontime-pfile{PFILE_N}-" % DOMAIN)
 
