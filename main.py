@@ -50,23 +50,19 @@ __STEP = config.getint('DEFAULT', '__STEP')
 MULTIPROCESSING_CPU_COUNT_MINUS = config.getint('DEFAULT', 'MULTIPROCESSING_CPU_COUNT_MINUS')
 
 time_based_on_expansions_per_second = config.getint('DEFAULT', 'time_based_on_expansions_per_second')
-include_metareasoning_time = config.getboolean('DEFAULT', 'include_metareasoning_time')
 multiply_TILs_by = config.getint('DEFAULT', 'multiply_TILs_by')
 real_to_plan_time_multiplier = config.getint('DEFAULT', 'real_to_plan_time_multiplier')
 calculate_Q_interval = config.getint('DEFAULT', 'calculate_Q_interval')
-add_weighted_f_value_to_Q = config.getfloat('DEFAULT', 'add_weighted_f_value_to_Q')
-min_probability_failure = config.getfloat('DEFAULT', 'min_probability_failure')
-slack_from_heuristic = config.getboolean('DEFAULT', 'slack_from_heuristic')
-forbid_self_overlapping_actions = config.getboolean('DEFAULT', 'forbid_self_overlapping_actions')
+add_weighted_f_value_to_Q = config.get('DEFAULT', 'add_weighted_f_value_to_Q')
+min_probability_failure = config.get('DEFAULT', 'min_probability_failure')
 deadline_aware_open_list = config.get('DEFAULT', 'deadline_aware_open_list')
-ijcai_gamma = config.getfloat('DEFAULT', 'ijcai_gamma')
+ijcai_gamma = config.get('DEFAULT', 'ijcai_gamma')
 ijcai_t_u = config.getint('DEFAULT', 'ijcai_t_u')
 icaps_for_n_expansions = config.getint('DEFAULT', 'icaps_for_n_expansions')
 time_aware_heuristic = config.getint('DEFAULT', 'time_aware_heuristic')
 dispatch_frontier_size = config.getint('DEFAULT', 'dispatch_frontier_size')
-subtree_focus_threshold = config.getfloat('DEFAULT', 'subtree_focus_threshold')
-dispatch_threshold = config.getfloat('DEFAULT', 'dispatch_threshold')
-optimistic_lst_for_dispatch_reasoning = config.getboolean('DEFAULT', 'optimistic_lst_for_dispatch_reasoning')
+subtree_focus_threshold = config.get('DEFAULT', 'subtree_focus_threshold')
+dispatch_threshold = config.get('DEFAULT', 'dispatch_threshold')
 
 
 PFILE_N = PFILE_START
@@ -212,14 +208,14 @@ while True:
 
                 base_command_common = (
                     f"./rewrite-no-lp --time-based-on-expansions-per-second {time_based_on_expansions_per_second} "
-                    f"--include-metareasoning-time {include_metareasoning_time} --multiply-TILs-by {multiply_TILs_by} "
+                    f"--include-metareasoning-time --multiply-TILs-by {multiply_TILs_by} "
                     f"--real-to-plan-time-multiplier {real_to_plan_time_multiplier} --calculate-Q-interval {calculate_Q_interval} "
                     f"--add-weighted-f-value-to-Q {add_weighted_f_value_to_Q} --min-probability-failure {min_probability_failure} "
-                    f"--slack-from-heuristic {slack_from_heuristic} --forbid-self-overlapping-actions {forbid_self_overlapping_actions} "
+                    f"--slack-from-heuristic --forbid-self-overlapping-actions "
                     f"--deadline-aware-open-list {deadline_aware_open_list} --ijcai-gamma {ijcai_gamma} --ijcai-t_u {ijcai_t_u} "
                     f"--icaps-for-n-expansions {icaps_for_n_expansions} --time-aware-heuristic {time_aware_heuristic} "
                     f"--dispatch-frontier-size {dispatch_frontier_size} --subtree-focus-threshold {subtree_focus_threshold} "
-                    f"--dispatch-threshold {dispatch_threshold} --optimistic-lst-for-dispatch-reasoning {optimistic_lst_for_dispatch_reasoning} "
+                    f"--dispatch-threshold {dispatch_threshold} --optimistic-lst-for-dispatch-reasoning "
                 )
 
                 base_command_end = (f" %s withdeadlines-ontime-pfile{PFILE_N}-" % DOMAIN)
@@ -229,7 +225,7 @@ while True:
                 def run_dispscript(i):
                     command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
                         i) + f" > disp/{PFILE_N}-" + str(i)
-                    print(f"[{datetime.now()}] Running disp command for file {PFILE_N}-{i}...")
+                    print(f"[{datetime.now()}] Running disp command for file {PFILE_N}-{i}. Command: {command}")
                     run_subprocess(command, i)
                     print(f"[{datetime.now()}] Finished disp command for file {PFILE_N}-{i}.")
 
