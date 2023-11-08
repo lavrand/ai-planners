@@ -160,7 +160,8 @@ while True:
                 commands_to_run = [
                     ("./add_initially_on_time", [f'{PFILE}', f'{AT}', f'{OBJECT}']),
                     ("./run-planner-to-get-initial-plan", [f'{DOMAIN}', f"ontime-pfile{PFILE_N}"]),
-                    ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS_CUR}', f'{EXPERIMENTS}', f'{PLAN_SEARCH_TIMEOUT_SECONDS}'])
+                    ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS_CUR}', f'{EXPERIMENTS}', f'{PLAN_SEARCH_TIMEOUT_SECONDS}', f'{subtree_focus_threshold}', f'{dispatch_threshold}']),
+                    ("./run-planner-to-get-initial-plan", [f'{DOMAIN}', f"withdeadlines-ontime-pfile{PFILE_N}"])
                 ]
 
                 def run_subprocess_args(command, args):
