@@ -126,6 +126,7 @@ pfile_cycle = itertools.cycle(SPECIFIC_PFILE_VALUES) if USE_SPECIFIC_PFILE_VALUE
 
 # Main loop to run everything in an infinite cycle
 while True:
+
     # Determine which PFILE_N values to use based on the flag
     if USE_SPECIFIC_PFILE_VALUES:
         pfile_values = [next(pfile_cycle)]   # use the specific values
@@ -138,9 +139,9 @@ while True:
             PFILE = f"pfile{PFILE_N}"
 
             for current_perturb_minus in range(PERTURB_MINUS, PERTURB_PLUS + 1, __STEP):  # Iterating from -PERTURB_MINUS to PERTURB_PLUS inclusive with step 10
-                PERTURB_MINUS = current_perturb_minus  # Updating the PERTURB_MINUS value for this iteration
+                PERTURB_MINUS_CUR = current_perturb_minus  # Updating the PERTURB_MINUS value for this iteration
 
-                print(f"[{datetime.now()}] Starting a new set of experiments for PFILE_N = {PFILE_N} with PERTURB_MINUS = {PERTURB_MINUS} ...")
+                print(f"[{datetime.now()}] Starting a new set of experiments for PFILE_N = {PFILE_N} with current_perturb_minus = {current_perturb_minus} ...")
 
                 print(f"[{datetime.now()}] Starting a new set of experiments...")
                 # Create directories and set permissions
@@ -163,7 +164,7 @@ while True:
                 commands_to_run = [
                     ("./add_initially_on_time", [f'{PFILE}', f'{AT}', f'{OBJECT}']),
                     ("./run-planner-to-get-initial-plan", [f'{DOMAIN}', f"ontime-pfile{PFILE_N}"]),
-                    ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS}', f'{EXPERIMENTS}', f'{PLAN_SEARCH_TIMEOUT_SECONDS}'])
+                    ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS_CUR}', f'{EXPERIMENTS}', f'{PLAN_SEARCH_TIMEOUT_SECONDS}'])
                 ]
 
                 def run_subprocess_args(command, args):
