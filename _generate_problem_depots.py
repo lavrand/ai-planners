@@ -64,6 +64,7 @@ def generate_depot_domain_pddl(domain_file):
     """)
     print(f"Depot domain file generated: {domain_file}")
 
+
 def generate_depot_problem_pddl(num_places, num_dead_ends, num_trucks, num_hoists, num_crates, problem_file):
     depots = [f"depot{i}" for i in range(num_places)]
     distributors = [f"distributor{i}" for i in range(num_places)]
@@ -85,34 +86,45 @@ def generate_depot_problem_pddl(num_places, num_dead_ends, num_trucks, num_hoist
         file.write(" ".join(pallets) + " - pallet\n  )\n")
         file.write("  (:init\n")
 
-        # Initialize locations of trucks, hoists, crates, and dead ends
+        # Initialize locations of trucks, hoists, crates, and pallets
         for truck in trucks:
-            file.write(f"    (at {truck} {random.choice(depots)})\n")
+            depot = random.choice(depots)
+            file.write(f"    (at {truck} {depot})\n")
             file.write(f"    (= (speed {truck}) {random.randint(1, 5)})\n")
         for hoist in hoists:
-            file.write(f"    (at {hoist} {random.choice(depots)})\n")
+            depot = random.choice(depots)
+            file.write(f"    (at {hoist} {depot})\n")
             file.write(f"    (available {hoist})\n")
             file.write(f"    (= (power {hoist}) {random.randint(1, 10)})\n")
         for i, crate in enumerate(crates):
             pallet = pallets[i]
-            place = random.choice(depots + distributors)
-            file.write(f"    (at {crate} {place})\n")
+            depot_or_distributor = random.choice(depots + distributors)
+            file.write(f"    (at {crate} {depot_or_distributor})\n")
             file.write(f"    (on {crate} {pallet})\n")
+            file.write(f"    (clear {crate})\n")
             file.write(f"    (= (weight {crate}) {random.randint(10, 100)})\n")
-        for place in depots + distributors:
-            for other_place in depots + distributors:
-                distance = random.randint(1, 10) if place != other_place else 0
-                file.write(f"    (= (distance {place} {other_place}) {distance})\n")
+            file.write(f"    (at {pallet} {depot_or_distributor})\n")
+            file.write(f"    (clear {pallet})\n")
+
+        # Initialize distances
+        for place1 in depots + distributors:
+            for place2 in depots + distributors:
+                distance = random.randint(1, 10) if place1 != place2 else 0
+                file.write(f"    (= (distance {place1} {place2}) {distance})\n")
+
+        # Initialize dead end paths
         for place in depots + distributors:
             dead_end_conn = random.choice(dead_ends)
             file.write(f"    (dead_end_path {place} {dead_end_conn})\n")
+
         file.write("  )\n")
         file.write("  (:goal\n    (and\n")
 
-        # Define some example goal conditions
-        for i in range(min(4, num_crates)):  # Example goal: moving up to 4 crates
+        # Define achievable goal conditions
+        for crate in crates[:min(4, num_crates)]:
             target = random.choice(depots + distributors)
-            file.write(f"        (at crate{i} {target})\n")
+            file.write(f"        (at {crate} {target})\n")
+
         file.write("    )\n  )\n")
         file.write("  (:metric minimize (total-time))\n")
         file.write(")\n")
