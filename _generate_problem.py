@@ -3,24 +3,23 @@ import random
 def generate_complex_domain_pddl(domain_file):
     with open(domain_file, "w") as file:
         file.write("""(define (domain complex_navigation)
-    (:requirements :strips :typing :equality :conditional-effects)
+    (:requirements :strips :typing :equality)
     (:types 
         location
         dead_end
-        key - location
+        key
     )
     (:predicates
         (path ?from - location ?to - location)
         (dead_end_path ?from - location ?to - dead_end)
-        (visited ?loc - location)
-        (key_at ?loc - key)
-        (has_key)
         (at ?loc - location)
+        (key_at ?key - key ?loc - location)
+        (has_key)
     )
     (:action move
         :parameters (?from ?to - location)
-        :precondition (and (at ?from) (path ?from ?to) (not (visited ?to)))
-        :effect (and (not (at ?from)) (at ?to) (visited ?to))
+        :precondition (and (at ?from) (path ?from ?to))
+        :effect (and (not (at ?from)) (at ?to))
     )
     (:action move_to_dead_end
         :parameters (?from - location ?to - dead_end)
@@ -28,17 +27,17 @@ def generate_complex_domain_pddl(domain_file):
         :effect (and (not (at ?from)))
     )
     (:action pick_up_key
-        :parameters (?loc - key)
-        :precondition (and (at ?loc) (key_at ?loc) (not (has_key)))
-        :effect (and (not (key_at ?loc)) (has_key))
+        :parameters (?key - key ?loc - location)
+        :precondition (and (at ?loc) (key_at ?key ?loc) (not (has_key)))
+        :effect (has_key)
     )
 )""")
     print(f"Domain file generated: {domain_file}")
 
-def generate_complex_problem_pddl(num_locations, num_dead_ends, problem_file):
+def generate_complex_problem_pddl(num_locations, num_dead_ends, num_keys, problem_file):
     locations = [f"loc{i}" for i in range(1, num_locations + 1)]
     dead_ends = [f"dead{i}" for i in range(1, num_dead_ends + 1)]
-    keys = [f"key{i}" for i in range(1, 5)]  # Few key locations
+    keys = [f"key{i}" for i in range(1, num_keys + 1)]
 
     with open(problem_file, "w") as file:
         file.write("(define (problem extended_navigation_problem)\n")
@@ -51,7 +50,7 @@ def generate_complex_problem_pddl(num_locations, num_dead_ends, problem_file):
 
         # Paths between locations
         for loc in locations:
-            connections = random.sample(locations, random.randint(4, 10))
+            connections = random.sample(locations, random.randint(4, 8))
             for conn in connections:
                 if conn != loc:
                     file.write(f"    (path {loc} {conn})\n")
@@ -61,7 +60,7 @@ def generate_complex_problem_pddl(num_locations, num_dead_ends, problem_file):
             dead_end_conn = random.choice(dead_ends)
             file.write(f"    (dead_end_path {loc} {dead_end_conn})\n")
 
-        # Key locations
+        # Keys at specific locations
         for key in keys:
             key_location = random.choice(locations)
             file.write(f"    (key_at {key} {key_location})\n")
@@ -74,4 +73,4 @@ def generate_complex_problem_pddl(num_locations, num_dead_ends, problem_file):
 
 # Generate domain and problem files
 generate_complex_domain_pddl("domain.pddl")
-generate_complex_problem_pddl(300, 300, "pfile1")  # Increase numbers as needed
+generate_complex_problem_pddl(300, 300, 4, "pfile1")  # Adjust numbers as needed
