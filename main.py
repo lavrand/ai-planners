@@ -63,7 +63,7 @@ time_aware_heuristic = config.getint('DEFAULT', 'time_aware_heuristic')
 dispatch_frontier_size = config.getint('DEFAULT', 'dispatch_frontier_size')
 subtree_focus_threshold = config.get('DEFAULT', 'subtree_focus_threshold')
 dispatch_threshold = config.get('DEFAULT', 'dispatch_threshold')
-
+RUN_ONCE = config.getboolean('DEFAULT', 'RUN_ONCE')
 
 PFILE_N = PFILE_START
 
@@ -122,6 +122,10 @@ pfile_cycle = itertools.cycle(SPECIFIC_PFILE_VALUES) if USE_SPECIFIC_PFILE_VALUE
 
 # Main loop to run everything in an infinite cycle
 while True:
+
+    # Check if the loop should run only once
+    if RUN_ONCE:
+        break
 
     # Determine which PFILE_N values to use based on the flag
     if USE_SPECIFIC_PFILE_VALUES:
