@@ -8,28 +8,34 @@ def generate_pddl_problem(num_cities, num_aircraft, num_people):
 
     # Initial Conditions
     initial_conditions = []
-    for i, plane in enumerate(aircrafts):
+    city_aircraft_map = {}
+
+    # Assigning aircrafts to cities and setting fuel
+    for plane in aircrafts:
         city_index = random.randint(0, num_cities - 1)
+        city_aircraft_map.setdefault(city_index, []).append(plane)
         initial_conditions.append(f"(at {plane} {cities[city_index]})")
-        initial_fuel = random.randint(100, 500)  # More restrictive fuel levels
+        initial_fuel = random.randint(500, 1000)  # Ensuring adequate fuel
         initial_conditions.append(f"(= (fuel {plane}) {initial_fuel})")
 
-    for i, person in enumerate(people):
-        city_index = random.randint(0, num_cities - 1)
+    # Assigning people to cities with at least one aircraft
+    for person in people:
+        city_index = random.choice(list(city_aircraft_map.keys()))
         initial_conditions.append(f"(at {person} {cities[city_index]})")
         initial_conditions.append(f"(still-on-time {person})")
 
-    # Distances between cities - more variability
+    # Distances between cities
     for i in range(num_cities):
         for j in range(num_cities):
             if i != j:
-                distance = random.randint(100, 1000)  # Randomized distances
+                distance = random.randint(100, 1000)
                 initial_conditions.append(f"(= (distance city{i} city{j}) {distance})")
 
-    # Goals - more complex
+    # Goals - ensuring at least one achievable goal for each person
     goals = []
-    for i, person in enumerate(people):
-        target_city = cities[random.randint(0, num_cities - 1)]
+    for person in people:
+        available_cities = list(set(range(num_cities)) - {city_index})
+        target_city = cities[random.choice(available_cities)]
         goals.append(f"(at {person} {target_city})")
 
     # Generate problem file content
@@ -53,9 +59,9 @@ def generate_pddl_problem(num_cities, num_aircraft, num_people):
     return problem_content
 
 # Generate the problem file content
-num_cities = 15  # Increased number of cities
-num_aircraft = 10  # Increased number of aircraft
-num_people = 20  # Increased number of people
+num_cities = 15
+num_aircraft = 10
+num_people = 20
 
 problem_content = generate_pddl_problem(num_cities, num_aircraft, num_people)
 
