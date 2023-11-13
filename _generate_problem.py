@@ -3,7 +3,7 @@ import random
 def generate_complex_domain_pddl(domain_file):
     with open(domain_file, "w") as file:
         file.write("""(define (domain complex_navigation)
-    (:requirements :strips :typing :equality)
+    (:requirements :strips :typing :equality :negative-preconditions)
     (:types 
         location
         dead_end
@@ -15,11 +15,12 @@ def generate_complex_domain_pddl(domain_file):
         (at ?loc - location)
         (key_at ?key - key ?loc - location)
         (has_key)
+        (visited ?loc - location)  ; Declare visited predicate
     )
     (:action move
         :parameters (?from ?to - location)
-        :precondition (and (at ?from) (path ?from ?to))
-        :effect (and (not (at ?from)) (at ?to))
+        :precondition (and (at ?from) (path ?from ?to) (not (visited ?to)))
+        :effect (and (not (at ?from)) (at ?to) (visited ?to))
     )
     (:action move_to_dead_end
         :parameters (?from - location ?to - dead_end)
@@ -73,4 +74,4 @@ def generate_complex_problem_pddl(num_locations, num_dead_ends, num_keys, proble
 
 # Generate domain and problem files
 generate_complex_domain_pddl("domain.pddl")
-generate_complex_problem_pddl(300, 300, 4, "pfile1")  # Adjust numbers as needed
+generate_complex_problem_pddl(300, 300, 4, "pfile")  # Adjust numbers as needed
