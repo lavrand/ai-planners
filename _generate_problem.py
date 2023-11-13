@@ -1,6 +1,6 @@
 import random
 
-def generate_pddl_problem(num_locations, output_file):
+def generate_complex_pddl_problem(num_locations, output_file):
     locations = [f"loc{i}" for i in range(1, num_locations + 1)]
 
     with open(output_file, "w") as file:
@@ -11,12 +11,18 @@ def generate_pddl_problem(num_locations, output_file):
         file.write(" - location\n  )\n")
         file.write("  (:init\n    (at loc1)\n")
 
-        # Creating paths
-        all_possible_paths = set((f"loc{i}", f"loc{j}") for i in range(1, num_locations) for j in range(1, num_locations) if i != j)
-        chosen_paths = set(random.sample(all_possible_paths, num_locations * 3))  # Increase the number of paths
+        # Creating a dense and complex network of paths
+        for loc in locations:
+            connections = random.sample(locations, random.randint(5, 10))  # Increase connections per location
+            for conn in connections:
+                if conn != loc:
+                    file.write(f"    (path {loc} {conn})\n")
 
-        for from_loc, to_loc in chosen_paths:
-            file.write(f"    (path {from_loc} {to_loc})\n")
+        # Introducing dead ends
+        for _ in range(num_locations // 2):
+            dead_end_from = random.choice(locations)
+            dead_end_to = f"dead{random.randint(1, num_locations)}"
+            file.write(f"    (path {dead_end_from} {dead_end_to})\n")
 
         file.write("  )\n")
         file.write(f"  (:goal\n    (at loc{num_locations})\n  )\n")
@@ -24,5 +30,4 @@ def generate_pddl_problem(num_locations, output_file):
 
     print(f"Problem file generated: {output_file}")
 
-# Increase the number of locations to increase complexity
-generate_pddl_problem(100, "pfile")  # Example with 100 locations
+generate_complex_pddl_problem(150, "pfile1")  # Example with 150 locations
