@@ -123,10 +123,6 @@ pfile_cycle = itertools.cycle(SPECIFIC_PFILE_VALUES) if USE_SPECIFIC_PFILE_VALUE
 # Main loop to run everything in an infinite cycle
 while True:
 
-    # Check if the loop should run only once
-    if RUN_ONCE:
-        break
-
     # Determine which PFILE_N values to use based on the flag
     if USE_SPECIFIC_PFILE_VALUES:
         pfile_values = [next(pfile_cycle)]   # use the specific values
@@ -383,4 +379,9 @@ while True:
             # Optionally, log the exception e to a log file or database for later analysis
         finally:
             # If there's any cleanup that ALWAYS needs to happen, put it here.
+
             pass
+
+    # Check if the loop should run only once
+    if RUN_ONCE:
+        break

@@ -11,13 +11,16 @@ def generate_pddl_problem(num_locations, output_file):
         file.write(" - location\n  )\n")
         file.write("  (:init\n    (at loc1)\n")
 
-        # Generating a complex web of paths
+        # Creating a guaranteed solvable path
         for i in range(1, num_locations):
-            # Create paths from each location to a few random other locations
+            file.write(f"    (path loc{i} loc{i+1})\n")
+
+        # Adding additional random paths
+        for loc in locations[:-1]:  # Exclude the last location
             connections = random.sample(locations, random.randint(2, 4))
             for conn in connections:
-                if conn != f"loc{i}":
-                    file.write(f"    (path loc{i} {conn})\n")
+                if conn != loc:
+                    file.write(f"    (path {loc} {conn})\n")
 
         file.write("  )\n")
         file.write(f"  (:goal\n    (at loc{num_locations})\n  )\n")
@@ -25,5 +28,4 @@ def generate_pddl_problem(num_locations, output_file):
 
     print(f"Problem file generated: {output_file}")
 
-# Change the number of locations as needed
-generate_pddl_problem(50, "pfile1")
+generate_pddl_problem(50, "pfile.pddl")
