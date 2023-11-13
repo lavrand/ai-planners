@@ -34,8 +34,8 @@ def generate_problem_pddl(num_locations, num_dead_ends, problem_file):
         file.write("(define (problem extended_navigation_problem)\n")
         file.write("  (:domain complex_navigation)\n")
         file.write("  (:objects\n    ")
-        file.write(" ".join(locations + dead_ends))
-        file.write(" - location\n  )\n")
+        file.write(" ".join(locations) + " - location\n    ")
+        file.write(" ".join(dead_ends) + " - dead_end\n  )\n")
         file.write("  (:init\n    (at loc1)\n")
 
         # Paths between locations
