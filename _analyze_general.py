@@ -66,10 +66,21 @@ for folder_name in archive_folders:
     new_folder_name = folder_name.replace('archive_', '')  # Optional: remove 'archive_' prefix for summary folder names
     new_folder_path = os.path.join(summary_dir, new_folder_name)
     os.makedirs(new_folder_path, exist_ok=True)
+    try:
+        # Print the current working directory for debugging
+        print("Current Working Directory: ", os.getcwd())
 
-    # Copy generated files to the new folders in the summary directory
-    for file_name in ['disp_vs_nodisp_plot.png', 'summary.csv']:
-        shutil.copy(os.path.join(folder_name, file_name), os.path.join(new_folder_path, file_name))
+        # Copy generated files to the new folders in the summary directory
+        for file_name in ['disp_vs_nodisp_plot.png', 'summary.csv']:
+            src_path = os.path.join(folder_name, file_name)
+
+            # Check if the source file exists
+            if os.path.exists(src_path):
+                shutil.copy(src_path, os.path.join(new_folder_path, file_name))
+            else:
+                print(f"File not found: {src_path}")
+    except Exception as e:
+        print("An error occurred:", e)
 
 def generate_plots(summary_csv_path):
     # Load the data
@@ -116,30 +127,39 @@ def generate_plots(summary_csv_path):
 
 def generate_doc(summary_dir):
     doc = Document()
-
     doc.add_heading('Analysis Report', 0)
 
-    # Add plots to the document
-    doc.add_picture('plot1.png', width=Inches(6))
-    doc.add_picture('plot2.png', width=Inches(6))
+    # Add global plots to the document
+    for plot_name in ['plot1.png', 'plot2.png']:
+        plot_path = os.path.join(summary_dir, plot_name)
+        if os.path.exists(plot_path):
+            doc.add_picture(plot_path, width=Inches(6))
+        else:
+            print(f"Global plot not found: {plot_path}")
 
     for folder_name in archive_folders:
-        new_folder_name = folder_name.replace('archive_', '')  # Same modification as above
+        new_folder_name = folder_name.replace('archive_', '')
         new_folder_path = os.path.join(summary_dir, new_folder_name)
 
         # Add CSV data to document
         csv_file = os.path.join(new_folder_path, 'summary.csv')
-        df = pd.read_csv(csv_file)
-        table = doc.add_table(df.shape[0] + 1, df.shape[1])
-        for j, (index, row) in enumerate(df.iterrows()):
-            for k, value in enumerate(row):
-                table.cell(j + 1, k).text = str(value)
-        for k, name in enumerate(df.columns):
-            table.cell(0, k).text = name
+        if os.path.exists(csv_file):
+            df = pd.read_csv(csv_file)
+            table = doc.add_table(df.shape[0] + 1, df.shape[1])
+            for j, (index, row) in enumerate(df.iterrows()):
+                for k, value in enumerate(row):
+                    table.cell(j + 1, k).text = str(value)
+            for k, name in enumerate(df.columns):
+                table.cell(0, k).text = name
+        else:
+            print(f"CSV file not found: {csv_file}")
 
         # Add plot to document
         plot_file = os.path.join(new_folder_path, 'disp_vs_nodisp_plot.png')
-        doc.add_picture(plot_file, width=Inches(6))
+        if os.path.exists(plot_file):
+            doc.add_picture(plot_file, width=Inches(6))
+        else:
+            print(f"Folder plot not found: {plot_file}")
 
     doc_path = os.path.join(summary_dir, 'summary.docx')
     doc.save(doc_path)
