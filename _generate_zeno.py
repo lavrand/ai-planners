@@ -1,3 +1,5 @@
+import random
+
 def generate_pddl_problem(num_cities, num_aircraft, num_people):
     # Create objects
     cities = [f"city{i}" for i in range(num_cities)]
@@ -7,23 +9,27 @@ def generate_pddl_problem(num_cities, num_aircraft, num_people):
     # Initial Conditions
     initial_conditions = []
     for i, plane in enumerate(aircrafts):
-        initial_conditions.append(f"(at {plane} {cities[i % num_cities]})")
-        initial_conditions.append(f"(= (fuel {plane}) 500)")  # Example fuel level
+        city_index = random.randint(0, num_cities - 1)
+        initial_conditions.append(f"(at {plane} {cities[city_index]})")
+        initial_fuel = random.randint(100, 500)  # More restrictive fuel levels
+        initial_conditions.append(f"(= (fuel {plane}) {initial_fuel})")
 
     for i, person in enumerate(people):
-        initial_conditions.append(f"(at {person} {cities[i % num_cities]})")
-        initial_conditions.append(f"(still-on-time {person})")  # Added this line
+        city_index = random.randint(0, num_cities - 1)
+        initial_conditions.append(f"(at {person} {cities[city_index]})")
+        initial_conditions.append(f"(still-on-time {person})")
 
-    # Distances between cities
+    # Distances between cities - more variability
     for i in range(num_cities):
         for j in range(num_cities):
-            distance = abs(i - j) * 100  # Example distance calculation
-            initial_conditions.append(f"(= (distance city{i} city{j}) {distance})")
+            if i != j:
+                distance = random.randint(100, 1000)  # Randomized distances
+                initial_conditions.append(f"(= (distance city{i} city{j}) {distance})")
 
-    # Goals
+    # Goals - more complex
     goals = []
-    for person in people:
-        target_city = cities[int(person[-1]) % num_cities]  # Example goal assignment
+    for i, person in enumerate(people):
+        target_city = cities[random.randint(0, num_cities - 1)]
         goals.append(f"(at {person} {target_city})")
 
     # Generate problem file content
@@ -47,9 +53,9 @@ def generate_pddl_problem(num_cities, num_aircraft, num_people):
     return problem_content
 
 # Generate the problem file content
-num_cities = 10  # Number of cities
-num_aircraft = 5  # Number of aircraft
-num_people = 15  # Number of people
+num_cities = 15  # Increased number of cities
+num_aircraft = 10  # Increased number of aircraft
+num_people = 20  # Increased number of people
 
 problem_content = generate_pddl_problem(num_cities, num_aircraft, num_people)
 
@@ -57,4 +63,4 @@ problem_content = generate_pddl_problem(num_cities, num_aircraft, num_people)
 with open("pfile1", "w") as file:
     file.write(problem_content)
 
-print("PDDL Problem file generated: zeno_travel_problem.pddl")
+print("PDDL Problem file generated: pfile1")
