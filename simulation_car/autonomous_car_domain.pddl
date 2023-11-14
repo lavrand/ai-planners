@@ -1,39 +1,66 @@
 (define (domain autonomous_car)
-  (:requirements :strips :typing :disjunctive-preconditions)
+  (:requirements :strips :typing :durative-actions :fluents :adl :negative-preconditions :duration-inequalities)
   (:types
-    location car fuel_level distance
-  )
-
-  (:constants
-    high medium low - fuel_level
-    safe close very_close cut_into - distance
+    location car
   )
 
   (:predicates
     (car_at ?car - car ?location - location)
-    (truck_at ?location - location)
     (road_between ?from - location ?to - location)
-    (fuel_level ?car - car ?level - fuel_level)
-    (distance_to_truck ?car - car ?dist - distance)
+    (fuel_level ?car - car ?level - (either low medium high))
+    (traffic ?location - location ?level - (either low medium high))
+    (truck_at ?location - location)
+    (truck_behavior ?behavior - (either safe close very_close cut_into))
   )
 
-  (:action move
-    :parameters (?car - car ?from - location ?to - location)
-    :precondition (and (car_at ?car ?from) (road_between ?from ?to) (fuel_level ?car high) (or (distance_to_truck ?car safe) (distance_to_truck ?car close)))
-    :effect (and (not (car_at ?car ?from)) (car_at ?car ?to) (distance_to_truck ?car safe))
+  (:functions
+    (battery_level ?car - car)
   )
 
-  (:action avoid_truck
-    :parameters (?car - car ?from - location ?to - location)
-    :precondition (and (car_at ?car ?from) (road_between ?from ?to) (distance_to_truck ?car very_close))
-    :effect (and (not (car_at ?car ?from)) (car_at ?car ?to) (distance_to_truck ?car safe))
+  (:durative-action drive
+    :parameters (?car - car ?from ?to - location)
+    :duration (>= ?duration 5)
+    :condition (and
+                 (over all (car_at ?car ?from))
+                 (over all (road_between ?from ?to))
+                 (at start (fuel_level ?car high))
+                 (at start (traffic ?to low)))
+    :effect (and
+              (at start (decrease (battery_level ?car) 10))
+              (at end (not (car_at ?car ?from)))
+              (at end (car_at ?car ?to)))
   )
 
-  (:action refuel
-    :parameters (?car - car)
-    :precondition (fuel_level ?car low)
-    :effect (fuel_level ?car high)
+  (:durative-action avoid_truck
+    :parameters (?car - car ?from ?to - location)
+    :duration (= ?duration 1)
+    :condition (and
+                 (over all (car_at ?car ?from))
+                 (over all (road_between ?from ?to))
+                 (at start (truck_at ?to))
+                 (at start (truck_behavior very_close)))
+    :effect (and
+              (at end (not (truck_at ?to)))
+              (at end (not (truck_behavior very_close)))
+              (at end (truck_behavior safe)))
   )
 
-  ;; Define additional actions related to 'cut_into' behavior here if necessary
+  (:durative-action wait
+    :parameters (?car - car ?location - location)
+    :duration (>= ?duration 1)
+    :condition (and
+                 (over all (car_at ?car ?location))
+                 (over all (traffic ?location high)))
+    :effect (and
+              (at start (decrease (battery_level ?car) 2)))
+  )
+
+  (:durative-action charge
+    :parameters (?car - car ?location - location)
+    :duration (= ?duration 10)
+    :condition (and
+                 (over all (car_at ?car ?location)))
+    :effect (and
+              (at end (increase (battery_level ?car) 50)))
+  )
 )
