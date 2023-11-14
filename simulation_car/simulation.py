@@ -10,8 +10,6 @@ TRAFFIC_LEVELS = ['low', 'medium', 'high']
 TRUCK_BEHAVIORS = ['safe', 'close', 'very_close', 'cut_into']
 CAR_INITIAL_BATTERY = 100
 
-
-# Function to generate a new PDDL problem file
 # Function to generate a new PDDL problem file
 def generate_problem_file(car_location, truck_location, car_battery, truck_behavior, traffic_conditions):
     with open("autonomous_car_problem.pddl", "w") as file:
@@ -22,8 +20,6 @@ def generate_problem_file(car_location, truck_location, car_battery, truck_behav
   (:objects 
     car1 - car
     {' '.join(LOCATIONS)} - location
-    high medium low - fuel_level
-    safe close very_close cut_into - truck_state
   )
 
   (:init 
@@ -42,9 +38,8 @@ def generate_problem_file(car_location, truck_location, car_battery, truck_behav
   )
 )
 """)
-        print(
-            f"Problem file for location {car_location}, truck at {truck_location}, battery at {car_battery}, truck behavior {truck_behavior} generated.")
-
+    print(
+        f"Problem file generated for location {car_location}, truck at {truck_location}, battery at {car_battery}, truck behavior {truck_behavior}.")
 
 # Function to call the PDDL solver
 def call_solver(solver_type, domain_file, problem_file):
@@ -67,12 +62,12 @@ def call_solver(solver_type, domain_file, problem_file):
         "--dispatch-frontier-size", "10",
         "--subtree-focus-threshold", "0.025",
         "--dispatch-threshold", "0.025",
-        domain_file, problem_file
+        "--domain", domain_file,
+        "--problem", problem_file
     ]
 
     if solver_type == 'disp':
-        base_command.insert(-2, "--use-dispatcher")
-        base_command.insert(-2, "LPFThreshold")
+        base_command += ["--use-dispatcher", "LPFThreshold"]
 
     result = subprocess.run(base_command, capture_output=True, text=True)
     return result.stdout
@@ -86,11 +81,10 @@ def simulate(domain_file):
     traffic_conditions = [random.choice(TRAFFIC_LEVELS) for _ in LOCATIONS]
 
     generate_problem_file(car_location, truck_location, car_battery, truck_behavior, traffic_conditions)
-    no_disp_plan = call_solver('no-disp', 'autonomous_car_domain.pddl', 'autonomous_car_problem.pddl')
-    disp_plan = call_solver('disp', 'autonomous_car_domain.pddl', 'autonomous_car_problem.pddl')
+    no_disp_plan = call_solver('no-disp', domain_file, 'autonomous_car_problem.pddl')
+    disp_plan = call_solver('disp', domain_file, 'autonomous_car_problem.pddl')
 
     return car_location, truck_location, car_battery, truck_behavior, no_disp_plan, disp_plan
-
 
 # Update UI with simulation results
 def update_ui(root, result_text_widget, domain_file):

@@ -2,8 +2,9 @@
   (:requirements :strips :typing :durative-actions :fluents :adl :negative-preconditions :duration-inequalities)
 
   (:types
-    location car fuel_level - enumeration
-    truck_state - enumeration
+    location
+    car
+    fuel_level truck_state - enumeration
   )
 
   (:constants
@@ -40,12 +41,8 @@
   (:durative-action change_traffic
     :parameters (?location - location ?new_level - fuel_level)
     :duration (= ?duration 1)
-    :condition (and
-                 (over all (not (car_at ?car ?location))))
+    :condition (and)
     :effect (and
-              (at end (not (traffic ?location high)))
-              (at end (not (traffic ?location medium)))
-              (at end (not (traffic ?location low)))
               (at end (traffic ?location ?new_level)))
   )
 
@@ -57,7 +54,8 @@
                  (over all (truck_at ?location))
                  (over all (truck_behavior very_close)))
     :effect (and
-              (at end (truck_behavior close)))
+              (at end (not (truck_behavior very_close)))
+              (at end (truck_behavior safe)))
   )
 
   (:action refuel
@@ -75,5 +73,5 @@
     :effect (at end (increase (battery_level ?car) 50))
   )
 
-  ;; Add more actions as needed for your scenario
+  ;; Additional actions can be added as needed
 )
