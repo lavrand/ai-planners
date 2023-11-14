@@ -1,14 +1,15 @@
 
-(define (problem dynamic_rescue_problem)
-    (:domain dynamic_rescue)
+(define (problem complex_rescue_problem)
+    (:domain complex_rescue)
     (:objects
-        loc0 loc1 loc2 loc3 loc4 loc5 loc6 loc7 loc8 loc9 - location
+        loc0 loc1 loc2 loc3 loc4 loc5 loc6 loc7 loc8 loc9 loc10 loc11 loc12 loc13 loc14 loc15 loc16 loc17 loc18 loc19 - location
     )
     (:init
         (robot_at loc0)
-        (target_at loc5) (target_at loc7) (target_at loc2)
-        (obstacle_at loc3) (obstacle_at loc3) (obstacle_at loc0) (obstacle_at loc9) (obstacle_at loc0)
+        (target_at loc10) (target_at loc15) (target_at loc5) (target_at loc12) (target_at loc7) (target_at loc5)
+        (obstacle_at loc12) (obstacle_at loc0) (obstacle_at loc11) (obstacle_at loc6) (obstacle_at loc15) (obstacle_at loc2) (obstacle_at loc4) (obstacle_at loc18) (obstacle_at loc19) (obstacle_at loc8)
+        (available change_goal)
     )
-    (:goal (and (rescued loc2) (rescued loc5) (rescued loc7))
+    (:goal (and (rescued loc2) (rescued loc5) (rescued loc7) (rescued loc10) (rescued loc12) (rescued loc15))
     )
 )
