@@ -25,7 +25,7 @@ def generate_problem_file(car_location, truck_location, car_battery, truck_behav
   (:init 
     (car_at car1 {car_location})
     (truck_at {truck_location})
-    (fuel_level car1 high)
+    (fuel_status car1 high)  ; Updated to use fuel_status
     {" ".join(f"(road_between {loc1} {loc2})" for loc1 in LOCATIONS for loc2 in LOCATIONS if loc1 != loc2)}
     {" ".join(f"(traffic {loc} {traffic_conditions[i]})" for i, loc in enumerate(LOCATIONS))}
     (truck_behavior {truck_behavior})
@@ -38,9 +38,8 @@ def generate_problem_file(car_location, truck_location, car_battery, truck_behav
   )
 )
 """)
-    print(
-        f"Problem file generated for location {car_location}, truck at {truck_location}, battery at {car_battery}, truck behavior {truck_behavior}.")
-
+        print(
+            f"Problem file generated for location {car_location}, truck at {truck_location}, battery at {car_battery}, truck behavior {truck_behavior}.")
 
 # Function to call the PDDL solver
 def call_solver(solver_type, domain_file, problem_file):

@@ -2,8 +2,7 @@
   (:requirements :strips :typing :durative-actions :fluents :adl :negative-preconditions :duration-inequalities)
 
   (:types
-    location
-    car
+    location car
     fuel_level truck_state - enumeration
   )
 
@@ -18,6 +17,7 @@
     (traffic ?location - location ?level - fuel_level)
     (truck_at ?location - location)
     (truck_behavior ?behavior - truck_state)
+    (fuel_status ?car - car ?level - fuel_level) ; Define the fuel status of the car
   )
 
   (:functions
@@ -60,10 +60,10 @@
 
   (:action refuel
     :parameters (?car - car)
-    :precondition (fuel_level ?car low)
+    :precondition (fuel_status ?car low) ; Corrected to use fuel_status predicate
     :effect (and
-              (not (fuel_level ?car low))
-              (fuel_level ?car high))
+              (not (fuel_status ?car low)) ; Corrected to use fuel_status predicate
+              (fuel_status ?car high)) ; Corrected to use fuel_status predicate
   )
 
   (:durative-action charge_battery
