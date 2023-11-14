@@ -6,7 +6,8 @@
     )
     (:init
         (robot_at loc0)
-        (target_at loc2) (target_at loc5) (target_at loc7)
+        (target_at loc5) (target_at loc7) (target_at loc2)
+        (obstacle_at loc3) (obstacle_at loc3) (obstacle_at loc0) (obstacle_at loc9) (obstacle_at loc0)
     )
     (:goal (and (rescued loc2) (rescued loc5) (rescued loc7))
     )

@@ -1,3 +1,5 @@
+import random
+
 def generate_pddl_domain():
     domain_str = """
 (define (domain dynamic_rescue)
@@ -24,7 +26,11 @@ def generate_pddl_domain():
     with open("dynamic_rescue_domain.pddl", "w") as domain_file:
         domain_file.write(domain_str)
 
-def generate_pddl_problem(num_locations, initial_robot_location, targets):
+def generate_pddl_problem(num_locations, targets, time_limit=0.5):
+    # Introducing dynamic obstacles and changing targets
+    dynamic_obstacles = [random.randint(0, num_locations - 1) for _ in range(num_locations // 2)]
+    dynamic_targets = [random.choice(targets) for _ in range(len(targets))]
+
     problem_str = f"""
 (define (problem dynamic_rescue_problem)
     (:domain dynamic_rescue)
@@ -32,8 +38,9 @@ def generate_pddl_problem(num_locations, initial_robot_location, targets):
         {" ".join(f"loc{i}" for i in range(num_locations))} - location
     )
     (:init
-        (robot_at loc{initial_robot_location})
-        {" ".join(f"(target_at loc{target})" for target in targets)}
+        (robot_at loc0)
+        {" ".join(f"(target_at loc{target})" for target in dynamic_targets)}
+        {" ".join(f"(obstacle_at loc{obs})" for obs in dynamic_obstacles)}
     )
     (:goal (and {" ".join(f"(rescued loc{target})" for target in targets)})
     )
@@ -43,4 +50,4 @@ def generate_pddl_problem(num_locations, initial_robot_location, targets):
         problem_file.write(problem_str)
 
 generate_pddl_domain()
-generate_pddl_problem(10, 0, [2, 5, 7])
+generate_pddl_problem(10, [2, 5, 7])
