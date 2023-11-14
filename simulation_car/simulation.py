@@ -34,7 +34,7 @@ def generate_problem_file(car_location, truck_location, fuel_level, truck_behavi
 
 # Function to call the PDDL solver
 def call_solver(solver_type, domain_file, problem_file):
-    base_command = "./rewrite-no-lp --time-based-on-expansions-per-second 500 " \
+    base_command = "../rewrite-no-lp --time-based-on-expansions-per-second 500 " \
                    "--include-metareasoning-time --multiply-TILs-by 1 " \
                    "--real-to-plan-time-multiplier 1 --calculate-Q-interval 100 " \
                    "--add-weighted-f-value-to-Q -0.000001 --min-probability-failure 0.001 " \
