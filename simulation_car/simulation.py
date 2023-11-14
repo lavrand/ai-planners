@@ -34,8 +34,23 @@ def generate_problem_file(car_location, truck_location, fuel_level, truck_behavi
 
 # Function to call the PDDL solver
 def call_solver(solver_type, domain_file, problem_file):
-    # Example command, adjust based on your solver's requirements
-    result = subprocess.run([solver_type, domain_file, problem_file], capture_output=True)
+    base_command = "./rewrite-no-lp --time-based-on-expansions-per-second 500 " \
+                   "--include-metareasoning-time --multiply-TILs-by 1 " \
+                   "--real-to-plan-time-multiplier 1 --calculate-Q-interval 100 " \
+                   "--add-weighted-f-value-to-Q -0.000001 --min-probability-failure 0.001 " \
+                   "--slack-from-heuristic --forbid-self-overlapping-actions " \
+                   "--deadline-aware-open-list IJCAI --ijcai-gamma 1 --ijcai-t_u 100 " \
+                   "--icaps-for-n-expansions 100 --time-aware-heuristic 1 " \
+                   "--dispatch-frontier-size 10 --subtree-focus-threshold 0.025 " \
+                   "--dispatch-threshold 0.025 "
+
+    if solver_type == 'disp':
+        command = base_command + "--use-dispatcher LPFThreshold "
+    else:  # 'no-disp'
+        command = base_command
+
+    command += f"{domain_file} {problem_file}"
+    result = subprocess.run(command, shell=True, capture_output=True)
     return result.stdout
 
 # Simulation logic
@@ -46,15 +61,15 @@ def simulate():
     truck_behavior = random.choice(TRUCK_BEHAVIORS)
 
     generate_problem_file(car_location, truck_location, fuel_level, truck_behavior)
-    offline_plan = call_solver('offline_solver', 'autonomous_car_domain.pddl', 'autonomous_car_problem.pddl')
-    online_plan = call_solver('online_solver', 'autonomous_car_domain.pddl', 'autonomous_car_problem.pddl')
+    no_disp_plan = call_solver('no-disp', 'autonomous_car_domain.pddl', 'autonomous_car_problem.pddl')
+    disp_plan = call_solver('disp', 'autonomous_car_domain.pddl', 'autonomous_car_problem.pddl')
 
-    return car_location, truck_location, fuel_level, truck_behavior, offline_plan, online_plan
+    return car_location, truck_location, fuel_level, truck_behavior, no_disp_plan.decode(), disp_plan.decode()
 
 # Update UI with simulation results
 def update_ui(root, result_label):
-    car_location, truck_location, fuel_level, truck_behavior, offline_plan, online_plan = simulate()
-    result_label.config(text=f"Car at: {car_location}\nTruck at: {truck_location}\nFuel: {fuel_level}\nTruck Behavior: {truck_behavior}\nOffline Plan: {offline_plan}\nOnline Plan: {online_plan}")
+    car_location, truck_location, fuel_level, truck_behavior, no_disp_plan, disp_plan = simulate()
+    result_label.config(text=f"Car at: {car_location}\nTruck at: {truck_location}\nFuel: {fuel_level}\nTruck Behavior: {truck_behavior}\nNo-Disp Plan: {no_disp_plan}\nDisp Plan: {disp_plan}")
 
 # UI setup
 root = tk.Tk()
