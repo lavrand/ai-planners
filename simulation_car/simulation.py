@@ -12,6 +12,7 @@ CAR_INITIAL_BATTERY = 100
 
 
 # Function to generate a new PDDL problem file
+# Function to generate a new PDDL problem file
 def generate_problem_file(car_location, truck_location, car_battery, truck_behavior, traffic_conditions):
     with open("autonomous_car_problem.pddl", "w") as file:
         file.write(f"""
@@ -21,6 +22,8 @@ def generate_problem_file(car_location, truck_location, car_battery, truck_behav
   (:objects 
     car1 - car
     {' '.join(LOCATIONS)} - location
+    high medium low - fuel_level
+    safe close very_close cut_into - truck_state
   )
 
   (:init 
@@ -28,7 +31,7 @@ def generate_problem_file(car_location, truck_location, car_battery, truck_behav
     (truck_at {truck_location})
     (fuel_level car1 high)
     {" ".join(f"(road_between {loc1} {loc2})" for loc1 in LOCATIONS for loc2 in LOCATIONS if loc1 != loc2)}
-    {" ".join(f"(traffic {loc} {level})" for loc, level in zip(LOCATIONS, traffic_conditions))}
+    {" ".join(f"(traffic {loc} {traffic_conditions[i]})" for i, loc in enumerate(LOCATIONS))}
     (truck_behavior {truck_behavior})
     (= (battery_level car1) {car_battery})
   )
@@ -39,8 +42,8 @@ def generate_problem_file(car_location, truck_location, car_battery, truck_behav
   )
 )
 """)
-    print(
-        f"Problem file for location {car_location}, truck at {truck_location}, battery at {car_battery}, truck behavior {truck_behavior} generated.")
+        print(
+            f"Problem file for location {car_location}, truck at {truck_location}, battery at {car_battery}, truck behavior {truck_behavior} generated.")
 
 
 # Function to call the PDDL solver
