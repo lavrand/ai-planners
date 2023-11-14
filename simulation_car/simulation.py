@@ -83,30 +83,44 @@ def simulate(domain_file):
     truck_behavior = random.choice(TRUCK_BEHAVIORS)
     traffic_conditions = [random.choice(TRAFFIC_LEVELS) for _ in LOCATIONS]
 
-    generate_problem_file(car_location, truck_location, car_battery, truck_behavior, traffic_conditions)
-    print("Generated problem file.")
+    # Decode the solver output
+    def decode_solver_output(output):
+        # Split the output by new lines and filter out empty lines
+        lines = [line.strip() for line in output.split('\n') if line.strip()]
 
-    no_disp_plan = call_solver('no-disp', domain_file, 'autonomous_car_problem.pddl')
-    print("No Disp Plan:")
-    print(no_disp_plan)
+        # Extract plan details
+        plan_details = [line for line in lines if line.startswith(';') or line.startswith('0.001:')]
 
-    disp_plan = call_solver('disp', domain_file, 'autonomous_car_problem.pddl')
-    print("Disp Plan:")
-    print(disp_plan)
+        # Extract warnings
+        warnings = [line for line in lines if line.startswith('Warning:')]
 
-    return car_location, truck_location, car_battery, truck_behavior, no_disp_plan, disp_plan
+        # Join the extracted details into multi-line strings for better readability
+        plan_str = '\n'.join(plan_details)
+        warnings_str = '\n'.join(warnings)
 
+        return plan_str, warnings_str
+
+    # Call the solver and decode its output
+    no_disp_output, no_disp_errors = call_solver('no-disp', domain_file, 'autonomous_car_problem.pddl')
+    no_disp_plan, no_disp_warnings = decode_solver_output(no_disp_output)
+
+    disp_output, disp_errors = call_solver('disp', domain_file, 'autonomous_car_problem.pddl')
+    disp_plan, disp_warnings = decode_solver_output(disp_output)
+
+    return car_location, truck_location, car_battery, truck_behavior, no_disp_plan, no_disp_warnings, disp_plan, disp_warnings
 
 # Update UI with simulation results
 def update_ui(root, result_text_widget, domain_file):
-    car_location, truck_location, car_battery, truck_behavior, no_disp_plan, disp_plan = simulate(domain_file)
+    car_location, truck_location, car_battery, truck_behavior, no_disp_plan, no_disp_warnings, disp_plan, disp_warnings = simulate(domain_file)
     result_text_widget.delete('1.0', tk.END)  # Clear the existing text
     result_text_widget.insert(tk.END, f"Car at: {car_location}\n")
     result_text_widget.insert(tk.END, f"Truck at: {truck_location}\n")
     result_text_widget.insert(tk.END, f"Battery Level: {car_battery}\n")
     result_text_widget.insert(tk.END, f"Truck Behavior: {truck_behavior}\n")
     result_text_widget.insert(tk.END, f"No Disp Plan:\n{no_disp_plan}\n")
+    result_text_widget.insert(tk.END, f"No Disp Warnings:\n{no_disp_warnings}\n")
     result_text_widget.insert(tk.END, f"Disp Plan:\n{disp_plan}\n")
+    result_text_widget.insert(tk.END, f"Disp Warnings:\n{disp_warnings}\n")
 
 # UI setup
 root = tk.Tk()
