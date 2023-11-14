@@ -2,6 +2,7 @@ import os
 import random
 import subprocess
 import tkinter as tk
+from tkinter.scrolledtext import ScrolledText
 
 # Constants for simulation
 LOCATIONS = ['loc1', 'loc2', 'loc3', 'loc4']
@@ -70,16 +71,27 @@ def simulate():
 
     return car_location, truck_location, fuel_level, truck_behavior, no_disp_plan.decode(), disp_plan.decode()
 
+
 # Update UI with simulation results
-def update_ui(root, result_label):
+def update_ui(root, result_text_widget):
     car_location, truck_location, fuel_level, truck_behavior, no_disp_plan, disp_plan = simulate()
-    result_label.config(text=f"Car at: {car_location}\nTruck at: {truck_location}\nFuel: {fuel_level}\nTruck Behavior: {truck_behavior}\nNo-Disp Plan: {no_disp_plan}\nDisp Plan: {disp_plan}")
+    result_text_widget.delete('1.0', tk.END)  # Clear the existing text
+    result_text_widget.insert(tk.END, f"Car at: {car_location}\n")
+    result_text_widget.insert(tk.END, f"Truck at: {truck_location}\n")
+    result_text_widget.insert(tk.END, f"Fuel: {fuel_level}\n")
+    result_text_widget.insert(tk.END, f"Truck Behavior: {truck_behavior}\n")
+    result_text_widget.insert(tk.END, f"No-Disp Plan: {no_disp_plan}\n")
+    result_text_widget.insert(tk.END, f"Disp Plan: {disp_plan}\n")
 
 # UI setup
 root = tk.Tk()
 root.title("Autonomous Car Simulation")
-result_label = tk.Label(root, text="Simulation Results", justify=tk.LEFT)
-result_label.pack()
-update_button = tk.Button(root, text="Run Simulation", command=lambda: update_ui(root, result_label))
-update_button.pack()
+
+# Using ScrolledText widget which includes a scrollbar
+result_text_widget = ScrolledText(root, height=15, width=100)
+result_text_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+update_button = tk.Button(root, text="Run Simulation", command=lambda: update_ui(root, result_text_widget))
+update_button.pack(side=tk.BOTTOM)
+
 root.mainloop()
