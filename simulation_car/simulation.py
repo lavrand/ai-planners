@@ -5,7 +5,7 @@ import tkinter as tk
 
 # Constants for simulation
 LOCATIONS = ['loc1', 'loc2', 'loc3', 'loc4']
-TRUCK_BEHAVIORS = ['safe', 'close', 'very_close']
+TRUCK_BEHAVIORS = ['safe', 'close', 'very_close', 'cut_into']
 
 # Function to generate a new PDDL problem file
 def generate_problem_file(car_location, truck_location, fuel_level, truck_behavior):
@@ -59,6 +59,10 @@ def simulate():
     truck_location = random.choice(LOCATIONS)
     fuel_level = 'high'
     truck_behavior = random.choice(TRUCK_BEHAVIORS)
+
+    # Simulate the 'cut-into' event when truck behavior is 'very_close'
+    if truck_behavior == 'very_close':
+        truck_behavior = 'cut_into'
 
     generate_problem_file(car_location, truck_location, fuel_level, truck_behavior)
     no_disp_plan = call_solver('no-disp', 'autonomous_car_domain.pddl', 'autonomous_car_problem.pddl')
