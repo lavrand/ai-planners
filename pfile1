@@ -1,15 +1,44 @@
+(define (problem ZTRAVEL-1-2)
+(:domain zeno-travel)
+(:objects
+	plane1 - aircraft
+	person1 - person
+	person2 - person
+	city0 - city
+	city1 - city
+	city2 - city
+	)
+(:init
+	(at plane1 city0)
+	(= (slow-speed plane1) 198)
+	(= (fast-speed plane1) 449)
+	(= (capacity plane1) 10232)
+	(= (fuel plane1) 3956)
+	(= (slow-burn plane1) 4)
+	(= (fast-burn plane1) 15)
+	(= (refuel-rate plane1) 2904)
+	(at person1 city0)
+	(at person2 city2)
+	(= (distance city0 city0) 0)
+	(= (distance city0 city1) 678)
+	(= (distance city0 city2) 775)
+	(= (distance city1 city0) 678)
+	(= (distance city1 city1) 0)
+	(= (distance city1 city2) 810)
+	(= (distance city2 city0) 775)
+	(= (distance city2 city1) 810)
+	(= (distance city2 city2) 0)
+	(= (total-fuel-used) 0)
+	(= (boarding-time) 0.3)
+	(= (debarking-time) 0.6)
+    (still-on-time person1)
+    (still-on-time person2)
+)
+(:goal (and
+	(at plane1 city1)
+	(at person1 city0)
+	(at person2 city2)
+	))
 
-(define (problem complex_rescue_problem)
-    (:domain complex_rescue)
-    (:objects
-        loc0 loc1 loc2 loc3 loc4 loc5 loc6 loc7 loc8 loc9 loc10 loc11 loc12 loc13 loc14 loc15 loc16 loc17 loc18 loc19 - location
-    )
-    (:init
-        (robot_at loc0)
-        (target_at loc10) (target_at loc15) (target_at loc5) (target_at loc12) (target_at loc7) (target_at loc5)
-        (obstacle_at loc12) (obstacle_at loc0) (obstacle_at loc11) (obstacle_at loc6) (obstacle_at loc15) (obstacle_at loc2) (obstacle_at loc4) (obstacle_at loc18) (obstacle_at loc19) (obstacle_at loc8)
-        (available change_goal)
-    )
-    (:goal (and (rescued loc2) (rescued loc5) (rescued loc7) (rescued loc10) (rescued loc12) (rescued loc15))
-    )
+(:metric minimize (+ (* 4 (total-time))  (* 0.005 (total-fuel-used))))
 )
