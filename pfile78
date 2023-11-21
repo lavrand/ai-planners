@@ -192,9 +192,9 @@
 ;    (order-fulfilled o2)  ; Announce 79
 ;    (order-fulfilled o3)  ; Announce 527
 ;    (order-fulfilled o4)  ; Announce 534
-    (order-fulfilled o5)  ; Announce 170
-    (order-fulfilled o6)  ; Announce 15
+;    (order-fulfilled o5)  ; Announce 170
+;    (order-fulfilled o6)  ; Announce 15
 ;    (order-fulfilled o7)  ; Announce 0
-    (order-fulfilled o8)  ; Announce 900
+;    (order-fulfilled o8)  ; Announce 900
   ))
 )

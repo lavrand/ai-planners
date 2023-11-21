@@ -190,9 +190,9 @@
 ;    (order-fulfilled o2)  ; Announce 85
 ;    (order-fulfilled o3)  ; Announce 161
 ;    (order-fulfilled o4)  ; Announce 535
-    (order-fulfilled o5)  ; Announce 201
-    (order-fulfilled o6)  ; Announce 93
-    (order-fulfilled o7)  ; Announce 0
+;    (order-fulfilled o5)  ; Announce 201
+;    (order-fulfilled o6)  ; Announce 93
+;    (order-fulfilled o7)  ; Announce 0
 ;    (order-fulfilled o8)  ; Announce 900
   ))
 )

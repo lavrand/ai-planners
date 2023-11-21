@@ -191,11 +191,11 @@
   (:goal (and
 
     (order-fulfilled o1)  ; Announce 0
-    (order-fulfilled o2)  ; Announce 184
+;    (order-fulfilled o2)  ; Announce 184
 ;    (order-fulfilled o3)  ; Announce 178
-    (order-fulfilled o4)  ; Announce 536
+;    (order-fulfilled o4)  ; Announce 536
 ;    (order-fulfilled o5)  ; Announce 262
-    (order-fulfilled o6)  ; Announce 54
+;    (order-fulfilled o6)  ; Announce 54
 ;    (order-fulfilled o7)  ; Announce 0
 ;    (order-fulfilled o8)  ; Announce 900
   ))
