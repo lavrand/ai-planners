@@ -30,7 +30,7 @@ def parse_metrics(file_path, file_identifier, disp_type):
                     if metric in line:
                         value = float(re.findall(r"[-+]?\d*\.\d+|\d+", line)[0])
                         if file_identifier not in data[metric]:
-                            data[metric][file_identifier] = {}
+                            data[metric][file_identifier] = {'disp': 'N/A', 'no-disp': 'N/A'}
                         data[metric][file_identifier][disp_type] = value
             logging.info(f"Processed metrics from {file_path}")
     except Exception as e:
@@ -64,14 +64,15 @@ def main():
 
     # Generate CSV files
     for metric, values in data.items():
+        sorted_values = sorted(values.items())  # Sorting values based on identifiers
         csv_file_path = os.path.join(output_dir, metric.replace(' ', '_') + '.csv')
         try:
             with open(csv_file_path, 'w', newline='') as csvfile:
                 csvwriter = csv.writer(csvfile)
                 header = ['Identifier', 'disp', 'no-disp']
                 csvwriter.writerow(header)
-                for identifier, disp_values in values.items():
-                    row = [identifier, disp_values.get('disp', 'N/A'), disp_values.get('no-disp', 'N/A')]
+                for identifier, disp_values in sorted_values:
+                    row = [identifier, disp_values['disp'], disp_values['no-disp']]
                     csvwriter.writerow(row)
             logging.info(f"CSV file created: {csv_file_path}")
         except Exception as e:
