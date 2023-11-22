@@ -7,11 +7,8 @@ import logging
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-N = 100
-
 # Constants for folder naming
 FOLDER_PREFIX = "archive_pfile_"
-ARCHIVE_SUFFIXES = range(0, 100)  # Assuming the range of suffixes
 METRICS = ["Time", "Discounted time", "Metareasoning time (not discounted)", "Dispatch metareasoning time (not discounted)", "Peak memory", "Nodes Generated", "Nodes Expanded", "Nodes Evaluated", "Nodes Tunneled", "Nodes memoised with open actions", "Nodes memoised without open actions", "Nodes pruned by memoisation"]
 
 # Data structure to store values
@@ -41,30 +38,33 @@ def parse_metrics(file_path, file_identifier, disp_type):
 
 def main():
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    output_dir = os.path.join(base_path, "_nodes_analysis")
+    os.makedirs(output_dir, exist_ok=True)
 
-    for suffix in ARCHIVE_SUFFIXES:
-        for n in range(1, N):
-            dir_name = os.path.join(base_path, F"{FOLDER_PREFIX}{n}_{suffix}")
-            if os.path.exists(dir_name):
-                logging.info(f"Processing directory {dir_name}")
-                for tar_file in os.listdir(dir_name):
+    for dir_name in os.listdir(base_path):
+        if dir_name.startswith(FOLDER_PREFIX):
+            dir_number = dir_name.split('_')[2]  # Extracting the first number (e.g., '25' from 'archive_pfile_25_13')
+            full_path = os.path.join(base_path, dir_name)
+            if os.path.isdir(full_path):
+                logging.info(f"Processing directory {full_path}")
+                for tar_file in os.listdir(full_path):
                     if tar_file.endswith(".tar.gz"):
-                        extract_tar_gz(os.path.join(dir_name, tar_file), dir_name)
+                        extract_tar_gz(os.path.join(full_path, tar_file), full_path)
 
                         for disp_type in ["disp", "no-disp"]:
-                            path = os.path.join(dir_name, disp_type)
+                            path = os.path.join(full_path, disp_type)
                             if os.path.isdir(path):
                                 for file in os.listdir(path):
-                                    if file.startswith(f"{n}-"):
+                                    if file.startswith(dir_number + "-"):
                                         file_path = os.path.join(path, file)
-                                        file_identifier = f"{n}-{file.split('-')[1]}"
+                                        file_identifier = f"{dir_number}-{file.split('-')[1]}"
                                         parse_metrics(file_path, file_identifier, disp_type)
             else:
-                logging.warning(f"Directory {dir_name} does not exist")
+                logging.warning(f"Directory {full_path} does not exist")
 
     # Generate CSV files
     for metric, values in data.items():
-        csv_file_path = os.path.join(base_path, metric + '.csv')
+        csv_file_path = os.path.join(output_dir, metric.replace(' ', '_') + '.csv')
         try:
             with open(csv_file_path, 'w', newline='') as csvfile:
                 csvwriter = csv.writer(csvfile)
