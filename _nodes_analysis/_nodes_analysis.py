@@ -36,6 +36,10 @@ def parse_metrics(file_path, file_identifier, disp_type):
     except Exception as e:
         logging.error(f"Error parsing metrics from {file_path}: {e}")
 
+def sort_identifiers(identifier):
+    parts = identifier.split('-')
+    return [int(parts[0]), int(parts[1])]
+
 def main():
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     output_dir = os.path.join(base_path, "_nodes_analysis")
@@ -64,7 +68,7 @@ def main():
 
     # Generate CSV files
     for metric, values in data.items():
-        sorted_values = sorted(values.items())  # Sorting values based on identifiers
+        sorted_values = sorted(values.items(), key=lambda x: sort_identifiers(x[0]))
         csv_file_path = os.path.join(output_dir, metric.replace(' ', '_') + '.csv')
         try:
             with open(csv_file_path, 'w', newline='') as csvfile:
