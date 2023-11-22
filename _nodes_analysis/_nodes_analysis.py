@@ -30,7 +30,7 @@ def parse_metrics(file_path, file_identifier, disp_type):
                     if metric in line:
                         value = float(re.findall(r"[-+]?\d*\.\d+|\d+", line)[0])
                         if file_identifier not in data[metric]:
-                            data[metric][file_identifier] = {'disp': 'N/A', 'no-disp': 'N/A'}
+                            data[metric][file_identifier] = {'disp': 'N/A', 'nodisp': 'N/A'}
                         data[metric][file_identifier][disp_type] = value
             logging.info(f"Processed metrics from {file_path}")
     except Exception as e:
@@ -55,7 +55,7 @@ def main():
                     if tar_file.endswith(".tar.gz"):
                         extract_tar_gz(os.path.join(full_path, tar_file), full_path)
 
-                        for disp_type in ["disp", "no-disp"]:
+                        for disp_type in ["disp", "nodisp"]:
                             path = os.path.join(full_path, disp_type)
                             if os.path.isdir(path):
                                 for file in os.listdir(path):
@@ -73,10 +73,10 @@ def main():
         try:
             with open(csv_file_path, 'w', newline='') as csvfile:
                 csvwriter = csv.writer(csvfile)
-                header = ['Identifier', 'disp', 'no-disp']
+                header = ['Identifier', 'disp', 'nodisp']
                 csvwriter.writerow(header)
                 for identifier, disp_values in sorted_values:
-                    row = [identifier, disp_values['disp'], disp_values['no-disp']]
+                    row = [identifier, disp_values['disp'], disp_values['nodisp']]
                     csvwriter.writerow(row)
             logging.info(f"CSV file created: {csv_file_path}")
         except Exception as e:
