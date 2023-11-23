@@ -1,8 +1,8 @@
 \section{Empirical Evaluation}
 
-\subsection{Efficiency of the 'Dispatcher' Approach in Time Management}
+\subsection{Efficiency of the Dispatcher Approach in Time Management}
 
-In this section, we analyze the efficiency of the newly developed Dispatcher approach in managing time constraints within the RCLL domain. The 'Time Taken by Dispatcher Approach' Figure 1: Time Taken by Dispatcher Approach distinctly illustrates the effectiveness of Dispatcher across various problem instances (from problem 1 to problem 6). Notably, the Dispatcher approach consistently solves problems within a 60-second threshold, a significant improvement over the traditional Offline method, which failed to provide solutions within the same time frame for these instances.
+In this section, we analyze the efficiency of the newly developed Dispatcher approach in managing time constraints within the RCLL domain. The 'Time Taken by Dispatcher Approach' Figure 1: Time Taken by Dispatcher Approach distinctly illustrates the effectiveness of Dispatcher across various problem instances (from problem 1 to problem 6, ten experiments were done for each problem). Notably, the Dispatcher approach consistently solves problems within a 60-second threshold, a significant improvement over the traditional Offline method, which failed to provide solutions within the same time frame for these instances.
 
 % For the Time Taken graph
 \begin{figure}[h]
@@ -16,7 +16,7 @@ In this section, we analyze the efficiency of the newly developed Dispatcher app
 
 This stark contrast in performance underlines the Dispatcher approach's capability to swiftly navigate complex problem spaces, affirming its suitability for time-sensitive applications in the RCLL domain.
 
-\subsection{Analyzing Problem-Solving Efficiency Through Nodes Expansion}
+\subsection{Analyzing Problem-Solving Efficiency Through Node Expansion}
 
 Further delving into the mechanics of the Dispatcher approach, we focus on the number of nodes expanded during problem-solving Figure 2: Nodes Expanded by Dispatcher Approach.
 
@@ -30,55 +30,6 @@ Further delving into the mechanics of the Dispatcher approach, we focus on the n
 \label{fig:nodes-expanded-disp}
 \end{figure}
 
-The data indicates that despite the complexity of the problems (ranging from problem 1 to problem 6 in the RCLL domain), the Dispatcher approach maintains a consistent level of node expansion. This consistency is pivotal, as it demonstrates the method's efficiency in finding solutions and its predictability and reliability regarding computational resources used.
+The data indicates that despite the complexity of the problems (ranging from problem 1 to problem 6 in the RCLL domain, ten experiments were done for each problem), the Dispatcher approach maintains a consistent level of node expansion. This consistency is pivotal, as it demonstrates the method's efficiency in finding solutions and its predictability and reliability regarding computational resources used.
 
-In contrast, the offline approach, which failed to solve these problems, would likely have required significantly higher node expansions, indicating less efficiency. Thus, the Dispatcher approach not only excels in time management but also in optimizing computational efforts, making it a robust tool for real-time applications in dynamic environments like the RCLL domain.
-
-% In this section, we present a detailed empirical evaluation comparing the performance of the dispatch and standard planner, based on various criteria.
-
-% The dataset for this evaluation is derived from the \texttt{driverlog-pfile15} instance. This dataset provides a comprehensive set of scenarios that challenge both methods in terms of their solution accuracy and efficiency.
-
-% Table 1 provides a side-by-side comparison of the two methods. Several observations can be made:
-% \begin{itemize}
-%     \item Both methods were able to solve a significant number of permutations, with a total of 386 permutations solved by both.
-%     \item 'Disp' had an edge in some scenarios, solving 180 permutations exclusively, while 'nodisp' managed to exclusively solve 166 permutations.
-%     \item In terms of average solution time for permutations tackled by both methods, 'disp' proved to be faster with a mean time of 13.56, whereas 'nodisp' took an average of 27.78.
-%     \item When assessing the average speedup ratio for 'disp' over common permutations, we observed a value of 0.58, indicating the relative efficiency of 'disp' over 'nodisp' in those scenarios.
-% \end{itemize}
-
-% \subsection{Results}
-
-% Figure 1 provides a visual representation of the performance of 'disp' versus a standard planner. The scatter plot offers a clear insight into the distribution of solution times for both methods, highlighting their respective strengths and weaknesses in different scenarios.
-
-% In conclusion, the empirical evaluation suggests that while both methods have their merits, 'disp' tends to outperform 'nodisp' in terms of efficiency in many scenarios. However, neither method consistently dominates the other across all tests, suggesting that the choice between them might be context-dependent.
-
-% \begin{table}[h!]
-%     \centering
-%     \setlength\tabcolsep{5pt} % adjust as needed
-%     \begin{tabular}{|p{6cm}|l|}
-%         \hline
-%         Original instance & driverlog-pfile15 \\
-%         \hline
-%         Number of permutations solved by both disp and nodisp & 386 \\
-%         \hline
-%         Number of permutations solved only by disp & 180 \\
-%         \hline
-%         Number of permutations solved only by nodisp & 166 \\
-%         \hline
-%         Average solution time for disp on permutations solved by both disp and nodisp & 13.56 \\
-%         \hline
-%         Average solution time for nodisp on permutations solved by both disp and nodisp & 27.78 \\
-%         \hline
-%         Average speedup ratio for disp over permutations solved by both disp and nodisp & 0.58 \\
-%         \hline
-%     \end{tabular}
-%     \caption{Performance comparison between disp and nodisp}
-%     \label{tab:my_label}
-% \end{table}
-
-% \begin{figure*}[t]
-%     \centering
-%     \includegraphics[width=1.0\linewidth]{image.png}
-%     \caption{Dispatch vs Standard planner empirical evaluation}
-%     \label{fig:enter-label}
-% \end{figure*}
+In contrast, the Offline approach, which failed to solve these problems, would require significantly higher node expansions, indicating less efficiency. Thus, the Dispatcher approach excels in time management and optimizing computational efforts, making it a robust tool for real-time applications in dynamic environments like the RCLL domain.
