@@ -2,7 +2,7 @@
 
 \subsection{Efficiency of the Dispatcher Approach in Time Management}
 
-In this section, we analyze the efficiency of the newly developed Dispatcher approach in managing time constraints within the RCLL domain. The 'Time Taken by Dispatcher Approach' Figure 1: Time Taken by Dispatcher Approach distinctly illustrates the effectiveness of Dispatcher across various problem instances (from problem 1 to problem 6, ten experiments were done for each problem). Notably, the Dispatcher approach consistently solves problems within a 60-second threshold, a significant improvement over the traditional Offline method, which failed to provide solutions within the same time frame for these instances.
+In this section, we analyze the efficiency of the newly developed Dispatcher approach in managing time constraints within the RCLL domain. Figure 1: Time Taken by Dispatcher Approach distinctly illustrates the effectiveness of the Dispatcher across various problem instances (from problem 1 to problem 6, ten experiments were done for each problem). Notably, the Dispatcher approach consistently solves problems within a 60-second threshold, a significant improvement over the traditional Offline method, which failed to provide solutions within the same time frame for these instances.
 
 % For the Time Taken graph
 \begin{figure}[h]
