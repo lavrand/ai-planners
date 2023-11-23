@@ -1,0 +1,35 @@
+\section{Empirical Evaluation}
+
+\subsection{Efficiency of the 'Dispatcher' Approach in Time Management}
+
+In this section, we analyze the efficiency of the newly developed Dispatcher approach in managing time constraints within the RCLL domain. The 'Time Taken by Dispatcher Approach' Figure 1: Time Taken by Dispatcher Approach distinctly illustrates the effectiveness of Dispatcher across various problem instances (from problem 1 to problem 6). Notably, the Dispatcher approach consistently solves problems within a 60-second threshold, a significant improvement over the traditional Offline method, which failed to provide solutions within the same time frame for these instances.
+
+% For the Time Taken graph
+\begin{figure}[h]
+\centering
+\resizebox{\columnwidth}{!}{
+\includegraphics{time_taken_disp.png}
+}
+\caption{Time Taken by Dispatcher Approach}
+\label{fig:time_taken_disp}
+\end{figure}
+
+This stark contrast in performance underlines the Dispatcher approach's capability to swiftly navigate complex problem spaces, affirming its suitability for time-sensitive applications in the RCLL domain.
+
+\subsection{Analyzing Problem-Solving Efficiency Through Nodes Expansion}
+
+Further delving into the mechanics of the Dispatcher approach, we focus on the number of nodes expanded during problem-solving Figure 2: Nodes Expanded by Dispatcher Approach.
+
+% For the Nodes Expanded graph
+\begin{figure}[h]
+\centering
+\resizebox{\columnwidth}{!}{
+\includegraphics{nodes_expanded_disp.png}
+}
+\caption{Nodes Expanded by Dispatcher Approach}
+\label{fig:nodes-expanded-disp}
+\end{figure}
+
+The data clearly indicates that despite the complexity of the problems (ranging from problem 1 to problem 6 in the RCLL domain), the Dispatcher approach maintains a consistent level of node expansion. This consistency is pivotal, as it demonstrates not only the method's efficiency in finding solutions but also its predictability and reliability in terms of computational resources used.
+
+In contrast, the Offline approach, which failed to solve these problems, likely would have required a significantly higher number of node expansions, indicating less efficiency. Thus, the Dispatcher approach not only excels in time management but also in optimizing computational efforts, making it a robust tool for real-time applications in dynamic environments like the RCLL domain.
