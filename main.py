@@ -64,6 +64,7 @@ dispatch_frontier_size = config.getint('DEFAULT', 'dispatch_frontier_size')
 subtree_focus_threshold = config.get('DEFAULT', 'subtree_focus_threshold')
 dispatch_threshold = config.get('DEFAULT', 'dispatch_threshold')
 RUN_ONCE = config.getboolean('DEFAULT', 'RUN_ONCE')
+DEADLINE_ON_FIRST_SNAP = config.getboolean('DEFAULT', 'DEADLINE_ON_FIRST_SNAP')
 
 PFILE_N = PFILE_START
 
@@ -219,24 +220,41 @@ while True:
                     f"--dispatch-threshold {dispatch_threshold} --optimistic-lst-for-dispatch-reasoning "
                 )
 
-                base_command_end = (f" %s withdeadlines-ontime-pfile{PFILE_N}-" % DOMAIN)
+                base_command_deadline_on_first_snap = (f" --deadline-on-first-snap-action 0.5 ")
+                if DEADLINE_ON_FIRST_SNAP:
+                    base_command_common += base_command_deadline_on_first_snap
+                    base_command_end = (f" %s pfile{PFILE_N}" % DOMAIN)
+                else:
+                    base_command_end = (f" %s withdeadlines-ontime-pfile{PFILE_N}-" % DOMAIN)
 
 
                 # Function to run the dispscript commands
                 def run_dispscript(i):
-                    command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
-                        i) + f" > disp/{PFILE_N}-" + str(i)
-                    print(f"[{datetime.now()}] Running disp command for file {PFILE_N}-{i}. Command: {command}")
-                    run_subprocess(command, i)
-                    print(f"[{datetime.now()}] Finished disp command for file {PFILE_N}-{i}.")
+                    if DEADLINE_ON_FIRST_SNAP:
+                        command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > disp/{PFILE_N}"
+                        print(f"[{datetime.now()}] Running disp command for file {PFILE_N}. Command: {command}")
+                        run_subprocess(command, i)
+                        print(f"[{datetime.now()}] Finished disp command for file {PFILE_N}.")
+                    else:
+                        command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
+                            i) + f" > disp/{PFILE_N}-" + str(i)
+                        print(f"[{datetime.now()}] Running disp command for file {PFILE_N}-{i}. Command: {command}")
+                        run_subprocess(command, i)
+                        print(f"[{datetime.now()}] Finished disp command for file {PFILE_N}-{i}.")
 
 
                 def run_nodispscript(i):
-                    command = base_command_common + base_command_end + str(i) + f" > nodisp/{PFILE_N}-" + str(i)
-                    print(f"[{datetime.now()}] Running nodisp command for file {PFILE_N}-{i}...")
-                    run_subprocess(command, i)
-                    print(f"[{datetime.now()}] Finished nodisp command for file {PFILE_N}-{i}.")
-
+                    if DEADLINE_ON_FIRST_SNAP:
+                        command = base_command_common + base_command_end + f" > nodisp/{PFILE_N}"
+                        print(f"[{datetime.now()}] Running nodisp command for file {PFILE_N}. Command: {command}")
+                        run_subprocess(command, i)
+                        print(f"[{datetime.now()}] Finished nodisp command for file {PFILE_N}.")
+                    else:
+                        command = base_command_common + base_command_end + str(
+                            i) + f" > nodisp/{PFILE_N}-" + str(i)
+                        print(f"[{datetime.now()}] Running nodisp command for file {PFILE_N}-{i}. Command: {command}")
+                        run_subprocess(command, i)
+                        print(f"[{datetime.now()}] Finished nodisp command for file {PFILE_N}-{i}.")
 
 
                 def run_subprocess(command, i):
