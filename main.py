@@ -65,6 +65,7 @@ subtree_focus_threshold = config.get('DEFAULT', 'subtree_focus_threshold')
 dispatch_threshold = config.get('DEFAULT', 'dispatch_threshold')
 RUN_ONCE = config.getboolean('DEFAULT', 'RUN_ONCE')
 DEADLINE_ON_FIRST_SNAP = config.getboolean('DEFAULT', 'DEADLINE_ON_FIRST_SNAP')
+deadline_on_first_snap_action = config.get('DEFAULT', 'deadline_on_first_snap_action')
 
 PFILE_N = PFILE_START
 
@@ -220,7 +221,7 @@ while True:
                     f"--dispatch-threshold {dispatch_threshold} --optimistic-lst-for-dispatch-reasoning "
                 )
 
-                base_command_deadline_on_first_snap = (f" --deadline-on-first-snap-action 0.5 ")
+                base_command_deadline_on_first_snap = (f" --deadline-on-first-snap-action {deadline_on_first_snap_action} ")
                 if DEADLINE_ON_FIRST_SNAP:
                     base_command_common += base_command_deadline_on_first_snap
                     base_command_end = (f" %s pfile{PFILE_N}" % DOMAIN)
