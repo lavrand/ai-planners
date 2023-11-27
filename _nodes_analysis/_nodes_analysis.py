@@ -39,7 +39,9 @@ def parse_metrics(file_path, file_identifier, disp_type):
                 elif ";;;; Problem Unsolvable" in line:
                     solution_status = "Problem Unsolvable"
 
-            solution_data[file_identifier] = solution_status
+            if file_identifier not in solution_data:
+                solution_data[file_identifier] = {'disp': 'Not Determined', 'nodisp': 'Not Determined'}
+            solution_data[file_identifier][disp_type] = solution_status
             logging.info(f"Processed metrics from {file_path}")
     except Exception as e:
         logging.error(f"Error parsing metrics from {file_path}: {e}")
@@ -68,10 +70,10 @@ def main():
     try:
         with open(solution_csv_path, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
-            header = ['Identifier', 'Solution Status']
+            header = ['Identifier', 'disp Solution Status', 'nodisp Solution Status']
             csvwriter.writerow(header)
             for identifier, status in solution_data.items():
-                csvwriter.writerow([identifier, status])
+                csvwriter.writerow([identifier, status['disp'], status['nodisp']])
         logging.info(f"CSV file created: {solution_csv_path}")
     except Exception as e:
         logging.error(f"Error writing to CSV file {solution_csv_path}: {e}")
