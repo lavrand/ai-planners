@@ -1,6 +1,6 @@
 (define (problem rcll-production-004-durative)
 	(:domain rcll-production-durative)
-    
+
   (:objects
     R-1 - robot
     R-2 - robot
@@ -18,11 +18,11 @@
     C-BS C-CS1 C-CS2 C-DS - mps
     CYAN - team-color
   )
-   
+
   (:init
    (mps-type C-BS BS)
    (mps-type C-CS1 CS)
-   (mps-type C-CS2 CS) 
+   (mps-type C-CS2 CS)
    (mps-type C-DS DS)
    (location-free START INPUT)
    (location-free C-BS INPUT)

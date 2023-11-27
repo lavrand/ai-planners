@@ -1,47 +1,39 @@
 (define (domain usar)
-  (:requirements :strips :typing :durative-actions :fluents)
-  (:types robot victim debris area)
+  (:requirements :strips :typing :durative-actions :fluents :timed-initial-literals)
+  (:types robot victim debris area task)
 
   (:functions
-    (battery-level ?r - robot) ; Battery level of robots
-    (debris-weight ?d - debris) ; Weight of debris pieces
-    (rescue-time ?v - victim) ; Time required to rescue a victim
+    (battery-level ?r - robot)
+    (task-duration ?t - task)
+    (distance ?from ?to - area)
   )
 
   (:predicates
     (robot-at ?r - robot ?a - area)
-    (victim-at ?v - victim ?a - area)
+    (task-at ?t - task ?a - area)
     (debris-at ?d - debris ?a - area)
-    (path-clear ?from ?to - area)
-    (rescued ?v - victim)
+    (task-completed ?t - task)
     (robot-functional ?r - robot)
   )
 
   (:durative-action move
     :parameters (?r - robot ?from ?to - area)
-    :duration (= ?duration 5) ; Fixed duration for simplicity
-    :condition (and (at start (robot-at ?r ?from)) (over all (path-clear ?from ?to)) (over all (robot-functional ?r)))
-    :effect (and (at start (not (robot-at ?r ?from))) (at end (robot-at ?r ?to)) (at end (decrease (battery-level ?r) 5)))
+    :duration (= ?duration (distance ?from ?to))
+    :condition (and (at start (robot-at ?r ?from)) (over all (robot-functional ?r)))
+    :effect (and (at start (not (robot-at ?r ?from))) (at end (robot-at ?r ?to)))
+  )
+
+  (:durative-action perform-task
+    :parameters (?r - robot ?t - task ?a - area)
+    :duration (= ?duration (task-duration ?t))
+    :condition (and (at start (robot-at ?r ?a)) (at start (task-at ?t ?a)) (over all (robot-functional ?r)))
+    :effect (at end (task-completed ?t))
   )
 
   (:durative-action clear-debris
     :parameters (?r - robot ?d - debris ?a - area)
-    :duration (= ?duration (* 2 (debris-weight ?d)))
-    :condition (and (at start (robot-at ?r ?a)) (over all (debris-at ?d ?a)) (over all (robot-functional ?r)))
-    :effect (and (at end (not (debris-at ?d ?a))) (at end (decrease (battery-level ?r) (* 0.2 (debris-weight ?d)))))
-  )
-
-  (:durative-action rescue-victim
-    :parameters (?r - robot ?v - victim ?a - area)
-    :duration (= ?duration (rescue-time ?v))
-    :condition (and (at start (robot-at ?r ?a)) (over all (victim-at ?v ?a)) (over all (robot-functional ?r)))
-    :effect (and (at end (rescued ?v)) (at end (decrease (battery-level ?r) 5)))
-  )
-
-  (:durative-action recharge-robot
-    :parameters (?r - robot)
     :duration (= ?duration 10)
-    :condition (at start (robot-functional ?r))
-    :effect (at end (increase (battery-level ?r) 20))
+    :condition (and (at start (robot-at ?r ?a)) (over all (debris-at ?d ?a)) (over all (robot-functional ?r)))
+    :effect (at end (not (debris-at ?d ?a)))
   )
 )
