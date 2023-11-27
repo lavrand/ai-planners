@@ -7,32 +7,51 @@
 )
 (:init
 
+    (localised kenny)
     (undocked kenny)
-	(localised kenny)
 
     (dock_at dock-station)
     (carrying_papers kenny)
 
-    (delivery_destination phdarea)
-	(at 1037.747 (not (delivery_destination phdarea)))
-
-    (delivery_destination coffee)
-	(at 737.747 (not (delivery_destination coffee)))
+    (= (papers_delivered kenny dan-office) 0)
+    (= (papers_delivered kenny phdarea) 0)
+    (= (papers_delivered kenny coffee) 0)
+    (= (papers_delivered kenny meeting-room) 0)
 
     (delivery_destination dan-office)
-	(at 237.747 (not (delivery_destination dan-office)))
+	(at 1600 (not (delivery_destination dan-office)))
 
-	(at 237.747 (delivery_destination meeting-room))
-	(at 837.747 (not (delivery_destination meeting-room)))
+    (delivery_destination meeting-room)
+	(at 1600 (not (delivery_destination meeting-room)))
 
-	(bailout_available)	
+    (delivery_destination coffee)
+	(at 1600 (not (delivery_destination coffee)))
+
+    (delivery_destination phdarea)
+	(at 1600 (not (delivery_destination phdarea)))
+
+	(bailout_available)
+	
 	(bailout_location dock-station)	
-	(= (bailout_distance) 6.05)
-	(at 6 (= (bailout_distance) 5.73))
-	(at 12 (= (bailout_distance) 5.52))
-	(at 18 (= (bailout_distance) 8.27))
-	(at 24 (= (bailout_distance) 9.18))
-	(at 31 (= (bailout_distance) 13.77))
+	(bailout_location entrance)	
+
+	(= (bailout_distance dock-station) 18.13)
+	(at 16.1 (= (bailout_distance dock-station) 14.9))
+	(at 32.2 (= (bailout_distance dock-station) 13.9))
+	(at 50.3 (= (bailout_distance dock-station) 10.9))
+	(at 68.4 (= (bailout_distance dock-station) 7.9))
+	(at 86.5 (= (bailout_distance dock-station) 4.9))
+	(at 104.6 (= (bailout_distance dock-station) 3.22))
+	(at 122.7 (= (bailout_distance dock-station) 9.66))
+
+	(= (bailout_distance entrance) 24.78)
+	(at 16.1 (= (bailout_distance entrance) 21.76))
+	(at 32.2 (= (bailout_distance entrance) 20.76))
+	(at 50.3 (= (bailout_distance entrance) 17.76))
+	(at 68.4 (= (bailout_distance entrance) 14.76))
+	(at 86.5 (= (bailout_distance entrance) 11.76))
+	(at 104.6 (= (bailout_distance entrance) 10.08))
+	(at 122.7 (= (bailout_distance entrance) 7.08))
 
 	(= (distance entrance dock-station) 6.865)
 	(= (distance entrance meeting-room) 5.399)
@@ -126,10 +145,10 @@
 	(= (distance coffee fridge) 6.938)
 )
 (:goal (and
-    ;; (papers_delivered kenny dan-office)
-    (papers_delivered kenny phdarea)
-    (papers_delivered kenny coffee)
-    (papers_delivered kenny meeting-room)
+    (= (papers_delivered kenny dan-office) 2)
+    (= (papers_delivered kenny phdarea) 2)
+    (= (papers_delivered kenny coffee) 2)
+    (= (papers_delivered kenny meeting-room) 2)
     (docked kenny)
     )
 )
