@@ -65,6 +65,16 @@ def main():
                     if tar_file.endswith(".tar.gz"):
                         extract_tar_gz(os.path.join(full_path, tar_file), full_path)
 
+                        # Iterate over 'disp' and 'nodisp' directories
+                        for disp_type in ["disp", "nodisp"]:
+                            disp_path = os.path.join(full_path, disp_type)
+                            if os.path.isdir(disp_path):
+                                for file in os.listdir(disp_path):
+                                    if file.startswith(dir_number + "-"):
+                                        file_path = os.path.join(disp_path, file)
+                                        file_identifier = f"{dir_number}-{file.split('-')[1]}"
+                                        parse_metrics(file_path, file_identifier, disp_type)
+
     # Generate Solution.csv file
     solution_csv_path = os.path.join(output_dir, 'Solution.csv')
     try:
