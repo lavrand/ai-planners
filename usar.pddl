@@ -19,9 +19,9 @@
 
   (:durative-action move
     :parameters (?r - robot ?from ?to - area)
-    :duration (= ?duration (* 0.5 (distance ?from ?to))) ; Duration based on distance
+    :duration (= ?duration 5) ; Fixed duration for simplicity
     :condition (and (at start (robot-at ?r ?from)) (over all (path-clear ?from ?to)) (over all (robot-functional ?r)))
-    :effect (and (at start (not (robot-at ?r ?from))) (at end (robot-at ?r ?to)) (at end (decrease (battery-level ?r) (* 0.1 (distance ?from ?to)))))
+    :effect (and (at start (not (robot-at ?r ?from))) (at end (robot-at ?r ?to)) (at end (decrease (battery-level ?r) 5)))
   )
 
   (:durative-action clear-debris

@@ -17,12 +17,12 @@
     (path-clear area2 area3)
     (robot-functional robot1)
     (robot-functional robot2)
-    (battery-level robot1) 100.0
-    (battery-level robot2) 100.0
-    (debris-weight debris1) 5.0
-    (debris-weight debris2) 3.0
-    (rescue-time victim1) 7.5
-    (rescue-time victim2) 10.0
+    (= (battery-level robot1) 100.0)
+    (= (battery-level robot2) 100.0)
+    (= (debris-weight debris1) 5.0)
+    (= (debris-weight debris2) 3.0)
+    (= (rescue-time victim1) 7.5)
+    (= (rescue-time victim2) 10.0)
   )
   (:goal (and
     (rescued victim1)
