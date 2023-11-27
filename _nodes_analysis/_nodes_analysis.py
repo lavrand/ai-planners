@@ -82,8 +82,12 @@ def main():
             csvwriter = csv.writer(csvfile)
             header = ['Identifier', 'disp', 'nodisp']
             csvwriter.writerow(header)
-            for identifier, status in solution_data.items():
+
+            # Sort the solution data before writing to CSV
+            sorted_solution_data = sorted(solution_data.items(), key=lambda x: sort_identifiers(x[0]))
+            for identifier, status in sorted_solution_data:
                 csvwriter.writerow([identifier, status['disp'], status['nodisp']])
+
         logging.info(f"CSV file created: {solution_csv_path}")
     except Exception as e:
         logging.error(f"Error writing to CSV file {solution_csv_path}: {e}")
