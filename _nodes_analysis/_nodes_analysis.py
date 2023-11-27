@@ -7,12 +7,13 @@ import logging
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Constants for folder naming
+# Constants
 FOLDER_PREFIX = "archive_pfile_"
 METRICS = ["Time", "Discounted time", "Metareasoning time (not discounted)", "Dispatch metareasoning time (not discounted)", "Peak memory", "Nodes Generated", "Nodes Expanded", "Nodes Evaluated", "Nodes Tunneled", "Nodes memoised with open actions", "Nodes memoised without open actions", "Nodes pruned by memoisation"]
 
-# Data structure to store values
+# Data structures
 data = {metric: {} for metric in METRICS}
+solution_data = {}
 
 def extract_tar_gz(tar_path, extract_path):
     try:
@@ -25,6 +26,7 @@ def extract_tar_gz(tar_path, extract_path):
 def parse_metrics(file_path, file_identifier, disp_type):
     try:
         with open(file_path, "r") as file:
+            solution_status = "Not Determined"
             for line in file:
                 for metric in METRICS:
                     if metric in line:
@@ -32,6 +34,12 @@ def parse_metrics(file_path, file_identifier, disp_type):
                         if file_identifier not in data[metric]:
                             data[metric][file_identifier] = {'disp': 'N/A', 'nodisp': 'N/A'}
                         data[metric][file_identifier][disp_type] = value
+                if ";;;; Solution Found" in line:
+                    solution_status = "Solution Found"
+                elif ";;;; Problem Unsolvable" in line:
+                    solution_status = "Problem Unsolvable"
+
+            solution_data[file_identifier] = solution_status
             logging.info(f"Processed metrics from {file_path}")
     except Exception as e:
         logging.error(f"Error parsing metrics from {file_path}: {e}")
@@ -55,32 +63,18 @@ def main():
                     if tar_file.endswith(".tar.gz"):
                         extract_tar_gz(os.path.join(full_path, tar_file), full_path)
 
-                        for disp_type in ["disp", "nodisp"]:
-                            path = os.path.join(full_path, disp_type)
-                            if os.path.isdir(path):
-                                for file in os.listdir(path):
-                                    if file.startswith(dir_number + "-"):
-                                        file_path = os.path.join(path, file)
-                                        file_identifier = f"{dir_number}-{file.split('-')[1]}"
-                                        parse_metrics(file_path, file_identifier, disp_type)
-            else:
-                logging.warning(f"Directory {full_path} does not exist")
-
-    # Generate CSV files
-    for metric, values in data.items():
-        sorted_values = sorted(values.items(), key=lambda x: sort_identifiers(x[0]))
-        csv_file_path = os.path.join(output_dir, metric.replace(' ', '_') + '.csv')
-        try:
-            with open(csv_file_path, 'w', newline='') as csvfile:
-                csvwriter = csv.writer(csvfile)
-                header = ['Identifier', 'disp', 'nodisp']
-                csvwriter.writerow(header)
-                for identifier, disp_values in sorted_values:
-                    row = [identifier, disp_values['disp'], disp_values['nodisp']]
-                    csvwriter.writerow(row)
-            logging.info(f"CSV file created: {csv_file_path}")
-        except Exception as e:
-            logging.error(f"Error writing to CSV file {csv_file_path}: {e}")
+    # Generate Solution.csv file
+    solution_csv_path = os.path.join(output_dir, 'Solution.csv')
+    try:
+        with open(solution_csv_path, 'w', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            header = ['Identifier', 'Solution Status']
+            csvwriter.writerow(header)
+            for identifier, status in solution_data.items():
+                csvwriter.writerow([identifier, status])
+        logging.info(f"CSV file created: {solution_csv_path}")
+    except Exception as e:
+        logging.error(f"Error writing to CSV file {solution_csv_path}: {e}")
 
 if __name__ == "__main__":
     main()
