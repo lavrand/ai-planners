@@ -70,7 +70,7 @@ def main():
     try:
         with open(solution_csv_path, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
-            header = ['Identifier', 'disp Solution Status', 'nodisp Solution Status']
+            header = ['Identifier', 'disp', 'nodisp']
             csvwriter.writerow(header)
             for identifier, status in solution_data.items():
                 csvwriter.writerow([identifier, status['disp'], status['nodisp']])
