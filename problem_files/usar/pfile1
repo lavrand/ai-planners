@@ -1,0 +1,23 @@
+(define (problem usar-instance)
+  (:domain usar)
+  (:objects
+    robot1 robot2 - robot
+    victim1 victim2 - victim
+    debris1 debris2 - debris
+    area1 area2 area3 - area
+  )
+  (:init
+    (robot-at robot1 area1)
+    (robot-at robot2 area2)
+    (victim-at victim1 area3)
+    (victim-at victim2 area2)
+    (debris-at debris1 area2)
+    (debris-at debris2 area3)
+    (path-clear area1 area2)
+    (path-clear area2 area3)
+  )
+  (:goal (and
+    (rescued victim1)
+    (rescued victim2)
+  ))
+)
