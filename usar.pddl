@@ -1,18 +1,18 @@
 (define (domain usar)
   (:requirements :strips :typing :durative-actions :fluents :timed-initial-literals)
-  (:types robot victim debris area task)
+  (:types robot victim debris area)
 
   (:functions
     (battery-level ?r - robot)
-    (task-duration ?t - task)
     (distance ?from ?to - area)
   )
 
   (:predicates
     (robot-at ?r - robot ?a - area)
-    (task-at ?t - task ?a - area)
+    (victim-at ?v - victim ?a - area)           ; Declare victim-at predicate
     (debris-at ?d - debris ?a - area)
-    (task-completed ?t - task)
+    (victim-rescued ?v - victim)                ; Declare victim-rescued predicate
+    (debris-cleared ?d - debris)                ; Declare debris-cleared predicate
     (robot-functional ?r - robot)
   )
 
