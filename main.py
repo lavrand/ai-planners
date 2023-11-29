@@ -15,9 +15,15 @@ from _replace_deadlines import replace_deadlines
 import configparser
 import sys
 
+# Define a logging function
+def log_message(message, log_file):
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    log_file.write(f"[{timestamp}] {message}\n")
+    print(f"[{timestamp}] {message}\n")
+
 # Check if a command line argument has been provided
 if len(sys.argv) < 2:
-    print("Usage: python main.py <config_file>")
+    log_message("Usage: python main.py <config_file>")
     sys.exit(1)
 
 # The second command line argument is expected to be the config file name
@@ -67,6 +73,8 @@ RUN_ONCE = config.getboolean('DEFAULT', 'RUN_ONCE')
 DEADLINE_ON_FIRST_SNAP = config.getboolean('DEFAULT', 'DEADLINE_ON_FIRST_SNAP')
 deadline_on_first_snap_action = config.get('DEFAULT', 'deadline_on_first_snap_action')
 ORIGINAL_PFILES = config.getboolean('DEFAULT', 'ORIGINAL_PFILES')
+log_file_path = config.get('DEFAULT', 'log_file_path')
+
 
 PFILE_N = PFILE_START
 
@@ -76,6 +84,8 @@ FOREST_DEADLINES_ENABLED = False  # DOUBLECHECK THIS IS DISABLED
 
 # Flag to enable or disable parallel processing
 ENABLE_PARALLEL = True
+
+log_file = open(log_file_path, 'a')
 
 def create_archive(current_pfile_n, pertrub_minus):
     """Archives specified directories and files into a folder specific to the current PFILE_N."""
@@ -100,7 +110,7 @@ def create_archive(current_pfile_n, pertrub_minus):
             if os.path.exists(item):  # Check if the item exists before adding
                 archive.add(item)
 
-    print(f"[{datetime.now()}] Created archive: {archive_path}")
+    log_message(f" Created archive: {archive_path}", log_file)
 
 
 def remove_folders_and_files():
@@ -116,7 +126,7 @@ def remove_folders_and_files():
             else:
                 os.remove(item)
 
-    print(f"[{datetime.now()}] Removed specified folders and files.")
+    log_message(f" Removed specified folders and files.", log_file)
 
 
 # Create an infinite iterator over the specific PFILE values
@@ -140,9 +150,9 @@ while True:
             for current_perturb_minus in range(PERTURB_MINUS, PERTURB_PLUS + 1, __STEP):  # Iterating from -PERTURB_MINUS to PERTURB_PLUS inclusive with step 10
                 PERTURB_MINUS_CUR = current_perturb_minus  # Updating the PERTURB_MINUS value for this iteration
 
-                print(f"[{datetime.now()}] Starting a new set of experiments for PFILE_N = {PFILE_N} with current_perturb_minus = {current_perturb_minus} ...")
+                log_message(f" Starting a new set of experiments for PFILE_N = {PFILE_N} with current_perturb_minus = {current_perturb_minus} ...", log_file)
 
-                print(f"[{datetime.now()}] Starting a new set of experiments...")
+                log_message(f" Starting a new set of experiments...", log_file)
                 # Create directories and set permissions
                 for dir_name in ['disp', 'nodisp']:
                     if not os.path.exists(dir_name):
@@ -183,32 +193,32 @@ while True:
                         result = subprocess.run(cmd, check=True, text=True, capture_output=True, timeout=PLAN_SEARCH_TIMEOUT_SECONDS * 2)
 
                         # If the command was successful, result.stdout will contain the output
-                        print(result.stdout)
+                        log_message(result.stdout, log_file)
 
                     except subprocess.TimeoutExpired:
                         # Handle the timeout exception as you see fit
-                        print("The command did not complete within timeout seconds.")
+                        log_message("The command did not complete within timeout seconds.", log_file)
                         # Here you might choose to try the command again, or perhaps record the timeout in a log file
 
                     except subprocess.CalledProcessError as e:
                         # Handle the exception for a non-zero exit code if check=True
-                        print(f"The command failed because: {e.stderr}")
+                        log_message(f"The command failed because: {e.stderr}", log_file)
                         # Here you can do additional handling of the error, like retrying the command or logging the error
 
                     except Exception as e:
-                        print(f"An error occurred: {str(e)}")
+                        log_message(f"An error occurred: {str(e)}", log_file)
                         return None
 
                 # Execute each command using the run_subprocess function
                 for cmd, args in commands_to_run:
-                    print(f"Executing command: {cmd} {' '.join(args)}")
+                    log_message(f"Executing command: {cmd} {' '.join(args)}", log_file)
                     run_subprocess_args(cmd, args)
 
                 if FOREST_DEADLINES_ENABLED:
                     replace_deadlines(PFILE_N)
-                    print(f"Deadlines replaced successfully with random forest model prediction deadlines..")
+                    log_message(f"Deadlines replaced successfully with random forest model prediction deadlines..", log_file)
 
-                print(f"[{datetime.now()}] Finished running the generation script.")
+                log_message(f" Finished running the generation script.", log_file)
 
                 base_command_common = (
                     f"./rewrite-no-lp --time-based-on-expansions-per-second {time_based_on_expansions_per_second} "
@@ -236,29 +246,29 @@ while True:
                 def run_dispscript(i):
                     if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
                         command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > disp/{PFILE_N}"
-                        print(f"[{datetime.now()}] Running disp command for file {PFILE_N}. Command: {command}")
+                        log_message(f" Running disp command for file {PFILE_N}. Command: {command}", log_file)
                         run_subprocess(command, i)
-                        print(f"[{datetime.now()}] Finished disp command for file {PFILE_N}.")
+                        log_message(f" Finished disp command for file {PFILE_N}.", log_file)
                     else:
                         command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
                             i) + f" > disp/{PFILE_N}-" + str(i)
-                        print(f"[{datetime.now()}] Running disp command for file {PFILE_N}-{i}. Command: {command}")
+                        log_message(f" Running disp command for file {PFILE_N}-{i}. Command: {command}", log_file)
                         run_subprocess(command, i)
-                        print(f"[{datetime.now()}] Finished disp command for file {PFILE_N}-{i}.")
+                        log_message(f" Finished disp command for file {PFILE_N}-{i}.", log_file)
 
 
                 def run_nodispscript(i):
                     if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
                         command = base_command_common + base_command_end + f" > nodisp/{PFILE_N}"
-                        print(f"[{datetime.now()}] Running nodisp command for file {PFILE_N}. Command: {command}")
+                        log_message(f" Running nodisp command for file {PFILE_N}. Command: {command}", log_file)
                         run_subprocess(command, i)
-                        print(f"[{datetime.now()}] Finished nodisp command for file {PFILE_N}.")
+                        log_message(f" Finished nodisp command for file {PFILE_N}.", log_file)
                     else:
                         command = base_command_common + base_command_end + str(
                             i) + f" > nodisp/{PFILE_N}-" + str(i)
-                        print(f"[{datetime.now()}] Running nodisp command for file {PFILE_N}-{i}. Command: {command}")
+                        log_message(f" Running nodisp command for file {PFILE_N}-{i}. Command: {command}", log_file)
                         run_subprocess(command, i)
-                        print(f"[{datetime.now()}] Finished nodisp command for file {PFILE_N}-{i}.")
+                        log_message(f" Finished nodisp command for file {PFILE_N}-{i}.", log_file)
 
 
                 def run_subprocess(command, i):
@@ -276,12 +286,12 @@ while True:
                         process.wait(timeout=10)  # give it 10 seconds to terminate gracefully
                         if process.poll() is None:  # if the process is still running after 10 seconds
                             os.killpg(os.getpgid(process.pid), signal.SIGKILL)  # forcibly kill the process group
-                        print(f"Command #{i} took longer than timeout seconds and was killed!")
+                        log_message(f"Command #{i} took longer than timeout seconds and was killed!", log_file)
                     else:
                         if process.returncode != 0:
-                            print(f"Command #{i} failed!")
+                            log_message(f"Command #{i} failed!", log_file)
                         else:
-                            print(f"Command #{i} completed successfully!")
+                            log_message(f"Command #{i} completed successfully!", log_file)
 
                     # Return stdout, stderr, and returncode
                     return stdout, stderr, process.returncode
@@ -289,7 +299,7 @@ while True:
                 # Define the number of processes to spawn. Ideally, this is the number of cores available.
                 num_processes = multiprocessing.cpu_count() - MULTIPROCESSING_CPU_COUNT_MINUS if ENABLE_PARALLEL else 1
                 # Log the number of processes
-                print(f"[{datetime.now()}] Running with {num_processes} parallel processes.")
+                log_message(f" Running with {num_processes} parallel processes.", log_file)
 
                 # Execute the scripts
                 if ENABLE_PARALLEL:
@@ -382,26 +392,26 @@ while True:
                     writer.writerow(headers)
                     writer.writerows(rows)
 
-                print(f"[{datetime.now()}] Finished current set of experiments. Starting archiving...")
+                log_message(f" Finished current set of experiments. Starting archiving...", log_file)
 
                 # Call the modified function with the current PFILE_N
                 create_archive(PFILE_N, current_perturb_minus)
 
-                print(f"[{datetime.now()}] Finished archiving.")
+                log_message(f" Finished archiving.", log_file)
 
-                print(f"[{datetime.now()}] Starting removing cache folder and files.")
+                log_message(f" Starting removing cache folder and files.", log_file)
                 remove_folders_and_files()
-                print(f"[{datetime.now()}] Finished removing cache folder and files.")
+                log_message(f" Finished removing cache folder and files.", log_file)
 
-                print(f"[{datetime.now()}] All PFILE_N experiments completed for this cycle. Restarting...")
+                log_message(f" All PFILE_N experiments completed for this cycle. Restarting...", log_file)
 
         except Exception as e:  # Catch any type of exception
-            print(f"[{datetime.now()}] An error occurred during processing for PFILE_N = {PFILE_N}: {str(e)}")
-            print("Continuing with the next PFILE_N...")
+            log_message(f" An error occurred during processing for PFILE_N = {PFILE_N}: {str(e)}", log_file)
+            log_message("Continuing with the next PFILE_N...", log_file)
             # Optionally, log the exception e to a log file or database for later analysis
         finally:
             # If there's any cleanup that ALWAYS needs to happen, put it here.
-
+            log_file.close()
             pass
 
     # Check if the loop should run only once
