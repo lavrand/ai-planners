@@ -66,6 +66,7 @@ dispatch_threshold = config.get('DEFAULT', 'dispatch_threshold')
 RUN_ONCE = config.getboolean('DEFAULT', 'RUN_ONCE')
 DEADLINE_ON_FIRST_SNAP = config.getboolean('DEFAULT', 'DEADLINE_ON_FIRST_SNAP')
 deadline_on_first_snap_action = config.get('DEFAULT', 'deadline_on_first_snap_action')
+ORIGINAL_PFILES = config.getboolean('DEFAULT', 'ORIGINAL_PFILES')
 
 PFILE_N = PFILE_START
 
@@ -225,13 +226,15 @@ while True:
                 if DEADLINE_ON_FIRST_SNAP:
                     base_command_common += base_command_deadline_on_first_snap
                     base_command_end = (f" %s pfile{PFILE_N}" % DOMAIN)
+                elif ORIGINAL_PFILES:
+                    base_command_end = (f" %s pfile{PFILE_N}" % DOMAIN)
                 else:
                     base_command_end = (f" %s withdeadlines-ontime-pfile{PFILE_N}-" % DOMAIN)
 
 
                 # Function to run the dispscript commands
                 def run_dispscript(i):
-                    if DEADLINE_ON_FIRST_SNAP:
+                    if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
                         command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > disp/{PFILE_N}"
                         print(f"[{datetime.now()}] Running disp command for file {PFILE_N}. Command: {command}")
                         run_subprocess(command, i)
@@ -245,7 +248,7 @@ while True:
 
 
                 def run_nodispscript(i):
-                    if DEADLINE_ON_FIRST_SNAP:
+                    if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
                         command = base_command_common + base_command_end + f" > nodisp/{PFILE_N}"
                         print(f"[{datetime.now()}] Running nodisp command for file {PFILE_N}. Command: {command}")
                         run_subprocess(command, i)
