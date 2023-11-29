@@ -2,7 +2,7 @@ import os
 import re
 
 # The N-th goal to keep uncommented
-X = 4  # Example value
+X = 1  # Example value
 
 
 def comment_all_except_nth_goal(file_path, n):
