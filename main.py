@@ -209,10 +209,12 @@ while True:
                         log_message(f"An error occurred: {str(e)}", log_file)
                         return None
 
-                # Execute each command using the run_subprocess function
-                for cmd, args in commands_to_run:
-                    log_message(f"Executing command: {cmd} {' '.join(args)}", log_file)
-                    run_subprocess_args(cmd, args)
+
+                if not (DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES):
+                    # Execute each command using the run_subprocess function
+                    for cmd, args in commands_to_run:
+                        log_message(f"Executing command: {cmd} {' '.join(args)}", log_file)
+                        run_subprocess_args(cmd, args)
 
                 if FOREST_DEADLINES_ENABLED:
                     replace_deadlines(PFILE_N)
@@ -271,7 +273,20 @@ while True:
                         log_message(f" Finished nodisp command for file {PFILE_N}-{i}.", log_file)
 
 
-                def run_subprocess(command, i):
+                # Parallel execution functions
+                def parallel_run_dispscript(PFILE_N):
+                    command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > disp/{PFILE_N}"
+                    log_message(f"Running disp command for file {PFILE_N}. Command: {command}", log_file)
+                    run_subprocess(command, None)
+
+
+                def parallel_run_nodispscript(PFILE_N):
+                    command = base_command_common + base_command_end + f" > nodisp/{PFILE_N}"
+                    log_message(f"Running nodisp command for file {PFILE_N}. Command: {command}", log_file)
+                    run_subprocess(command, None)
+
+
+                def run_subprocess(command, i=None):
                     stdout, stderr = None, None  # Initialize these to avoid UnboundLocalError
 
                     # Start the process in a new session
@@ -286,12 +301,21 @@ while True:
                         process.wait(timeout=10)  # give it 10 seconds to terminate gracefully
                         if process.poll() is None:  # if the process is still running after 10 seconds
                             os.killpg(os.getpgid(process.pid), signal.SIGKILL)  # forcibly kill the process group
-                        log_message(f"Command #{i} took longer than timeout seconds and was killed!", log_file)
+                        if i is not None:
+                            log_message(f"Command #{i} took longer than timeout seconds and was killed!", log_file)
+                        else:
+                            log_message(f"Command took longer than timeout seconds and was killed!", log_file)
                     else:
                         if process.returncode != 0:
-                            log_message(f"Command #{i} failed!", log_file)
+                            if i is not None:
+                                log_message(f"Command #{i} failed!", log_file)
+                            else:
+                                log_message(f"Command failed!", log_file)
                         else:
-                            log_message(f"Command #{i} completed successfully!", log_file)
+                            if i is not None:
+                                log_message(f"Command #{i} completed successfully!", log_file)
+                            else:
+                                log_message(f"Command completed successfully!", log_file)
 
                     # Return stdout, stderr, and returncode
                     return stdout, stderr, process.returncode
@@ -303,9 +327,16 @@ while True:
 
                 # Execute the scripts
                 if ENABLE_PARALLEL:
-                    with multiprocessing.Pool(processes=num_processes) as pool:
-                        pool.map(run_dispscript, range(1, EXPERIMENTS + 1))  # This will distribute the list of indexes to the available processes
-                        pool.map(run_nodispscript, range(1, EXPERIMENTS + 1))
+                    # Parallel execution when DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES is True
+                    if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
+                        with multiprocessing.Pool(num_processes) as pool:
+                            pfile_nums = range(PFILE_START, PFILE_START + num_processes)
+                            pool.map(parallel_run_dispscript, [f"pfile{num}" for num in pfile_nums])
+                            pool.map(parallel_run_nodispscript, [f"pfile{num}" for num in pfile_nums])
+                    else:
+                        with multiprocessing.Pool(processes=num_processes) as pool:
+                            pool.map(run_dispscript, range(1, EXPERIMENTS + 1))  # This will distribute the list of indexes to the available processes
+                            pool.map(run_nodispscript, range(1, EXPERIMENTS + 1))
                 else:
                     # Non-parallel execution as fallback
                     for i in range(1, EXPERIMENTS + 1):
