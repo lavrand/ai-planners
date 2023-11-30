@@ -411,9 +411,11 @@ while True:
             # Optionally, log the exception e to a log file or database for later analysis
         finally:
             # If there's any cleanup that ALWAYS needs to happen, put it here.
-            log_file.close()
             pass
 
     # Check if the loop should run only once
     if RUN_ONCE:
         break
+
+
+log_file.close()
