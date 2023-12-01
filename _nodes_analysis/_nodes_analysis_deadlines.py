@@ -13,6 +13,7 @@ METRICS = ["Time", "Discounted time", "Metareasoning time (not discounted)", "Di
 
 # Data structure to store values
 data = {metric: {} for metric in METRICS}
+solution_data = {}  # Data structure for solution status
 
 def extract_tar_gz(tar_path, extract_path):
     try:
@@ -47,7 +48,7 @@ def main():
 
     for dir_name in os.listdir(base_path):
         if dir_name.startswith(FOLDER_PREFIX):
-            dir_number = dir_name.split('_')[2]  # Extracting the first number (e.g., '25' from 'archive_pfile_25_13')
+            dir_number = dir_name.split('_')[2]
             full_path = os.path.join(base_path, dir_name)
             if os.path.isdir(full_path):
                 logging.info(f"Processing directory {full_path}")
@@ -59,14 +60,24 @@ def main():
                             path = os.path.join(full_path, disp_type)
                             if os.path.isdir(path):
                                 for file in os.listdir(path):
-                                    # if file.startswith(dir_number + "-"):
-                                        file_path = os.path.join(path, file)
-                                        file_identifier = f"{dir_number}"
-                                        parse_metrics(file_path, file_identifier, disp_type)
+                                    file_path = os.path.join(path, file)
+                                    file_identifier = f"{dir_number}"
+                                    parse_metrics(file_path, file_identifier, disp_type)
+
+                                    # Determine solution status
+                                    solution_status = "Not Determined"
+                                    with open(file_path, "r") as file:
+                                        for line in file:
+                                            if ";;;; Solution Found" in line:
+                                                solution_status = "Solution Found"
+                                            elif ";;;; Problem Unsolvable" in line:
+                                                solution_status = "Problem Unsolvable"
+                                    if file_identifier not in solution_data:
+                                        solution_data[file_identifier] = {'disp': 'Not Determined', 'nodisp': 'Not Determined'}
+                                    solution_data[file_identifier][disp_type] = solution_status
             else:
                 logging.warning(f"Directory {full_path} does not exist")
 
-    # Generate CSV files
     for metric, values in data.items():
         # sorted_values = sorted(values.items(), key=lambda x: sort_identifiers(x[0]))
         csv_file_path = os.path.join(output_dir, metric.replace(' ', '_') + '.csv')
@@ -82,6 +93,20 @@ def main():
             logging.info(f"CSV file created: {csv_file_path}")
         except Exception as e:
             logging.error(f"Error writing to CSV file {csv_file_path}: {e}")
+
+    # Generate Solution.csv file
+    solution_csv_path = os.path.join(output_dir, 'Solution.csv')
+    try:
+        with open(solution_csv_path, 'w', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            header = ['Identifier', 'disp', 'nodisp']
+            csvwriter.writerow(header)
+            for identifier, disp_values in solution_data.items():
+                row = [identifier, disp_values['disp'], disp_values['nodisp']]
+                csvwriter.writerow(row)
+        logging.info(f"CSV file created: {solution_csv_path}")
+    except Exception as e:
+        logging.error(f"Error writing to CSV file {solution_csv_path}: {e}")
 
 if __name__ == "__main__":
     main()
