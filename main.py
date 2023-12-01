@@ -21,6 +21,19 @@ def log_message(message, log_file):
     log_file.write(f"[{timestamp}] {message}\n")
     print(f"[{timestamp}] {message}\n")
 
+# Updated function for creating and organizing directories
+def create_and_organize_directories(current_pfile_n):
+    pfile_directory = f"p{current_pfile_n}"
+    if not os.path.exists(pfile_directory):
+        os.makedirs(pfile_directory)
+
+    for dir_name in ['disp', 'nodisp']:
+        dir_path = os.path.join(pfile_directory, dir_name)
+        if os.path.exists(dir_path) and not os.path.isdir(dir_path):
+            os.remove(dir_path)  # Remove if it exists and is not a directory
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
 # Check if a command line argument has been provided
 if len(sys.argv) < 2:
     log_message("Usage: python main.py <config_file>")
@@ -88,45 +101,38 @@ ENABLE_PARALLEL = True
 
 log_file = open(log_file_path, 'a')
 
+# Updated archiving function
 def create_archive(current_pfile_n):
-    """Archives specified directories and files into a folder specific to the current PFILE_N."""
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    archive_name = f"{timestamp}.tar.gz"
-
-    # Define the directory based on the current PFILE_N
+    archive_name = f"{timestamp}_{current_pfile_n}.tar.gz"
     archive_dir = f"archive_pfile_{current_pfile_n}"
     if not os.path.exists(archive_dir):
-        os.makedirs(archive_dir)  # Create directory if it doesn't exist
-
-    # Full path for the archive file
+        os.makedirs(archive_dir)
     archive_path = os.path.join(archive_dir, archive_name)
-
-    # List of directories and files to archive
-    items_to_archive = ['disp', 'nodisp', f"pfile{current_pfile_n}"]
-
-    # Create the archive
+    pfile_directory = f"p{current_pfile_n}"
+    items_to_archive = [os.path.join(pfile_directory, 'disp'), os.path.join(pfile_directory, 'nodisp')]
     with tarfile.open(archive_path, 'w:gz') as archive:
         for item in items_to_archive:
-            if os.path.exists(item):  # Check if the item exists before adding
-                archive.add(item)
+            if os.path.exists(item):
+                archive.add(item, arcname=os.path.basename(item))
+    log_message(f"Created archive: {archive_path}", log_file)
 
-    log_message(f" Created archive: {archive_path}", log_file)
 
 
-def remove_folders_and_files():
-    """Deletes the specified directories and files."""
-    items_to_delete = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
-
-    items_to_delete.extend([f"withdeadlines-ontime-pfile{PFILE_N}-{i}" for i in range(1, 101)])
-
-    for item in items_to_delete:
-        if os.path.exists(item):
-            if os.path.isdir(item):
-                shutil.rmtree(item)
-            else:
-                os.remove(item)
-
-    log_message(f" Removed specified folders and files.", log_file)
+# def remove_folders_and_files():
+#     """Deletes the specified directories and files."""
+#     items_to_delete = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
+#
+#     items_to_delete.extend([f"withdeadlines-ontime-pfile{PFILE_N}-{i}" for i in range(1, 101)])
+#
+#     for item in items_to_delete:
+#         if os.path.exists(item):
+#             if os.path.isdir(item):
+#                 shutil.rmtree(item)
+#             else:
+#                 os.remove(item)
+#
+#     log_message(f" Removed specified folders and files.", log_file)
 
 
 # Create an infinite iterator over the specific PFILE values
@@ -147,24 +153,29 @@ while True:
             PFILE_N = current_pfile  # Updating the PFILE_N value for this iteration
             PFILE = f"pfile{PFILE_N}"
 
+            # Create and organize directories for current pfile
+            create_and_organize_directories(PFILE_N)
+
             for current_perturb_minus in range(PERTURB_MINUS, PERTURB_PLUS + 1, __STEP):  # Iterating from -PERTURB_MINUS to PERTURB_PLUS inclusive with step 10
                 PERTURB_MINUS_CUR = current_perturb_minus  # Updating the PERTURB_MINUS value for this iteration
 
-                log_message(f" Starting a new set of experiments for PFILE_N = {PFILE_N} with current_perturb_minus = {current_perturb_minus} ...", log_file)
+                # log_message(f" Starting a new set of experiments for PFILE_N = {PFILE_N} with current_perturb_minus = {current_perturb_minus} ...", log_file)
+                log_message(
+                    f" Starting a new set of experiments for PFILE_N = {PFILE_N} ...",
+                    log_file)
+                # log_message(f" Starting a new set of experiments...", log_file)
+                # # Create directories and set permissions
+                # for dir_name in ['disp', 'nodisp']:
+                #     if not os.path.exists(dir_name):
+                #         os.makedirs(dir_name)
+                #         os.chmod(dir_name, 0o755)
+                #
+                # # Directories to parse
+                # directories = ['disp', 'nodisp']
 
-                log_message(f" Starting a new set of experiments...", log_file)
-                # Create directories and set permissions
-                for dir_name in ['disp', 'nodisp']:
-                    if not os.path.exists(dir_name):
-                        os.makedirs(dir_name)
-                        os.chmod(dir_name, 0o755)
-
-                # Directories to parse
-                directories = ['disp', 'nodisp']
-
-                # Output CSV filenames
-                csv_filename = "times.csv"
-                csv_filename_better = "timesDispBetter.csv"
+                # # Output CSV filenames
+                # csv_filename = "times.csv"
+                # csv_filename_better = "timesDispBetter.csv"
 
                 # Base filename pattern
                 base_filename = f"{PFILE_N}-"
@@ -247,7 +258,7 @@ while True:
                 # Function to run the dispscript commands
                 def run_dispscript(i):
                     if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
-                        command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > disp/{PFILE_N}"
+                        command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > p{PFILE_N}/disp/{PFILE_N}"
                         log_message(f" Running disp command for file {PFILE_N}. Command: {command}", log_file)
                         run_subprocess(command, i)
                         log_message(f" Finished disp command for file {PFILE_N}.", log_file)
@@ -261,7 +272,7 @@ while True:
 
                 def run_nodispscript(i):
                     if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
-                        command = base_command_common + base_command_end + f" > nodisp/{PFILE_N}"
+                        command = base_command_common + base_command_end + f" > p{PFILE_N}/nodisp/{PFILE_N}"
                         log_message(f" Running nodisp command for file {PFILE_N}. Command: {command}", log_file)
                         run_subprocess(command, i)
                         log_message(f" Finished nodisp command for file {PFILE_N}.", log_file)
@@ -274,16 +285,16 @@ while True:
 
 
                 # Parallel execution functions
-                def parallel_run_dispscript(PFILE_N):
-                    command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > disp/{PFILE_N}"
-                    log_message(f"Running disp command for file {PFILE_N}. Command: {command}", log_file)
-                    run_subprocess(command, None)
-
-
-                def parallel_run_nodispscript(PFILE_N):
-                    command = base_command_common + base_command_end + f" > nodisp/{PFILE_N}"
-                    log_message(f"Running nodisp command for file {PFILE_N}. Command: {command}", log_file)
-                    run_subprocess(command, None)
+                # def parallel_run_dispscript(PFILE_N):
+                #     command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > p{PFILE_N}/disp/{PFILE_N}"
+                #     log_message(f"Running disp command for file {PFILE_N}. Command: {command}", log_file)
+                #     run_subprocess(command, None)
+                #
+                #
+                # def parallel_run_nodispscript(PFILE_N):
+                #     command = base_command_common + base_command_end + f" > p{PFILE_N}/nodisp/{PFILE_N}"
+                #     log_message(f"Running nodisp command for file {PFILE_N}. Command: {command}", log_file)
+                #     run_subprocess(command, None)
 
 
                 def run_subprocess(command, i=None):
@@ -321,107 +332,107 @@ while True:
                     return stdout, stderr, process.returncode
 
                 # Define the number of processes to spawn. Ideally, this is the number of cores available.
-                num_processes = CPU_COUNT_PC - MULTIPROCESSING_CPU_COUNT_MINUS if ENABLE_PARALLEL else 1
-                # Log the number of processes
-                log_message(f" Running with {num_processes} parallel processes.", log_file)
+                # num_processes = CPU_COUNT_PC - MULTIPROCESSING_CPU_COUNT_MINUS if ENABLE_PARALLEL else 1
+                # # Log the number of processes
+                # log_message(f" Running with {num_processes} parallel processes.", log_file)
 
-                # Execute the scripts
-                if ENABLE_PARALLEL:
-                    # Parallel execution when DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES is True
-                    if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
-                        with multiprocessing.Pool(num_processes) as pool:
-                            pfile_nums = range(PFILE_START, PFILE_START + num_processes)
-                            pool.map(parallel_run_dispscript, [f"pfile{num}" for num in pfile_nums])
-                            pool.map(parallel_run_nodispscript, [f"pfile{num}" for num in pfile_nums])
-                    else:
-                        with multiprocessing.Pool(processes=num_processes) as pool:
-                            pool.map(run_dispscript, range(1, EXPERIMENTS + 1))  # This will distribute the list of indexes to the available processes
-                            pool.map(run_nodispscript, range(1, EXPERIMENTS + 1))
-                else:
-                    # Non-parallel execution as fallback
-                    for i in range(1, EXPERIMENTS + 1):
-                        run_dispscript(i)
-                        run_nodispscript(i)
+                # # Execute the scripts
+                # if ENABLE_PARALLEL:
+                #     # Parallel execution when DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES is True
+                #     if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
+                #         with multiprocessing.Pool(num_processes) as pool:
+                #             pfile_nums = range(PFILE_START, PFILE_START + num_processes)
+                #             pool.map(parallel_run_dispscript, [f"pfile{num}" for num in pfile_nums])
+                #             pool.map(parallel_run_nodispscript, [f"pfile{num}" for num in pfile_nums])
+                #     else:
+                #         with multiprocessing.Pool(processes=num_processes) as pool:
+                #             pool.map(run_dispscript, range(1, EXPERIMENTS + 1))  # This will distribute the list of indexes to the available processes
+                #             pool.map(run_nodispscript, range(1, EXPERIMENTS + 1))
+                # else:
+                # Non-parallel execution as fallback
+                for i in range(1, EXPERIMENTS + 1):
+                    run_dispscript(i)
+                    run_nodispscript(i)
 
-                # Extract time from the line
-                def extract_time(line):
-                    try:
-                        return float(line.split()[2])
-                    except:
-                        # parsing code error
-                        return "9999999"
-
-
-                # Extract execution time data and write to CSV
-                def extract_time_and_write_csv():
-                    with open(csv_filename, 'w', newline='') as csvfile, open(csv_filename_better, 'w',
-                                                                              newline='') as csvbetterfile:
-                        csvwriter = csv.writer(csvfile)
-                        csvbetterwriter = csv.writer(csvbetterfile)
-                        csvwriter.writerow(['File', 'disp', 'nodisp'])
-                        csvbetterwriter.writerow(['File', 'disp', 'nodisp'])
-
-                        for i in range(1, EXPERIMENTS + 1):  # 1 to EXPERIMENTS inclusive
-                            filename = base_filename + str(i)
-                            times = [filename]  # Start with filename as first column
-
-                            disp_time = 0
-                            nodisp_time = 0
-
-                            for directory in directories:
-                                filepath = os.path.join(directory, filename)
-
-                                if os.path.exists(filepath):
-                                    with open(filepath, 'r') as f:
-
-                                        lines = f.readlines()
-
-                                        # ;;;; Problem Unsolvable
-                                        line_unsolvable = next((l for l in lines if l.startswith(";;;; Problem Unsolvable")), None)
-                                        if not line_unsolvable:
-                                            # Search in the stored lines for the line with '; Time'
-                                            line = next((l for l in lines if l.startswith("; Time")), None)
-
-                                            if line:
-                                                time_val = extract_time(line)
-                                                if directory == 'disp':
-                                                    disp_time = time_val
-                                                else:
-                                                    nodisp_time = time_val
-                                                times.append(time_val)
-                                            else:
-                                                # no line for time code
-                                                times.append(9999)
-                                        else:
-                                            # unsolvable code
-                                            times.append(99999)
-                                else:
-                                    # filepath doesn't exist code
-                                    times.append(999999)
-
-                            # Write extracted times to CSV
-                            csvwriter.writerow(times)
-
-                            # If 'disp' is faster than 'nodisp', write to the better times file
-                            if isinstance(disp_time, float) and isinstance(nodisp_time, float) and disp_time < nodisp_time:
-                                csvbetterwriter.writerow(times)
-
-
-                extract_time_and_write_csv()
-
-                # Read the times.csv file
-                with open('times.csv', 'r') as file:
-                    reader = csv.reader(file)
-
-                    # Extract headers and rows
-                    headers = next(reader)
-                    rows = [row for row in reader if float(row[1]) < float(row[2])]
-
-                # Write the filtered rows to timesDispBetter.csv
-                with open('timesDispBetter.csv', 'w', newline='') as file:
-                    writer = csv.writer(file)
-                    writer.writerow(headers)
-                    writer.writerows(rows)
+                # # Extract time from the line
+                # def extract_time(line):
+                #     try:
+                #         return float(line.split()[2])
+                #     except:
+                #         # parsing code error
+                #         return "9999999"
+                #
+                #
+                # # Extract execution time data and write to CSV
+                # def extract_time_and_write_csv():
+                #     with open(csv_filename, 'w', newline='') as csvfile, open(csv_filename_better, 'w',
+                #                                                               newline='') as csvbetterfile:
+                #         csvwriter = csv.writer(csvfile)
+                #         csvbetterwriter = csv.writer(csvbetterfile)
+                #         csvwriter.writerow(['File', 'disp', 'nodisp'])
+                #         csvbetterwriter.writerow(['File', 'disp', 'nodisp'])
+                #
+                #         for i in range(1, EXPERIMENTS + 1):  # 1 to EXPERIMENTS inclusive
+                #             filename = base_filename + str(i)
+                #             times = [filename]  # Start with filename as first column
+                #
+                #             disp_time = 0
+                #             nodisp_time = 0
+                #
+                #             for directory in directories:
+                #                 filepath = os.path.join(directory, filename)
+                #
+                #                 if os.path.exists(filepath):
+                #                     with open(filepath, 'r') as f:
+                #
+                #                         lines = f.readlines()
+                #
+                #                         # ;;;; Problem Unsolvable
+                #                         line_unsolvable = next((l for l in lines if l.startswith(";;;; Problem Unsolvable")), None)
+                #                         if not line_unsolvable:
+                #                             # Search in the stored lines for the line with '; Time'
+                #                             line = next((l for l in lines if l.startswith("; Time")), None)
+                #
+                #                             if line:
+                #                                 time_val = extract_time(line)
+                #                                 if directory == 'disp':
+                #                                     disp_time = time_val
+                #                                 else:
+                #                                     nodisp_time = time_val
+                #                                 times.append(time_val)
+                #                             else:
+                #                                 # no line for time code
+                #                                 times.append(9999)
+                #                         else:
+                #                             # unsolvable code
+                #                             times.append(99999)
+                #                 else:
+                #                     # filepath doesn't exist code
+                #                     times.append(999999)
+                #
+                #             # Write extracted times to CSV
+                #             csvwriter.writerow(times)
+                #
+                #             # If 'disp' is faster than 'nodisp', write to the better times file
+                #             if isinstance(disp_time, float) and isinstance(nodisp_time, float) and disp_time < nodisp_time:
+                #                 csvbetterwriter.writerow(times)
+                #
+                #
+                # extract_time_and_write_csv()
+                #
+                # # Read the times.csv file
+                # with open('times.csv', 'r') as file:
+                #     reader = csv.reader(file)
+                #
+                #     # Extract headers and rows
+                #     headers = next(reader)
+                #     rows = [row for row in reader if float(row[1]) < float(row[2])]
+                #
+                # # Write the filtered rows to timesDispBetter.csv
+                # with open('timesDispBetter.csv', 'w', newline='') as file:
+                #     writer = csv.writer(file)
+                #     writer.writerow(headers)
+                #     writer.writerows(rows)
 
                 log_message(f" Finished current set of experiments. Starting archiving...", log_file)
 
@@ -430,9 +441,9 @@ while True:
 
                 log_message(f" Finished archiving.", log_file)
 
-                log_message(f" Starting removing cache folder and files.", log_file)
-                remove_folders_and_files()
-                log_message(f" Finished removing cache folder and files.", log_file)
+                # log_message(f" Starting removing cache folder and files.", log_file)
+                # # remove_folders_and_files()
+                # log_message(f" Finished removing cache folder and files.", log_file)
 
                 log_message(f" All PFILE_N experiments completed for this cycle. Restarting...", log_file)
 
