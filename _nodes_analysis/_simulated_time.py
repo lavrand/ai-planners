@@ -15,7 +15,8 @@ nodes_expanded_df[['disp', 'nodisp']] = nodes_expanded_df[['disp', 'nodisp']].ap
 solution_df = pd.read_csv("Solution.csv")
 
 # Preprocess Solution.csv to get the identifiers as integers
-solution_df['Identifier'] = solution_df['Identifier'].str.split('-').str[0].astype(int)
+# Directly convert 'Identifier' to int, assuming they are numeric
+solution_df['Identifier'] = solution_df['Identifier'].astype(int)
 
 # Update disp and nodisp in nodes_expanded_df based on Solution.csv criteria
 for idx in solution_df.index:
