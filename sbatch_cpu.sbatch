@@ -19,7 +19,7 @@ echo "Current working directory is:"
 pwd
 echo "SLURM_JOBID"=$SLURM_JOBID
 echo "SLURM_JOB_NODELIST"=$SLURM_JOB_NODELIST
-output=$(./cs_storage/andreyl/pancake/ai/ai-planners/_run_configs.sh)
+output=$(./cs_storage/andreyl/ai/ai-planners/_run_configs.sh)
 status=$?
 if [ $status -ne 0 ]; then
     echo "Script failed with status $status"
