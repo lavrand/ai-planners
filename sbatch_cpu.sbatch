@@ -17,7 +17,7 @@ source activate new_env
 
 echo "Current working directory is:"
 pwd
-echo "SLURM_JOBID”=$SLURM_JOBID
+echo "SLURM_JOBID"=$SLURM_JOBID
 echo "SLURM_JOB_NODELIST"=$SLURM_JOB_NODELIST
 output=$(./cs_storage/andreyl/pancake/ai/ai-planners/_run_configs.sh)
 status=$?
