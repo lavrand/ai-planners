@@ -88,13 +88,13 @@ ENABLE_PARALLEL = True
 
 log_file = open(log_file_path, 'a')
 
-def create_archive(current_pfile_n, pertrub_minus):
+def create_archive(current_pfile_n):
     """Archives specified directories and files into a folder specific to the current PFILE_N."""
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     archive_name = f"{timestamp}.tar.gz"
 
     # Define the directory based on the current PFILE_N
-    archive_dir = f"archive_pfile_{current_pfile_n}_{pertrub_minus}"
+    archive_dir = f"archive_pfile_{current_pfile_n}"
     if not os.path.exists(archive_dir):
         os.makedirs(archive_dir)  # Create directory if it doesn't exist
 
@@ -102,8 +102,7 @@ def create_archive(current_pfile_n, pertrub_minus):
     archive_path = os.path.join(archive_dir, archive_name)
 
     # List of directories and files to archive
-    items_to_archive = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
-    items_to_archive.extend([f"withdeadlines-ontime-pfile{current_pfile_n}-{i}" for i in range(1, 101)])
+    items_to_archive = ['disp', 'nodisp', f"pfile{current_pfile_n}"]
 
     # Create the archive
     with tarfile.open(archive_path, 'w:gz') as archive:
@@ -427,7 +426,7 @@ while True:
                 log_message(f" Finished current set of experiments. Starting archiving...", log_file)
 
                 # Call the modified function with the current PFILE_N
-                create_archive(PFILE_N, current_perturb_minus)
+                create_archive(PFILE_N)
 
                 log_message(f" Finished archiving.", log_file)
 
