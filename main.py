@@ -74,7 +74,8 @@ DEADLINE_ON_FIRST_SNAP = config.getboolean('DEFAULT', 'DEADLINE_ON_FIRST_SNAP')
 deadline_on_first_snap_action = config.get('DEFAULT', 'deadline_on_first_snap_action')
 ORIGINAL_PFILES = config.getboolean('DEFAULT', 'ORIGINAL_PFILES')
 log_file_path = config.get('DEFAULT', 'log_file_path')
-
+CPU_COUNT_PC = multiprocessing.cpu_count()
+CPU_COUNT = CPU_COUNT_PC - MULTIPROCESSING_CPU_COUNT_MINUS
 
 PFILE_N = PFILE_START
 
@@ -321,7 +322,7 @@ while True:
                     return stdout, stderr, process.returncode
 
                 # Define the number of processes to spawn. Ideally, this is the number of cores available.
-                num_processes = multiprocessing.cpu_count() - MULTIPROCESSING_CPU_COUNT_MINUS if ENABLE_PARALLEL else 1
+                num_processes = CPU_COUNT_PC - MULTIPROCESSING_CPU_COUNT_MINUS if ENABLE_PARALLEL else 1
                 # Log the number of processes
                 log_message(f" Running with {num_processes} parallel processes.", log_file)
 
