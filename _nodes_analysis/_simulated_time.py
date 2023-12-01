@@ -32,10 +32,13 @@ for idx in solution_df.index:
 
 # Filter rows from Nodes_Expanded where 'disp' column in Solution.csv is 'Solution Found'
 solution_identifiers = solution_df[solution_df['disp'] == 'Solution Found']['Identifier']
-nodes_expanded_disp_solution_found_df = nodes_expanded_df[nodes_expanded_df['Identifier'].isin(solution_identifiers)]
+nodes_expanded_disp_solution_found = nodes_expanded_df[nodes_expanded_df['Identifier'].isin(solution_identifiers)]
+
+# Create a copy of the DataFrame to avoid SettingWithCopyWarning
+nodes_expanded_disp_solution_found_copy = nodes_expanded_disp_solution_found.copy()
 
 # Replace NaNs with 9999 in the final result file
-nodes_expanded_disp_solution_found_df.fillna(9999, inplace=True)
+nodes_expanded_disp_solution_found_copy.fillna(9999, inplace=True)
 
-# Save the Nodes_Expanded_Disp_Solution_Found.csv
-nodes_expanded_disp_solution_found_df.to_csv("Simulated_Time_Solution_Found.csv", index=False)
+# Save the Simulated_Time_Solution_Found.csv
+nodes_expanded_disp_solution_found_copy.to_csv("Simulated_Time_Solution_Found.csv", index=False)
