@@ -7,11 +7,11 @@ import logging
 # Configure basic logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Constants
+# Constants for folder naming
 FOLDER_PREFIX = "archive_pfile_"
 METRICS = ["Time", "Discounted time", "Metareasoning time (not discounted)", "Dispatch metareasoning time (not discounted)", "Peak memory", "Nodes Generated", "Nodes Expanded", "Nodes Evaluated", "Nodes Tunneled", "Nodes memoised with open actions", "Nodes memoised without open actions", "Nodes pruned by memoisation"]
 
-# Data structures
+# Data structure to store values
 data = {metric: {} for metric in METRICS}
 solution_data = {}
 
@@ -26,7 +26,6 @@ def extract_tar_gz(tar_path, extract_path):
 def parse_metrics(file_path, file_identifier, disp_type):
     try:
         with open(file_path, "r") as file:
-            solution_status = "Not Determined"
             for line in file:
                 for metric in METRICS:
                     if metric in line:
@@ -34,21 +33,12 @@ def parse_metrics(file_path, file_identifier, disp_type):
                         if file_identifier not in data[metric]:
                             data[metric][file_identifier] = {'disp': 'N/A', 'nodisp': 'N/A'}
                         data[metric][file_identifier][disp_type] = value
-                if ";;;; Solution Found" in line:
-                    solution_status = "Solution Found"
-                elif ";;;; Problem Unsolvable" in line:
-                    solution_status = "Problem Unsolvable"
-
-            if file_identifier not in solution_data:
-                solution_data[file_identifier] = {'disp': 'Not Determined', 'nodisp': 'Not Determined'}
-            solution_data[file_identifier][disp_type] = solution_status
             logging.info(f"Processed metrics from {file_path}")
     except Exception as e:
         logging.error(f"Error parsing metrics from {file_path}: {e}")
 
 def sort_identifiers(identifier):
-    parts = identifier.split('-')
-    return [int(parts[0]), int(parts[1])]
+    return int(identifier)
 
 def main():
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -57,7 +47,7 @@ def main():
 
     for dir_name in os.listdir(base_path):
         if dir_name.startswith(FOLDER_PREFIX):
-            dir_number = dir_name.split('_')[2]  # Extracting the first number (e.g., '25' from 'archive_pfile_25_13')
+            dir_number = dir_name.split('_')[2]
             full_path = os.path.join(base_path, dir_name)
             if os.path.isdir(full_path):
                 logging.info(f"Processing directory {full_path}")
@@ -65,29 +55,54 @@ def main():
                     if tar_file.endswith(".tar.gz"):
                         extract_tar_gz(os.path.join(full_path, tar_file), full_path)
 
-                        # Iterate over 'disp' and 'nodisp' directories
                         for disp_type in ["disp", "nodisp"]:
-                            disp_path = os.path.join(full_path, disp_type)
-                            if os.path.isdir(disp_path):
-                                for file in os.listdir(disp_path):
-                                    if file.startswith(dir_number + "-"):
-                                        file_path = os.path.join(disp_path, file)
-                                        file_identifier = f"{dir_number}-{file.split('-')[1]}"
-                                        parse_metrics(file_path, file_identifier, disp_type)
+                            path = os.path.join(full_path, disp_type)
+                            if os.path.isdir(path):
+                                for file in os.listdir(path):
+                                    file_path = os.path.join(path, file)
+                                    file_identifier = f"{dir_number}"
+                                    parse_metrics(file_path, file_identifier, disp_type)
 
-    # Generate Solution.csv file
+                                    # Determine solution status
+                                    solution_status = "Not Determined"
+                                    with open(file_path, "r") as file:
+                                        for line in file:
+                                            if ";;;; Solution Found" in line:
+                                                solution_status = "Solution Found"
+                                            elif ";;;; Problem Unsolvable" in line:
+                                                solution_status = "Problem Unsolvable"
+                                    if file_identifier not in solution_data:
+                                        solution_data[file_identifier] = {'disp': 'Not Determined', 'nodisp': 'Not Determined'}
+                                    solution_data[file_identifier][disp_type] = solution_status
+            else:
+                logging.warning(f"Directory {full_path} does not exist")
+
+    for metric, values in data.items():
+        sorted_values = sorted(values.items(), key=lambda x: sort_identifiers(x[0]))
+        csv_file_path = os.path.join(output_dir, metric.replace(' ', '_') + '.csv')
+        try:
+            with open(csv_file_path, 'w', newline='') as csvfile:
+                csvwriter = csv.writer(csvfile)
+                header = ['Identifier', 'disp', 'nodisp']
+                csvwriter.writerow(header)
+                for identifier, disp_values in sorted_values:
+                    row = [identifier, disp_values['disp'], disp_values['nodisp']]
+                    csvwriter.writerow(row)
+            logging.info(f"CSV file created: {csv_file_path}")
+        except Exception as e:
+            logging.error(f"Error writing to CSV file {csv_file_path}: {e}")
+
+    # Generate and sort Solution.csv file
+    sorted_solution_data = sorted(solution_data.items(), key=lambda x: sort_identifiers(x[0]))
     solution_csv_path = os.path.join(output_dir, 'Solution.csv')
     try:
         with open(solution_csv_path, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             header = ['Identifier', 'disp', 'nodisp']
             csvwriter.writerow(header)
-
-            # Sort the solution data before writing to CSV
-            sorted_solution_data = sorted(solution_data.items(), key=lambda x: sort_identifiers(x[0]))
-            for identifier, status in sorted_solution_data:
-                csvwriter.writerow([identifier, status['disp'], status['nodisp']])
-
+            for identifier, disp_values in sorted_solution_data:
+                row = [identifier, disp_values['disp'], disp_values['nodisp']]
+                csvwriter.writerow(row)
         logging.info(f"CSV file created: {solution_csv_path}")
     except Exception as e:
         logging.error(f"Error writing to CSV file {solution_csv_path}: {e}")

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run Python scripts one by one
-python _nodes_analysis_deadlines.py
+python _nodes_analysis.py
 python _simulated_time.py
 python _generate_summary.py
 python _xyplot.py
