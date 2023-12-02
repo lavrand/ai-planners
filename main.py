@@ -1,19 +1,15 @@
+import configparser
+import itertools
+import multiprocessing
+import os
+import signal
 import subprocess
+import sys
 import tarfile
 from datetime import datetime
-import os
-import re
-import csv
-import signal
-import shutil
-import multiprocessing
-import itertools
-from functools import partial
-from _execute_command import execute_command
-from _execute_command_args import execute_command_args
+
 from _replace_deadlines import replace_deadlines
-import configparser
-import sys
+
 
 # Define a logging function
 def log_message(message, log_file):
@@ -118,346 +114,196 @@ def create_archive(current_pfile_n):
     log_message(f"Created archive: {archive_path}", log_file)
 
 
-
-# def remove_folders_and_files():
-#     """Deletes the specified directories and files."""
-#     items_to_delete = ['disp', 'nodisp', 'times.csv', 'timesDispBetter.csv']
-#
-#     items_to_delete.extend([f"withdeadlines-ontime-pfile{PFILE_N}-{i}" for i in range(1, 101)])
-#
-#     for item in items_to_delete:
-#         if os.path.exists(item):
-#             if os.path.isdir(item):
-#                 shutil.rmtree(item)
-#             else:
-#                 os.remove(item)
-#
-#     log_message(f" Removed specified folders and files.", log_file)
-
-
 # Create an infinite iterator over the specific PFILE values
 pfile_cycle = itertools.cycle(SPECIFIC_PFILE_VALUES) if USE_SPECIFIC_PFILE_VALUES else None
 
 
-# Main loop to run everything in an infinite cycle
-while True:
+# Determine which PFILE_N values to use based on the flag
+if USE_SPECIFIC_PFILE_VALUES:
+    pfile_values = [next(pfile_cycle)]   # use the specific values
+else:
+    pfile_values = range(PFILE_START, PFILE_END + 1)  # use the range
 
-    # Determine which PFILE_N values to use based on the flag
-    if USE_SPECIFIC_PFILE_VALUES:
-        pfile_values = [next(pfile_cycle)]   # use the specific values
-    else:
-        pfile_values = range(PFILE_START, PFILE_END + 1)  # use the range
+for current_pfile in pfile_values:  # Looping over the defined range
+    try:  # Add a try block to catch any exceptions that occur for a single PFILE_N.
+        PFILE_N = current_pfile  # Updating the PFILE_N value for this iteration
+        PFILE = f"pfile{PFILE_N}"
 
-    for current_pfile in pfile_values:  # Looping over the defined range
-        try:  # Add a try block to catch any exceptions that occur for a single PFILE_N.
-            PFILE_N = current_pfile  # Updating the PFILE_N value for this iteration
-            PFILE = f"pfile{PFILE_N}"
+        # Create and organize directories for current pfile
+        create_and_organize_directories(PFILE_N)
 
-            # Create and organize directories for current pfile
-            create_and_organize_directories(PFILE_N)
+        for current_perturb_minus in range(PERTURB_MINUS, PERTURB_PLUS + 1, __STEP):  # Iterating from -PERTURB_MINUS to PERTURB_PLUS inclusive with step 10
+            PERTURB_MINUS_CUR = current_perturb_minus  # Updating the PERTURB_MINUS value for this iteration
 
-            for current_perturb_minus in range(PERTURB_MINUS, PERTURB_PLUS + 1, __STEP):  # Iterating from -PERTURB_MINUS to PERTURB_PLUS inclusive with step 10
-                PERTURB_MINUS_CUR = current_perturb_minus  # Updating the PERTURB_MINUS value for this iteration
+            # log_message(f" Starting a new set of experiments for PFILE_N = {PFILE_N} with current_perturb_minus = {current_perturb_minus} ...", log_file)
+            log_message(
+                f" Starting a new set of experiments for PFILE_N = {PFILE_N} ...",
+                log_file)
 
-                # log_message(f" Starting a new set of experiments for PFILE_N = {PFILE_N} with current_perturb_minus = {current_perturb_minus} ...", log_file)
-                log_message(
-                    f" Starting a new set of experiments for PFILE_N = {PFILE_N} ...",
-                    log_file)
-                # log_message(f" Starting a new set of experiments...", log_file)
-                # # Create directories and set permissions
-                # for dir_name in ['disp', 'nodisp']:
-                #     if not os.path.exists(dir_name):
-                #         os.makedirs(dir_name)
-                #         os.chmod(dir_name, 0o755)
-                #
-                # # Directories to parse
-                # directories = ['disp', 'nodisp']
+            # Base filename pattern
+            base_filename = f"{PFILE_N}-"
 
-                # # Output CSV filenames
-                # csv_filename = "times.csv"
-                # csv_filename_better = "timesDispBetter.csv"
+            # Define commands and arguments
+            commands_to_run = [
+                ("./add_initially_on_time", [f'{PFILE}', f'{AT}', f'{OBJECT}']),
+                ("./run-planner-to-get-initial-plan", [f'{DOMAIN}', f"ontime-pfile{PFILE_N}"]),
+                ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS_CUR}', f'{EXPERIMENTS}', f'{PLAN_SEARCH_TIMEOUT_SECONDS}', f'{subtree_focus_threshold}', f'{dispatch_threshold}']),
+                ("./run-planner-to-get-initial-plan", [f'{DOMAIN}', f"withdeadlines-ontime-pfile{PFILE_N}"])
+            ]
 
-                # Base filename pattern
-                base_filename = f"{PFILE_N}-"
+            def run_subprocess_args(command, args):
+                """
+                Run a command with arguments and handle exceptions.
 
-                # Define commands and arguments
-                commands_to_run = [
-                    ("./add_initially_on_time", [f'{PFILE}', f'{AT}', f'{OBJECT}']),
-                    ("./run-planner-to-get-initial-plan", [f'{DOMAIN}', f"ontime-pfile{PFILE_N}"]),
-                    ("./gen", [f'{PFILE_N}', f'{DOMAIN}', f'{AT}', f'{OBJECT}', f'{PERTURB_RND}', f'{PERTURB_MINUS_CUR}', f'{EXPERIMENTS}', f'{PLAN_SEARCH_TIMEOUT_SECONDS}', f'{subtree_focus_threshold}', f'{dispatch_threshold}']),
-                    ("./run-planner-to-get-initial-plan", [f'{DOMAIN}', f"withdeadlines-ontime-pfile{PFILE_N}"])
-                ]
+                Parameters:
+                command (str): The command to execute.
+                args (list): A list of arguments for the command.
+                """
+                # Combine the command and its arguments into one list.
+                cmd = [command] + args
 
-                def run_subprocess_args(command, args):
-                    """
-                    Run a command with arguments and handle exceptions.
+                try:
+                    # Execute the command with arguments, and wait for it to complete, but not longer than PLAN_SEARCH_TIMEOUT_SECONDS * 2
+                    result = subprocess.run(cmd, check=True, text=True, capture_output=True, timeout=PLAN_SEARCH_TIMEOUT_SECONDS * 2)
 
-                    Parameters:
-                    command (str): The command to execute.
-                    args (list): A list of arguments for the command.
-                    """
-                    # Combine the command and its arguments into one list.
-                    cmd = [command] + args
+                    # If the command was successful, result.stdout will contain the output
+                    log_message(result.stdout, log_file)
 
-                    try:
-                        # Execute the command with arguments, and wait for it to complete, but not longer than PLAN_SEARCH_TIMEOUT_SECONDS * 2
-                        result = subprocess.run(cmd, check=True, text=True, capture_output=True, timeout=PLAN_SEARCH_TIMEOUT_SECONDS * 2)
+                except subprocess.TimeoutExpired:
+                    # Handle the timeout exception as you see fit
+                    log_message("The command did not complete within timeout seconds.", log_file)
+                    # Here you might choose to try the command again, or perhaps record the timeout in a log file
 
-                        # If the command was successful, result.stdout will contain the output
-                        log_message(result.stdout, log_file)
+                except subprocess.CalledProcessError as e:
+                    # Handle the exception for a non-zero exit code if check=True
+                    log_message(f"The command failed because: {e.stderr}", log_file)
+                    # Here you can do additional handling of the error, like retrying the command or logging the error
 
-                    except subprocess.TimeoutExpired:
-                        # Handle the timeout exception as you see fit
-                        log_message("The command did not complete within timeout seconds.", log_file)
-                        # Here you might choose to try the command again, or perhaps record the timeout in a log file
-
-                    except subprocess.CalledProcessError as e:
-                        # Handle the exception for a non-zero exit code if check=True
-                        log_message(f"The command failed because: {e.stderr}", log_file)
-                        # Here you can do additional handling of the error, like retrying the command or logging the error
-
-                    except Exception as e:
-                        log_message(f"An error occurred: {str(e)}", log_file)
-                        return None
+                except Exception as e:
+                    log_message(f"An error occurred: {str(e)}", log_file)
+                    return None
 
 
-                if not (DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES):
-                    # Execute each command using the run_subprocess function
-                    for cmd, args in commands_to_run:
-                        log_message(f"Executing command: {cmd} {' '.join(args)}", log_file)
-                        run_subprocess_args(cmd, args)
+            if not (DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES):
+                # Execute each command using the run_subprocess function
+                for cmd, args in commands_to_run:
+                    log_message(f"Executing command: {cmd} {' '.join(args)}", log_file)
+                    run_subprocess_args(cmd, args)
 
-                if FOREST_DEADLINES_ENABLED:
-                    replace_deadlines(PFILE_N)
-                    log_message(f"Deadlines replaced successfully with random forest model prediction deadlines..", log_file)
+            if FOREST_DEADLINES_ENABLED:
+                replace_deadlines(PFILE_N)
+                log_message(f"Deadlines replaced successfully with random forest model prediction deadlines..", log_file)
 
-                log_message(f" Finished running the generation script.", log_file)
+            log_message(f" Finished running the generation script.", log_file)
 
-                base_command_common = (
-                    f"./rewrite-no-lp --time-based-on-expansions-per-second {time_based_on_expansions_per_second} "
-                    f"--include-metareasoning-time --multiply-TILs-by {multiply_TILs_by} "
-                    f"--real-to-plan-time-multiplier {real_to_plan_time_multiplier} --calculate-Q-interval {calculate_Q_interval} "
-                    f"--add-weighted-f-value-to-Q {add_weighted_f_value_to_Q} --min-probability-failure {min_probability_failure} "
-                    f"--slack-from-heuristic --forbid-self-overlapping-actions "
-                    f"--deadline-aware-open-list {deadline_aware_open_list} --ijcai-gamma {ijcai_gamma} --ijcai-t_u {ijcai_t_u} "
-                    f"--icaps-for-n-expansions {icaps_for_n_expansions} --time-aware-heuristic {time_aware_heuristic} "
-                    f"--dispatch-frontier-size {dispatch_frontier_size} --subtree-focus-threshold {subtree_focus_threshold} "
-                    f"--dispatch-threshold {dispatch_threshold} --optimistic-lst-for-dispatch-reasoning "
-                )
+            base_command_common = (
+                f"./rewrite-no-lp --time-based-on-expansions-per-second {time_based_on_expansions_per_second} "
+                f"--include-metareasoning-time --multiply-TILs-by {multiply_TILs_by} "
+                f"--real-to-plan-time-multiplier {real_to_plan_time_multiplier} --calculate-Q-interval {calculate_Q_interval} "
+                f"--add-weighted-f-value-to-Q {add_weighted_f_value_to_Q} --min-probability-failure {min_probability_failure} "
+                f"--slack-from-heuristic --forbid-self-overlapping-actions "
+                f"--deadline-aware-open-list {deadline_aware_open_list} --ijcai-gamma {ijcai_gamma} --ijcai-t_u {ijcai_t_u} "
+                f"--icaps-for-n-expansions {icaps_for_n_expansions} --time-aware-heuristic {time_aware_heuristic} "
+                f"--dispatch-frontier-size {dispatch_frontier_size} --subtree-focus-threshold {subtree_focus_threshold} "
+                f"--dispatch-threshold {dispatch_threshold} --optimistic-lst-for-dispatch-reasoning "
+            )
 
-                base_command_deadline_on_first_snap = (f" --deadline-on-first-snap-action {deadline_on_first_snap_action} ")
-                if DEADLINE_ON_FIRST_SNAP:
-                    base_command_common += base_command_deadline_on_first_snap
-                    base_command_end = (f" %s pfile{PFILE_N}" % DOMAIN)
-                elif ORIGINAL_PFILES:
-                    base_command_end = (f" %s pfile{PFILE_N}" % DOMAIN)
+            base_command_deadline_on_first_snap = (f" --deadline-on-first-snap-action {deadline_on_first_snap_action} ")
+            if DEADLINE_ON_FIRST_SNAP:
+                base_command_common += base_command_deadline_on_first_snap
+                base_command_end = (f" %s pfile{PFILE_N}" % DOMAIN)
+            elif ORIGINAL_PFILES:
+                base_command_end = (f" %s pfile{PFILE_N}" % DOMAIN)
+            else:
+                base_command_end = (f" %s withdeadlines-ontime-pfile{PFILE_N}-" % DOMAIN)
+
+
+            # Function to run the dispscript commands
+            def run_dispscript(i):
+                if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
+                    command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > p{PFILE_N}/disp/{PFILE_N}"
+                    log_message(f" Running disp command for file {PFILE_N}. Command: {command}", log_file)
+                    run_subprocess(command, i)
+                    log_message(f" Finished disp command for file {PFILE_N}.", log_file)
                 else:
-                    base_command_end = (f" %s withdeadlines-ontime-pfile{PFILE_N}-" % DOMAIN)
+                    command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
+                        i) + f" > disp/{PFILE_N}-" + str(i)
+                    log_message(f" Running disp command for file {PFILE_N}-{i}. Command: {command}", log_file)
+                    run_subprocess(command, i)
+                    log_message(f" Finished disp command for file {PFILE_N}-{i}.", log_file)
 
 
-                # Function to run the dispscript commands
-                def run_dispscript(i):
-                    if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
-                        command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > p{PFILE_N}/disp/{PFILE_N}"
-                        log_message(f" Running disp command for file {PFILE_N}. Command: {command}", log_file)
-                        run_subprocess(command, i)
-                        log_message(f" Finished disp command for file {PFILE_N}.", log_file)
+            def run_nodispscript(i):
+                if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
+                    command = base_command_common + base_command_end + f" > p{PFILE_N}/nodisp/{PFILE_N}"
+                    log_message(f" Running nodisp command for file {PFILE_N}. Command: {command}", log_file)
+                    run_subprocess(command, i)
+                    log_message(f" Finished nodisp command for file {PFILE_N}.", log_file)
+                else:
+                    command = base_command_common + base_command_end + str(
+                        i) + f" > nodisp/{PFILE_N}-" + str(i)
+                    log_message(f" Running nodisp command for file {PFILE_N}-{i}. Command: {command}", log_file)
+                    run_subprocess(command, i)
+                    log_message(f" Finished nodisp command for file {PFILE_N}-{i}.", log_file)
+
+
+            def run_subprocess(command, i=None):
+                stdout, stderr = None, None  # Initialize these to avoid UnboundLocalError
+
+                # Start the process in a new session
+                process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                           preexec_fn=os.setsid)
+                try:
+                    # communicate() waits for the process to complete or for the timeout to expire
+                    stdout, stderr = process.communicate(timeout=PLAN_SEARCH_TIMEOUT_SECONDS)
+                except subprocess.TimeoutExpired:
+                    # If the timeout expires, kill the entire process group
+                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # try to terminate the process group gracefully
+                    process.wait(timeout=10)  # give it 10 seconds to terminate gracefully
+                    if process.poll() is None:  # if the process is still running after 10 seconds
+                        os.killpg(os.getpgid(process.pid), signal.SIGKILL)  # forcibly kill the process group
+                    if i is not None:
+                        log_message(f"Command #{i} took longer than timeout seconds and was killed!", log_file)
                     else:
-                        command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + str(
-                            i) + f" > disp/{PFILE_N}-" + str(i)
-                        log_message(f" Running disp command for file {PFILE_N}-{i}. Command: {command}", log_file)
-                        run_subprocess(command, i)
-                        log_message(f" Finished disp command for file {PFILE_N}-{i}.", log_file)
-
-
-                def run_nodispscript(i):
-                    if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
-                        command = base_command_common + base_command_end + f" > p{PFILE_N}/nodisp/{PFILE_N}"
-                        log_message(f" Running nodisp command for file {PFILE_N}. Command: {command}", log_file)
-                        run_subprocess(command, i)
-                        log_message(f" Finished nodisp command for file {PFILE_N}.", log_file)
-                    else:
-                        command = base_command_common + base_command_end + str(
-                            i) + f" > nodisp/{PFILE_N}-" + str(i)
-                        log_message(f" Running nodisp command for file {PFILE_N}-{i}. Command: {command}", log_file)
-                        run_subprocess(command, i)
-                        log_message(f" Finished nodisp command for file {PFILE_N}-{i}.", log_file)
-
-
-                # Parallel execution functions
-                # def parallel_run_dispscript(PFILE_N):
-                #     command = base_command_common + "--use-dispatcher LPFThreshold " + base_command_end + f" > p{PFILE_N}/disp/{PFILE_N}"
-                #     log_message(f"Running disp command for file {PFILE_N}. Command: {command}", log_file)
-                #     run_subprocess(command, None)
-                #
-                #
-                # def parallel_run_nodispscript(PFILE_N):
-                #     command = base_command_common + base_command_end + f" > p{PFILE_N}/nodisp/{PFILE_N}"
-                #     log_message(f"Running nodisp command for file {PFILE_N}. Command: {command}", log_file)
-                #     run_subprocess(command, None)
-
-
-                def run_subprocess(command, i=None):
-                    stdout, stderr = None, None  # Initialize these to avoid UnboundLocalError
-
-                    # Start the process in a new session
-                    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                               preexec_fn=os.setsid)
-                    try:
-                        # communicate() waits for the process to complete or for the timeout to expire
-                        stdout, stderr = process.communicate(timeout=PLAN_SEARCH_TIMEOUT_SECONDS)
-                    except subprocess.TimeoutExpired:
-                        # If the timeout expires, kill the entire process group
-                        os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # try to terminate the process group gracefully
-                        process.wait(timeout=10)  # give it 10 seconds to terminate gracefully
-                        if process.poll() is None:  # if the process is still running after 10 seconds
-                            os.killpg(os.getpgid(process.pid), signal.SIGKILL)  # forcibly kill the process group
+                        log_message(f"Command took longer than timeout seconds and was killed!", log_file)
+                else:
+                    if process.returncode != 0:
                         if i is not None:
-                            log_message(f"Command #{i} took longer than timeout seconds and was killed!", log_file)
+                            log_message(f"Command #{i} failed!", log_file)
                         else:
-                            log_message(f"Command took longer than timeout seconds and was killed!", log_file)
+                            log_message(f"Command failed!", log_file)
                     else:
-                        if process.returncode != 0:
-                            if i is not None:
-                                log_message(f"Command #{i} failed!", log_file)
-                            else:
-                                log_message(f"Command failed!", log_file)
+                        if i is not None:
+                            log_message(f"Command #{i} completed successfully!", log_file)
                         else:
-                            if i is not None:
-                                log_message(f"Command #{i} completed successfully!", log_file)
-                            else:
-                                log_message(f"Command completed successfully!", log_file)
+                            log_message(f"Command completed successfully!", log_file)
 
-                    # Return stdout, stderr, and returncode
-                    return stdout, stderr, process.returncode
+                # Return stdout, stderr, and returncode
+                return stdout, stderr, process.returncode
 
-                # Define the number of processes to spawn. Ideally, this is the number of cores available.
-                # num_processes = CPU_COUNT_PC - MULTIPROCESSING_CPU_COUNT_MINUS if ENABLE_PARALLEL else 1
-                # # Log the number of processes
-                # log_message(f" Running with {num_processes} parallel processes.", log_file)
+            # Non-parallel execution as fallback
+            for i in range(1, EXPERIMENTS + 1):
+                run_dispscript(i)
+                run_nodispscript(i)
 
-                # # Execute the scripts
-                # if ENABLE_PARALLEL:
-                #     # Parallel execution when DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES is True
-                #     if DEADLINE_ON_FIRST_SNAP or ORIGINAL_PFILES:
-                #         with multiprocessing.Pool(num_processes) as pool:
-                #             pfile_nums = range(PFILE_START, PFILE_START + num_processes)
-                #             pool.map(parallel_run_dispscript, [f"pfile{num}" for num in pfile_nums])
-                #             pool.map(parallel_run_nodispscript, [f"pfile{num}" for num in pfile_nums])
-                #     else:
-                #         with multiprocessing.Pool(processes=num_processes) as pool:
-                #             pool.map(run_dispscript, range(1, EXPERIMENTS + 1))  # This will distribute the list of indexes to the available processes
-                #             pool.map(run_nodispscript, range(1, EXPERIMENTS + 1))
-                # else:
-                # Non-parallel execution as fallback
-                for i in range(1, EXPERIMENTS + 1):
-                    run_dispscript(i)
-                    run_nodispscript(i)
 
-                # # Extract time from the line
-                # def extract_time(line):
-                #     try:
-                #         return float(line.split()[2])
-                #     except:
-                #         # parsing code error
-                #         return "9999999"
-                #
-                #
-                # # Extract execution time data and write to CSV
-                # def extract_time_and_write_csv():
-                #     with open(csv_filename, 'w', newline='') as csvfile, open(csv_filename_better, 'w',
-                #                                                               newline='') as csvbetterfile:
-                #         csvwriter = csv.writer(csvfile)
-                #         csvbetterwriter = csv.writer(csvbetterfile)
-                #         csvwriter.writerow(['File', 'disp', 'nodisp'])
-                #         csvbetterwriter.writerow(['File', 'disp', 'nodisp'])
-                #
-                #         for i in range(1, EXPERIMENTS + 1):  # 1 to EXPERIMENTS inclusive
-                #             filename = base_filename + str(i)
-                #             times = [filename]  # Start with filename as first column
-                #
-                #             disp_time = 0
-                #             nodisp_time = 0
-                #
-                #             for directory in directories:
-                #                 filepath = os.path.join(directory, filename)
-                #
-                #                 if os.path.exists(filepath):
-                #                     with open(filepath, 'r') as f:
-                #
-                #                         lines = f.readlines()
-                #
-                #                         # ;;;; Problem Unsolvable
-                #                         line_unsolvable = next((l for l in lines if l.startswith(";;;; Problem Unsolvable")), None)
-                #                         if not line_unsolvable:
-                #                             # Search in the stored lines for the line with '; Time'
-                #                             line = next((l for l in lines if l.startswith("; Time")), None)
-                #
-                #                             if line:
-                #                                 time_val = extract_time(line)
-                #                                 if directory == 'disp':
-                #                                     disp_time = time_val
-                #                                 else:
-                #                                     nodisp_time = time_val
-                #                                 times.append(time_val)
-                #                             else:
-                #                                 # no line for time code
-                #                                 times.append(9999)
-                #                         else:
-                #                             # unsolvable code
-                #                             times.append(99999)
-                #                 else:
-                #                     # filepath doesn't exist code
-                #                     times.append(999999)
-                #
-                #             # Write extracted times to CSV
-                #             csvwriter.writerow(times)
-                #
-                #             # If 'disp' is faster than 'nodisp', write to the better times file
-                #             if isinstance(disp_time, float) and isinstance(nodisp_time, float) and disp_time < nodisp_time:
-                #                 csvbetterwriter.writerow(times)
-                #
-                #
-                # extract_time_and_write_csv()
-                #
-                # # Read the times.csv file
-                # with open('times.csv', 'r') as file:
-                #     reader = csv.reader(file)
-                #
-                #     # Extract headers and rows
-                #     headers = next(reader)
-                #     rows = [row for row in reader if float(row[1]) < float(row[2])]
-                #
-                # # Write the filtered rows to timesDispBetter.csv
-                # with open('timesDispBetter.csv', 'w', newline='') as file:
-                #     writer = csv.writer(file)
-                #     writer.writerow(headers)
-                #     writer.writerows(rows)
+            log_message(f" Finished current set of experiments. Starting archiving...", log_file)
 
-                log_message(f" Finished current set of experiments. Starting archiving...", log_file)
+            # Call the modified function with the current PFILE_N
+            create_archive(PFILE_N)
 
-                # Call the modified function with the current PFILE_N
-                create_archive(PFILE_N)
+            log_message(f" Finished archiving.", log_file)
 
-                log_message(f" Finished archiving.", log_file)
 
-                # log_message(f" Starting removing cache folder and files.", log_file)
-                # # remove_folders_and_files()
-                # log_message(f" Finished removing cache folder and files.", log_file)
+            log_message(f" All PFILE_N experiments completed for this cycle. Restarting...", log_file)
 
-                log_message(f" All PFILE_N experiments completed for this cycle. Restarting...", log_file)
-
-        except Exception as e:  # Catch any type of exception
-            log_message(f" An error occurred during processing for PFILE_N = {PFILE_N}: {str(e)}", log_file)
-            log_message("Continuing with the next PFILE_N...", log_file)
-            # Optionally, log the exception e to a log file or database for later analysis
-        finally:
-            # If there's any cleanup that ALWAYS needs to happen, put it here.
-            pass
-
-    # Check if the loop should run only once
-    if RUN_ONCE:
-        break
+    except Exception as e:  # Catch any type of exception
+        log_message(f" An error occurred during processing for PFILE_N = {PFILE_N}: {str(e)}", log_file)
+        log_message("Continuing with the next PFILE_N...", log_file)
+        # Optionally, log the exception e to a log file or database for later analysis
+    finally:
+        # If there's any cleanup that ALWAYS needs to happen, put it here.
+        pass
 
 
 log_file.close()
