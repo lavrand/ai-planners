@@ -26,14 +26,19 @@ def extract_tar_gz(tar_path, extract_path):
 def parse_metrics(file_path, file_identifier, disp_type):
     try:
         with open(file_path, "r") as file:
+            found = False
             for line in file:
                 for metric in METRICS:
                     if metric in line:
+                        found = True
                         value = float(re.findall(r"[-+]?\d*\.\d+|\d+", line)[0])
                         if file_identifier not in data[metric]:
                             data[metric][file_identifier] = {'disp': 'N/A', 'nodisp': 'N/A'}
                         data[metric][file_identifier][disp_type] = value
-            logging.info(f"Processed metrics from {file_path}")
+            if not found:
+                logging.warning(f"Metrics not found in {file_path}")
+            else:
+                logging.info(f"Processed metrics from {file_path}")
     except Exception as e:
         logging.error(f"Error parsing metrics from {file_path}: {e}")
 
@@ -45,9 +50,13 @@ def main():
     output_dir = os.path.join(base_path, "_nodes_analysis")
     os.makedirs(output_dir, exist_ok=True)
 
+    processed_identifiers = set()
+    expected_identifiers = set()
+
     for dir_name in os.listdir(base_path):
         if dir_name.startswith(FOLDER_PREFIX):
             dir_number = dir_name.split('_')[2]
+            expected_identifiers.add(dir_number)
             full_path = os.path.join(base_path, dir_name)
             if os.path.isdir(full_path):
                 logging.info(f"Processing directory {full_path}")
@@ -62,6 +71,7 @@ def main():
                                     file_path = os.path.join(path, file)
                                     file_identifier = f"{dir_number}"
                                     parse_metrics(file_path, file_identifier, disp_type)
+                                    processed_identifiers.add(file_identifier)
 
                                     # Determine solution status
                                     solution_status = "Not Determined"
@@ -77,20 +87,9 @@ def main():
             else:
                 logging.warning(f"Directory {full_path} does not exist")
 
-    for metric, values in data.items():
-        sorted_values = sorted(values.items(), key=lambda x: sort_identifiers(x[0]))
-        csv_file_path = os.path.join(output_dir, metric.replace(' ', '_') + '.csv')
-        try:
-            with open(csv_file_path, 'w', newline='') as csvfile:
-                csvwriter = csv.writer(csvfile)
-                header = ['Identifier', 'disp', 'nodisp']
-                csvwriter.writerow(header)
-                for identifier, disp_values in sorted_values:
-                    row = [identifier, disp_values['disp'], disp_values['nodisp']]
-                    csvwriter.writerow(row)
-            logging.info(f"CSV file created: {csv_file_path}")
-        except Exception as e:
-            logging.error(f"Error writing to CSV file {csv_file_path}: {e}")
+    missed_identifiers = expected_identifiers - processed_identifiers
+    if missed_identifiers:
+        logging.warning(f"Missed processing the following identifiers: {missed_identifiers}")
 
     # Generate and sort Solution.csv file
     sorted_solution_data = sorted(solution_data.items(), key=lambda x: sort_identifiers(x[0]))
