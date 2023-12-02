@@ -2,9 +2,7 @@ import csv
 import os
 
 NODISP_ROW = 2
-
 DISP_ROW = 1
-
 ROUND = 4
 
 # Load the data from output_full.csv
@@ -19,6 +17,10 @@ both_solved = [row for row in data if row[DISP_ROW] not in ['9999', '9999.0'] an
 disp_only = [row for row in data if row[DISP_ROW] not in ['9999', '9999.0'] and row[NODISP_ROW] in ['9999', '9999.0']]
 nodisp_only = [row for row in data if row[DISP_ROW] in ['9999', '9999.0'] and row[NODISP_ROW] not in ['9999', '9999.0']]
 
+# Calculate the total number of problems and problems solved by each method
+total_problems = len(data)
+total_solved_by_disp = len(both_solved) + len(disp_only)
+total_solved_by_nodisp = len(both_solved) + len(nodisp_only)
 
 # Calculate the sum and length once to avoid repeating these operations
 sum_disp = sum(float(row[DISP_ROW]) for row in both_solved)
@@ -46,11 +48,14 @@ output_filename = "summary.csv"
 with open(output_filename, 'w') as f:
     csv_writer = csv.writer(f)
     csv_writer.writerow(['Original instance', folder_name])
-    csv_writer.writerow(['Number of permutations solved by both disp and nodisp', len(both_solved)])
-    csv_writer.writerow(['Number of permutations solved only by disp', len(disp_only)])
-    csv_writer.writerow(['Number of permutations solved only by nodisp', len(nodisp_only)])
-    csv_writer.writerow(['Average solution time for disp on permutations solved by both disp and nodisp', avg_disp])
-    csv_writer.writerow(['Average solution time for nodisp on permutations solved by both disp and nodisp', avg_nodisp])
-    csv_writer.writerow(['Average speedup ratio for disp over permutations solved by both disp and nodisp', avg_ratio])
+    csv_writer.writerow(['Total number of problems', total_problems])
+    csv_writer.writerow(['Number of problems solved by both disp and nodisp', len(both_solved)])
+    csv_writer.writerow(['Number of problems solved only by disp', len(disp_only)])
+    csv_writer.writerow(['Number of problems solved only by nodisp', len(nodisp_only)])
+    csv_writer.writerow(['Total number of problems solved by disp', total_solved_by_disp])
+    csv_writer.writerow(['Total number of problems solved by nodisp', total_solved_by_nodisp])
+    csv_writer.writerow(['Average solution time for disp on problems solved by both disp and nodisp', avg_disp])
+    csv_writer.writerow(['Average solution time for nodisp on problems solved by both disp and nodisp', avg_nodisp])
+    csv_writer.writerow(['Average speedup ratio for disp over problems solved by both disp and nodisp', avg_ratio])
 
 print(f"Summary data has been written to {output_filename}")
