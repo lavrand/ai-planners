@@ -4,8 +4,16 @@ import re
 import csv
 import logging
 
-# Configure basic logging
+# Configure logging to file and console
+log_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), '_nodes_analysis', 'nodes_analysis.log')
+os.makedirs(os.path.dirname(log_filename), exist_ok=True)
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+file_handler = logging.FileHandler(log_filename)
+console_handler = logging.StreamHandler()
+
+logging.getLogger().addHandler(file_handler)
+logging.getLogger().addHandler(console_handler)
 
 # Constants for folder naming
 FOLDER_PREFIX = "archive_pfile_"
@@ -37,10 +45,15 @@ def parse_metrics(file_path, file_identifier, disp_type):
                         data[metric][file_identifier][disp_type] = value
             if not found:
                 logging.warning(f"Metrics not found in {file_path}")
+                for metric in METRICS:
+                    if file_identifier not in data[metric]:
+                        data[metric][file_identifier] = {'disp': 'N/A', 'nodisp': 'N/A'}
+                    data[metric][file_identifier][disp_type] = 'N/A'
             else:
                 logging.info(f"Processed metrics from {file_path}")
     except Exception as e:
         logging.error(f"Error parsing metrics from {file_path}: {e}")
+
 
 def sort_identifiers(identifier):
     return int(identifier)
