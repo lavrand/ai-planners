@@ -41,8 +41,15 @@ config_file = sys.argv[1]
 # Initialize the configparser
 config = configparser.ConfigParser()
 
+log_file_error = open("error_log.txt", 'a')
+
 # Read the configuration file passed as a command line argument
-config.read(config_file)
+try:
+    config.read(config_file)
+except configparser.DuplicateOptionError as e:
+    log_message(f"Duplicate option error in config file: {e}", log_file_error)
+    # Handle the exception (e.g., exit the script or ignore the duplicate)
+
 
 # Retrieve the values from the config file
 DOMAIN = config.get('DEFAULT', 'DOMAIN')
@@ -307,3 +314,4 @@ for current_pfile in pfile_values:  # Looping over the defined range
 
 
 log_file.close()
+log_file_error.close()
