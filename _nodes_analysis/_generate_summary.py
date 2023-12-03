@@ -55,8 +55,8 @@ with open(output_filename, 'w') as f:
     csv_writer.writerow(['Number of problems solved only by nodisp', len(nodisp_only)])
     csv_writer.writerow(['Total number of problems solved by disp', total_solved_by_disp])
     csv_writer.writerow(['Total number of problems solved by nodisp', total_solved_by_nodisp])
-    csv_writer.writerow(['Average solution time for disp on problems solved by both disp and nodisp', avg_disp])
-    csv_writer.writerow(['Average solution time for nodisp on problems solved by both disp and nodisp', avg_nodisp])
+    csv_writer.writerow(['Average expanded nodes for disp on problems solved by both disp and nodisp', avg_disp])
+    csv_writer.writerow(['Average expanded nodes for nodisp on problems solved by both disp and nodisp', avg_nodisp])
     csv_writer.writerow(['Average speedup ratio for disp over problems solved by both disp and nodisp', avg_ratio])
 
 print(f"Summary data has been written to {output_filename}")
