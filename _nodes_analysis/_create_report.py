@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+# create_report.py
 import pandas as pd
 from docx import Document
 from docx.shared import Inches
@@ -8,15 +8,17 @@ from docx.oxml.ns import nsdecls
 def add_table_from_csv(doc, file_path):
     df = pd.read_csv(file_path)
 
-    # Convert numeric columns to integers, ignoring errors
-    df = df.apply(pd.to_numeric, errors='ignore').fillna(df)
+    # Apply rounding to numeric rows
+    for col in df.columns:
+        if df[col].dtype.kind in 'fi':  # Check for float or integer columns
+            df[col] = df[col].round(0).astype(int)
 
     table = doc.add_table(rows=1, cols=len(df.columns))
     table.style = 'Table Grid'
 
     # Add the header rows.
     for j in range(len(df.columns)):
-        table.cell(0,j).text = df.columns[j]
+        table.cell(0, j).text = df.columns[j]
 
     # Add the rest of the data frame
     for i in range(df.shape[0]):
