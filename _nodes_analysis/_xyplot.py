@@ -45,9 +45,9 @@ plt.plot([0, max_limit], [0, max_limit], color='red', linewidth=2)
 
 # Settings for the plot with larger fonts.
 font_size = 14  # You can adjust the size to your preference.
-plt.title("Disp vs NoDisp Times", fontsize=font_size + 2)
-plt.xlabel("Disp Time", fontsize=font_size)
-plt.ylabel("NoDisp Time", fontsize=font_size)
+plt.title("Disp vs NoDisp Nodes Expanded", fontsize=font_size + 2)
+plt.xlabel("Disp Nodes Expanded", fontsize=font_size)
+plt.ylabel("NoDisp Nodes Expanded", fontsize=font_size)
 plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 
 # Increase tick label size

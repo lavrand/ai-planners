@@ -5,7 +5,7 @@ import numpy as np
 nodes_expanded_df = pd.read_csv("Nodes_Expanded.csv")
 
 # Define the constant EPS
-EPS = 10
+EPS = 1
 
 # Replace 'N/A' with np.nan and divide by EPS
 nodes_expanded_df.replace('N/A', np.nan, inplace=True)
