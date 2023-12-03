@@ -1,26 +1,16 @@
-#!/bin/bash
-
-# Run Python scripts one by one
-python _nodes_analysis.py
-python _simulated_time.py
-python _generate_summary.py
-python _xyplot.py
-
-# Check if the required files exist
-if [[ -f "disp_vs_nodisp_plot.png" && -f "summary.csv" && -f "Simulated_Time_Solution_Found.csv" ]]; then
-    # Use a Python script to insert the image and tables into a Word document
-    python - <<EOF
+#!/usr/bin/python3
 import pandas as pd
 from docx import Document
-from docx.shared import Inches, RGBColor
+from docx.shared import Inches
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
 
-# Function to add a table from CSV to the document
 def add_table_from_csv(doc, file_path):
     df = pd.read_csv(file_path)
-    # Round all values
-    df = df.round(0).astype(int)
+
+    # Convert numeric columns to integers, ignoring errors
+    df = df.apply(pd.to_numeric, errors='ignore').fillna(df)
+
     table = doc.add_table(rows=1, cols=len(df.columns))
     table.style = 'Table Grid'
 
@@ -38,7 +28,7 @@ def add_table_from_csv(doc, file_path):
             if 'disp' in df.columns and 'nodisp' in df.columns:
                 disp_index = df.columns.get_loc('disp')
                 nodisp_index = df.columns.get_loc('nodisp')
-                if j == disp_index or j == nodisp_index:
+                if j in [disp_index, nodisp_index] and pd.to_numeric(value, errors='coerce') is not None:
                     if df.iloc[i, disp_index] > df.iloc[i, nodisp_index]:
                         # Color red
                         row_cells[j]._element.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="FF0000"/>'.format(nsdecls('w'))))
@@ -46,29 +36,14 @@ def add_table_from_csv(doc, file_path):
                         # Color green
                         row_cells[j]._element.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="00FF00"/>'.format(nsdecls('w'))))
 
-# Create a new Word document
-doc = Document()
+def create_report(image_path, summary_csv, simulated_time_csv, report_docx):
+    doc = Document()
+    doc.add_picture(image_path, width=Inches(6))
+    doc.add_page_break()
+    add_table_from_csv(doc, summary_csv)
+    doc.add_page_break()
+    add_table_from_csv(doc, simulated_time_csv)
+    doc.save(report_docx)
 
-# Insert the image
-doc.add_picture('disp_vs_nodisp_plot.png', width=Inches(6))
-
-# Add a page break
-doc.add_page_break()
-
-# Insert the first table
-add_table_from_csv(doc, 'summary.csv')
-
-# Add a page break
-doc.add_page_break()
-
-# Insert the second table
-add_table_from_csv(doc, 'Simulated_Time_Solution_Found.csv')
-
-# Save the document
-doc.save('report.docx')
-EOF
-
-    echo "Report generated successfully as report.docx"
-else
-    echo "Required files not found."
-fi
+if __name__ == "__main__":
+    create_report('disp_vs_nodisp_plot.png', 'summary.csv', 'Simulated_Time_Solution_Found.csv', 'report.docx')
