@@ -8,8 +8,8 @@ def calculate_log_etps_updated(nodes_expanded_file, time_file, solution_file):
     time_df = pd.read_csv(time_file)
     solution_df = pd.read_csv(solution_file)
 
-    # Filter out identifiers without solutions
-    solution_df = solution_df[(solution_df['disp'] == 'Solution Found') | (solution_df['nodisp'] == 'Solution Found')]
+    # Filter out identifiers where solutions were found in both 'disp' and 'nodisp'
+    solution_df = solution_df[(solution_df['disp'] == 'Solution Found') & (solution_df['nodisp'] == 'Solution Found')]
 
     # Merging the dataframes on 'Identifier'
     merged_df = pd.merge(nodes_expanded_df, time_df, on='Identifier', suffixes=('_nodes', '_time'))

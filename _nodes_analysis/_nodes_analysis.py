@@ -100,6 +100,21 @@ def main():
             else:
                 logging.warning(f"Directory {full_path} does not exist")
 
+    for metric, values in data.items():
+        sorted_values = sorted(values.items(), key=lambda x: sort_identifiers(x[0]))
+        csv_file_path = os.path.join(output_dir, metric.replace(' ', '_') + '.csv')
+        try:
+            with open(csv_file_path, 'w', newline='') as csvfile:
+                csvwriter = csv.writer(csvfile)
+                header = ['Identifier', 'disp', 'nodisp']
+                csvwriter.writerow(header)
+                for identifier, disp_values in sorted_values:
+                    row = [identifier, disp_values['disp'], disp_values['nodisp']]
+                    csvwriter.writerow(row)
+            logging.info(f"CSV file created: {csv_file_path}")
+        except Exception as e:
+            logging.error(f"Error writing to CSV file {csv_file_path}: {e}")
+
     missed_identifiers = expected_identifiers - processed_identifiers
     if missed_identifiers:
         logging.warning(f"Missed processing the following identifiers: {missed_identifiers}")

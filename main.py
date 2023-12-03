@@ -95,6 +95,7 @@ CPU_COUNT = CPU_COUNT_PC - MULTIPROCESSING_CPU_COUNT_MINUS
 
 PFILE_N = PFILE_START
 
+report_script_path = "_nodes_analysis/_nodes_analysis.py"
 
 PFILE = f"pfile{PFILE_N}"
 FOREST_DEADLINES_ENABLED = False  # DOUBLECHECK THIS IS DISABLED
@@ -253,5 +254,20 @@ for current_pfile in pfile_values:  # Looping over the defined range
         pass
 
 
+# Function to run the _report.sh script
+def run_report_script():
+    try:
+        subprocess.run(["bash", report_script_path], check=True)
+        log_message("Successfully ran _report.sh", log_file)
+    except subprocess.CalledProcessError as e:
+        log_message(f"Failed to run _report.sh: {e}", log_file)
+
+
+# Invoke the function
+run_report_script()
+
+
 log_file.close()
 log_file_error.close()
+
+
