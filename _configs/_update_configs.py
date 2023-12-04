@@ -5,8 +5,8 @@ TOTAL_INPUT = 300  # Total input value
 N = 12              # Number of configuration files
 
 # New constants to replace
-TIME_BASED_ON_EXPANSIONS_PER_SECOND = 1000
-PLAN_SEARCH_TIMEOUT_SECONDS = 60
+TIME_BASED_ON_EXPANSIONS_PER_SECOND = 100
+PLAN_SEARCH_TIMEOUT_SECONDS = 120
 DOMAIN = "rcll_domain_production_durations_time_windows.pddl"
 SUBTREE_FOCUS_THRESHOLD = 1
 DISPATCH_THRESHOLD = 0.025
