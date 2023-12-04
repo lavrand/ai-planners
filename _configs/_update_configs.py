@@ -1,7 +1,7 @@
 import math
 
 # Constants
-TOTAL_INPUT = 300  # Total input value
+TOTAL_INPUT = 500  # Total input value
 N = 12              # Number of configuration files
 
 # New constants to replace
