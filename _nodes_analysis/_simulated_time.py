@@ -6,11 +6,11 @@ import numpy as np
 nodes_expanded_df = pd.read_csv("Nodes_Expanded.csv")
 
 # Define the constant EPS
-EPS = 1
+# EPS = 1
 
 # Replace 'N/A' with np.nan and divide by EPS
 nodes_expanded_df.replace('N/A', np.nan, inplace=True)
-nodes_expanded_df[['disp', 'nodisp']] = nodes_expanded_df[['disp', 'nodisp']].apply(pd.to_numeric, errors='coerce') / EPS
+nodes_expanded_df[['disp', 'nodisp']] = nodes_expanded_df[['disp', 'nodisp']].apply(pd.to_numeric, errors='coerce') #/ EPS
 
 # Read the Solution.csv file
 solution_df = pd.read_csv("Solution.csv")
