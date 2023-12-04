@@ -1,11 +1,11 @@
 import math
 
 # Constants
-TOTAL_INPUT = 1000  # Total input value
+TOTAL_INPUT = 300  # Total input value
 N = 12              # Number of configuration files
 
 # New constants to replace
-TIME_BASED_ON_EXPANSIONS_PER_SECOND = 100
+TIME_BASED_ON_EXPANSIONS_PER_SECOND = 500
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 DOMAIN = "rcll_domain_production_durations_time_windows.pddl"
 SUBTREE_FOCUS_THRESHOLD = 1
