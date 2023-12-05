@@ -43,12 +43,14 @@ avg_ratio = 0 if len(both_solved) == 0 else round(
 
 # Determine the parent folder (two levels up)
 folder_name = os.path.basename(os.path.dirname(os.path.abspath("output_full.csv")))
+domain = "RCLL"
 
 # Create the new CSV
 output_filename = "summary.csv"
 with open(output_filename, 'w') as f:
     csv_writer = csv.writer(f)
-    csv_writer.writerow(['Original instance', folder_name])
+    # csv_writer.writerow(['Original instance', folder_name])
+    csv_writer.writerow(['Original instance', domain])
     csv_writer.writerow(['Total number of problems', total_problems])
     csv_writer.writerow(['Number of problems solved by both disp and nodisp', len(both_solved)])
     csv_writer.writerow(['Number of problems solved only by disp', len(disp_only)])

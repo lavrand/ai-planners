@@ -3,6 +3,7 @@ import subprocess
 import time
 import pandas as pd
 from docx import Document
+from shutil import copy2
 
 # Constants
 RCLL = "RCLL"
@@ -22,25 +23,34 @@ def reshape_data(df, folder_number):
     reshaped_df['Experiment #'] = folder_number
     return reshaped_df
 
-# Function to rename report.docx and update its content
-def rename_and_update_report(nodes_analysis_dir, folder_number):
-    old_report_path = os.path.join(nodes_analysis_dir, 'report.docx')
-    new_report_path = os.path.join(nodes_analysis_dir, f'{folder_number}.docx')
+# Function to replace text in the docx file
+def replace_text_in_docx(docx_path, old_text, new_text):
+    doc = Document(docx_path)
+    for paragraph in doc.paragraphs:
+        if old_text in paragraph.text:
+            paragraph.text = paragraph.text.replace(old_text, new_text)
+    doc.save(docx_path)
 
-    # Rename report.docx to {folder_number}.docx
+# Function to rename report.docx and update its content
+def process_report(nodes_analysis_dir, experiment_number):
+    old_report_path = os.path.join(nodes_analysis_dir, 'report.docx')
+    new_report_path = os.path.join(nodes_analysis_dir, f'{experiment_number}.docx')
+    upper_dir = os.path.join(nodes_analysis_dir, '..', '..')  # Two levels up
+
+    # Rename report.docx to {experiment_number}.docx and update its content
     if os.path.exists(old_report_path):
         os.rename(old_report_path, new_report_path)
         print(f"Renamed report to {new_report_path}")
 
-        # Replace "_nodes_analysis" with "RCLL {folder_number}" in the document
-        doc = Document(new_report_path)
-        for paragraph in doc.paragraphs:
-            if "_nodes_analysis" in paragraph.text:
-                paragraph.text = paragraph.text.replace("_nodes_analysis", f"{RCLL} {folder_number}")
-        doc.save(new_report_path)
-        print(f"Updated contents of {new_report_path}")
+        # Replace specific lines with the experiment number
+        replace_text_in_docx(new_report_path, "_nodes_analysis", f"{RCLL} {experiment_number}")
+        replace_text_in_docx(new_report_path, "Original instance _nodes_analysis", f"Original instance {experiment_number}")
 
-# Function to run the report script and collect data
+        # Copy the file to two directories above
+        copy2(new_report_path, upper_dir)
+        print(f"Copied {new_report_path} to {upper_dir}")
+
+# Main function to run the report script and collect data
 def run_report_and_collect_data(base_dir, output_csv, max_folder_num):
     consolidated_data = []
 
@@ -49,13 +59,9 @@ def run_report_and_collect_data(base_dir, output_csv, max_folder_num):
         report_script = os.path.join(nodes_analysis_dir, '_report.sh')
         summary_csv = os.path.join(nodes_analysis_dir, 'summary.csv')
 
-        # Run report script and rename/update Word document
         if os.path.exists(report_script):
             print(f"Running report script in {nodes_analysis_dir}")
             subprocess.run(['./_report.sh'], cwd=nodes_analysis_dir)
-
-            # Rename and update report.docx
-            rename_and_update_report(nodes_analysis_dir, i)
 
             # Wait until summary.csv is populated
             while not is_summary_populated(summary_csv):
@@ -69,6 +75,9 @@ def run_report_and_collect_data(base_dir, output_csv, max_folder_num):
                 consolidated_data.append(reshaped_df)
             except Exception as e:
                 print(f"Error reading {summary_csv}: {e}")
+
+        # Process the report after summary.csv is populated
+        process_report(nodes_analysis_dir, i)
 
     # Combine all data into a single DataFrame
     final_df = pd.concat(consolidated_data, ignore_index=True)
