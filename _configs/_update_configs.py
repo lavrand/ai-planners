@@ -9,7 +9,7 @@ TIME_BASED_ON_EXPANSIONS_PER_SECOND = 500
 PLAN_SEARCH_TIMEOUT_SECONDS = 60
 DOMAIN = "rcll_domain_production_durations_time_windows.pddl"
 SUBTREE_FOCUS_THRESHOLD = 1
-DISPATCH_THRESHOLD = 0.1
+DISPATCH_THRESHOLD = 0.1 # was 0.025
 
 # Function to calculate the range for each file
 def calculate_ranges(total_input, num_files):
