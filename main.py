@@ -95,7 +95,7 @@ CPU_COUNT = CPU_COUNT_PC - MULTIPROCESSING_CPU_COUNT_MINUS
 
 PFILE_N = PFILE_START
 
-report_script_path = "_nodes_analysis/_nodes_analysis.py"
+report_script_path = "_nodes_analysis/_report.sh"
 
 PFILE = f"pfile{PFILE_N}"
 FOREST_DEADLINES_ENABLED = False  # DOUBLECHECK THIS IS DISABLED
@@ -264,7 +264,7 @@ def run_report_script():
 
 
 # Invoke the function
-run_report_script()
+# run_report_script()
 
 
 log_file.close()
