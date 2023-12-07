@@ -5,7 +5,7 @@ TOTAL_INPUT = 100  # Total input value
 N = 10              # Number of configuration files
 
 # New constants to replace
-TIME_BASED_ON_EXPANSIONS_PER_SECOND = 200
+TIME_BASED_ON_EXPANSIONS_PER_SECOND = 300
 DISPATCH_THRESHOLD = 0.025  # was 0.025
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 600
