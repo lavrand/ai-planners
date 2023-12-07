@@ -1,12 +1,12 @@
 import math
 
 # Constants
-TOTAL_INPUT = 300  # Total input value
-N = 12              # Number of configuration files
+TOTAL_INPUT = 100  # Total input value
+N = 10              # Number of configuration files
 
 # New constants to replace
-TIME_BASED_ON_EXPANSIONS_PER_SECOND = 300
-DISPATCH_THRESHOLD = 0.25  # was 0.025
+TIME_BASED_ON_EXPANSIONS_PER_SECOND = 10
+DISPATCH_THRESHOLD = 0.025  # was 0.025
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 600
 DOMAIN = "rcll_domain_production_durations_time_windows.pddl"

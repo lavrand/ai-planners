@@ -21,4 +21,4 @@ def rename_files_in_folder(folder_path):
 
 # Example usage
 # Please replace 'your_folder_path' with the actual path of the folder you want to rename files in.
-rename_files_in_folder('problem_files/rcll')
+rename_files_in_folder('problem_files/rcll_3robots')
