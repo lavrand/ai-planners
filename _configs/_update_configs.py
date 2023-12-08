@@ -5,8 +5,8 @@ TOTAL_INPUT = 100  # Total input value
 N = 10              # Number of configuration files
 
 # New constants to replace
-TIME_BASED_ON_EXPANSIONS_PER_SECOND = 10
-DISPATCH_THRESHOLD = 0.1  # was 0.025
+TIME_BASED_ON_EXPANSIONS_PER_SECOND = 25  # can be 10, 25, 50, 100, 200, 300, 500, 1000
+DISPATCH_THRESHOLD = 0.1  # can be 0.025, 0.1, 0.25
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 600
 DOMAIN = "rcll_domain_production_durations_time_windows.pddl"
