@@ -4,6 +4,7 @@
   (:objects
     R-1 - robot
     R-2 - robot
+    R-3 - robot
     o1 - order
     wp1 - workpiece
     cg1 cg2 cg3 cb1 cb2 cb3 - cap-carrier
@@ -11,7 +12,7 @@
     CYAN - team-color
   )
    
-  (:init (order-delivery-window-open o1) (at 128.477 (not (order-delivery-window-open o1))) (can-commit-for-ontime-delivery o1) (at 6.59 (not (can-commit-for-ontime-delivery o1)))
+  (:init (order-delivery-window-open o1) (at 154.643 (not (order-delivery-window-open o1))) (can-commit-for-ontime-delivery o1) (at 16.05 (not (can-commit-for-ontime-delivery o1)))
    (mps-type C-BS BS)
    (mps-type C-CS1 CS)
    (mps-type C-CS2 CS) 
@@ -38,6 +39,7 @@
    (wp-unused wp1)
    (robot-waiting R-1)
    (robot-waiting R-2)
+   (robot-waiting R-3)
 
    (mps-state C-BS IDLE)
    (mps-state C-CS1 IDLE)
