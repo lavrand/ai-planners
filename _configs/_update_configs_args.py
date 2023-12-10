@@ -34,7 +34,7 @@ ranges = calculate_ranges(TOTAL_INPUT, N)
 
 # Update configuration files
 for i, (start, end) in enumerate(ranges, 1):
-    config_file_name = f"config{i}.ini"  # Assuming the files are named config1.ini, config2.ini, etc.
+    config_file_name = "config{}.ini".format(i)  # Compatible with older Python versions
 
     # Read existing content
     with open(config_file_name, 'r') as file:
