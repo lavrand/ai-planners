@@ -28,9 +28,36 @@ do
     # Change directory to _configs within the cloned repository
     cd $i/_configs
 
-    # Store job ID and parameters in the arrays
-    final_parameters[$i]="${time_expansions[$i]},${dispatch_threshold[$i]}"
-    job_ids[$i]=$job_id
+    echo "Running Python script with parameters --time_expansions=${time_expansions[$i]} --dispatch_threshold=${dispatch_threshold[$i]}"
+    # Run the python script with the specified parameters
+    python3 _update_configs_args.py --time_expansions ${time_expansions[$i]} --dispatch_threshold ${dispatch_threshold[$i]}
+
+    # Go one level up before running sbatch
+    echo "Going one level up from $i/_configs"
+    cd ..
+
+    # Checking if sbatch.sbatch exists in the current directory
+    if [ -f "sbatch.sbatch" ]; then
+        echo "Submitting job in directory $i"
+        # Submit the job and capture the output
+        output=$(sbatch sbatch.sbatch)
+
+        # Extract the job ID from the output
+        job_id=$(echo $output | grep -oP '(?<=Submitted batch job )\d+')
+
+        # Store the job ID and parameters in the arrays
+        job_ids[$i]=$job_id
+        final_parameters[$i]="${time_expansions[$i]},${dispatch_threshold[$i]}"
+
+        # Print the mapping of folder number to job ID
+        echo "$i - $job_id"
+    else
+        echo "sbatch.sbatch not found in directory $i"
+    fi
+
+    # Go back to the parent directory
+    echo "Going back to the parent directory from $i"
+    cd ..
 done
 
 # Log that the script has completed and display all job IDs in CSV format
