@@ -16,24 +16,38 @@ declare -A dispatch_threshold=(
 # Loop through the folders
 for i in {1..24}
 do
+    echo "Cloning repository into directory $i"
     # Clone the repository into a folder named as the current number
     git clone https://github.com/lavrand/ai-planners.git $i
 
+    echo "Changing directory to $i/_configs"
     # Change directory to _configs within the cloned repository
     cd $i/_configs
 
+    echo "Running Python script with parameters --time_expansions=${time_expansions[$i]} --dispatch_threshold=${dispatch_threshold[$i]}"
     # Run the python script with the specified parameters
     python3 _update_configs_args.py --time_expansions ${time_expansions[$i]} --dispatch_threshold ${dispatch_threshold[$i]}
 
-    # Submit the job and capture the output
-    output=$(sbatch sbatch.sbatch)
+    # Go one level up before running sbatch
+    echo "Going one level up from $i/_configs"
+    cd ..
 
-    # Extract the job ID from the output
-    job_id=$(echo $output | grep -oP '(?<=Submitted batch job )\d+')
+    # Checking if sbatch.sbatch exists in the current directory
+    if [ -f "sbatch.sbatch" ]; then
+        echo "Submitting job in directory $i"
+        # Submit the job and capture the output
+        output=$(sbatch sbatch.sbatch)
 
-    # Print the mapping of folder number to job ID
-    echo "$i - $job_id"
+        # Extract the job ID from the output
+        job_id=$(echo $output | grep -oP '(?<=Submitted batch job )\d+')
+
+        # Print the mapping of folder number to job ID
+        echo "$i - $job_id"
+    else
+        echo "sbatch.sbatch not found in directory $i"
+    fi
 
     # Go back to the parent directory
-    cd ../..
+    echo "Going back to the parent directory from $i"
+    cd ..
 done
