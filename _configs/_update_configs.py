@@ -9,7 +9,7 @@ TIME_BASED_ON_EXPANSIONS_PER_SECOND = 10  # can be 10, 25, 50, 100, 200, 300, 50
 DISPATCH_THRESHOLD = 0.025  # can be 0.025, 0.1, 0.25
 
 PLAN_SEARCH_TIMEOUT_SECONDS = 600
-DOMAIN = "domain_no_adl_1.pddl"
+DOMAIN = "domain_no_adl_2.pddl"
 SUBTREE_FOCUS_THRESHOLD = 1
 
 # Function to calculate the range for each file
