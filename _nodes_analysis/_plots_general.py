@@ -89,7 +89,7 @@ def create_and_save_plot_name(data, name):
     plt.yticks(fontsize=14)
     plt.ylim(99.5, 100.1)  # Set y-axis limit
     y_ticks = plt.yticks()[0]
-    y_ticks_labels = [str(int(tick)) if tick < 100.1 else '' for tick in y_ticks]
+    y_ticks_labels = [f"{tick:.1f}" if tick < 100.1 else '' for tick in y_ticks]
     plt.gca().set_yticklabels(y_ticks_labels)
 
     plt.legend(fontsize=14, loc='lower right', ncol=2)
