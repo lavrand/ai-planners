@@ -26,7 +26,7 @@ DISPATCH_THRESHOLD = args.dispatch_threshold
 
 # Other constants
 PLAN_SEARCH_TIMEOUT_SECONDS = 600
-DOMAIN = "domain_turtlebot_bailout1.pddl"
+DOMAIN = "domain_no_adl_1.pddl"
 SUBTREE_FOCUS_THRESHOLD = 1
 
 # Calculate ranges

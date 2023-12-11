@@ -23,7 +23,7 @@ do
     cd $i/_configs
 
     # Run the python script with the specified parameters
-    python _update_configs_args.py --time_expansions ${time_expansions[$i]} --dispatch_threshold ${dispatch_threshold[$i]}
+    python3 _update_configs_args.py --time_expansions ${time_expansions[$i]} --dispatch_threshold ${dispatch_threshold[$i]}
 
     # Submit the job and capture the output
     output=$(sbatch sbatch.sbatch)
