@@ -27,6 +27,14 @@ data3 = {
     'disp(0.25)': [1, 3, 7, 11, 20, 25, 22, 34]
 }
 
+data4 = {
+    'EPS': [10, 25, 50, 100, 200, 300, 500, 1000],
+    'nodisp': [100, 100, 100, 100, 100, 100, 100, 100],
+    'disp(0.025)': [100, 100, 100, 100, 100, 100, 100, 100],
+    'disp(0.1)': [100, 100, 100, 100, 100, 100, 100, 100],
+    'disp(0.25)': [100, 100, 100, 100, 100, 100, 100, 100],
+}
+
 def create_and_save_plot(data, numRobots):
 # Plotting
     plt.figure(figsize=(10, 6))
@@ -54,8 +62,37 @@ def create_and_save_plot(data, numRobots):
 
 
     # Save the plot as an image file
-    plt.savefig( 'RCLL_'+str(numRobots)+'.png', bbox_inches='tight')
+    plt.savefig( str(numRobots)+'.png', bbox_inches='tight')
+
+def create_and_save_plot_name(data, name):
+# Plotting
+    plt.figure(figsize=(10, 6))
+    plt.rcParams['font.family'] = 'serif'
+    plt.rcParams['font.serif'] = 'cmr10'
+
+    plt.plot(data['EPS'], data['nodisp'], marker='o', label='nodisp', linewidth=2)
+    plt.plot(data['EPS'], data['disp(0.025)'], marker='s', label='disp(0.025)', linewidth=2)
+    plt.plot(data['EPS'], data['disp(0.1)'], marker='^', label='disp(0.1)', linewidth=2)
+    plt.plot(data['EPS'], data['disp(0.25)'], marker='d', label='disp(0.25)', linewidth=2)
+
+    # Adding labels and legend
+    plt.xlabel('Expansions Per Second', fontsize=18)
+    plt.ylabel('% Solved', fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+
+    plt.legend(fontsize=14, loc='lower right', ncol=2)
+
+
+    # Add text box
+    plt.text(0.05, 0.95, name, transform=plt.gca().transAxes,
+             verticalalignment='top', fontsize=18, bbox=dict(boxstyle='round', facecolor='white', edgecolor='none',alpha=0.5))
+
+
+    # Save the plot as an image file
+    plt.savefig( name + '.png', bbox_inches='tight')
 
 create_and_save_plot(data1, 1)
 create_and_save_plot(data2, 2)
 create_and_save_plot(data3, 3)
+create_and_save_plot_name(data4, "Turtlebot")
