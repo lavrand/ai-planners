@@ -1,8 +1,8 @@
 import math
 
 # Constants
-TOTAL_INPUT = 8  # Total input value
-N = 8              # Number of configuration files
+TOTAL_INPUT = 6  # Total input value
+N = 6              # Number of configuration files
 
 # New constants to replace
 TIME_BASED_ON_EXPANSIONS_PER_SECOND = 10  # can be 10, 25, 50, 100, 200, 300, 500, 1000

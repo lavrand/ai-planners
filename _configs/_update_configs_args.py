@@ -2,8 +2,8 @@ import math
 import argparse
 
 # Constants
-TOTAL_INPUT = 8  # Total input value
-N = 8              # Number of configuration files
+TOTAL_INPUT = 6  # Total input value
+N = 6              # Number of configuration files
 
 # Function to calculate the range for each file
 def calculate_ranges(total_input, num_files):
