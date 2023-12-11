@@ -89,6 +89,6 @@ def run_report_and_collect_data(base_dir, output_csv, max_folder_num):
 # Set your parameters here
 BASE_DIR = "."  # Replace with your actual directory path
 OUTPUT_CSV = "consolidated_table.csv"  # Replace with your desired output file path
-MAX_FOLDER_NUM = 11  # Replace with the highest number of your folders
+MAX_FOLDER_NUM = 24  # Replace with the highest number of your folders
 
 run_report_and_collect_data(BASE_DIR, OUTPUT_CSV, MAX_FOLDER_NUM)
