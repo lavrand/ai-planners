@@ -13,6 +13,18 @@ declare -A dispatch_threshold=(
     [17]=0.025 [18]=0.025 [19]=0.025 [20]=0.025 [21]=0.025 [22]=0.025 [23]=0.025 [24]=0.025
 )
 
+declare -A subtree_focus_threshold=(
+  [1]=0.125 [2]=0.125 [3]=0.125 [4]=0.125 [5]=0.125 [6]=0.125 [7]=0.125 [8]=0.125
+  [9]=0.05 [10]=0.05 [11]=0.05 [12]=0.05 [13]=0.05 [14]=0.05 [15]=0.05 [16]=0.05
+  [17]=0.0125 [18]=0.0125 [19]=0.0125 [20]=0.0125 [21]=0.0125 [22]=0.0125 [23]=0.0125 [24]=0.0125
+)
+
+#declare -A subtree_focus_threshold=(
+#  [1]=1 [2]=1 [3]=1 [4]=1 [5]=1 [6]=1 [7]=1 [8]=1
+#  [9]=1 [10]=1 [11]=1 [12]=1 [13]=1 [14]=1 [15]=1 [16]=1
+#  [17]=1 [18]=1 [19]=1 [20]=1 [21]=1 [22]=1 [23]=1 [24]=1
+#)
+
 # Initialize arrays to store job IDs and parameters
 declare -A job_ids
 declare -A final_parameters
@@ -30,7 +42,7 @@ do
 
     echo "Running Python script with parameters --time_expansions=${time_expansions[$i]} --dispatch_threshold=${dispatch_threshold[$i]}"
     # Run the python script with the specified parameters
-    python3 _update_configs_args.py --time_expansions ${time_expansions[$i]} --dispatch_threshold ${dispatch_threshold[$i]}
+    python3 _update_configs_args.py --subtree-focus-threshold ${subtree_focus_threshold[$i]} --time_expansions ${time_expansions[$i]} --dispatch_threshold ${dispatch_threshold[$i]}
 
     # Go one level up before running sbatch
     echo "Going one level up from $i/_configs"
@@ -47,7 +59,7 @@ do
 
         # Store the job ID and parameters in the arrays
         job_ids[$i]=$job_id
-        final_parameters[$i]="${time_expansions[$i]},${dispatch_threshold[$i]}"
+        final_parameters[$i]="${time_expansions[$i]},${subtree_focus_threshold[$i]},${dispatch_threshold[$i]}"
 
         # Print the mapping of folder number to job ID
         echo "$i - $job_id"
@@ -62,7 +74,7 @@ done
 
 # Log that the script has completed and display all job IDs in CSV format
 echo "Script execution completed."
-echo "id,batch,EPS,dispatch"
+echo "id,batch,EPS,subtree-focus-threshold,dispatch-threshold"
 for i in {1..24}
 do
     echo "$i,${job_ids[$i]},${final_parameters[$i]}"

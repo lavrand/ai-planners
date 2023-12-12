@@ -12,6 +12,7 @@ def calculate_ranges(total_input, num_files):
 
 # Create argument parser
 parser = argparse.ArgumentParser(description='Update configuration files.')
+parser.add_argument('-s', '--subtree-focus-threshold', type=float, required=True)
 parser.add_argument('--time_expansions', type=int, default=1000,
                     help='Time based on expansions per second (can be 10, 25, 50, 100, 200, 300, 500, 1000)')
 parser.add_argument('--dispatch_threshold', type=float, default=0.025,
@@ -23,11 +24,11 @@ args = parser.parse_args()
 # New constants from arguments
 TIME_BASED_ON_EXPANSIONS_PER_SECOND = args.time_expansions
 DISPATCH_THRESHOLD = args.dispatch_threshold
+SUBTREE_FOCUS_THRESHOLD = args.subtree_focus_threshold
 
 # Other constants
 PLAN_SEARCH_TIMEOUT_SECONDS = 600
 DOMAIN = "domain_no_adl_2.pddl"
-SUBTREE_FOCUS_THRESHOLD = 1
 
 # Calculate ranges
 ranges = calculate_ranges(TOTAL_INPUT, N)
