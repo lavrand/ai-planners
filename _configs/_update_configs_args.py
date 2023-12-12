@@ -12,6 +12,8 @@ def calculate_ranges(total_input, num_files):
 
 # Create argument parser
 parser = argparse.ArgumentParser(description='Update configuration files.')
+parser.add_argument('--dispatch-frontier-size', type=int, default=10,
+                    help='Dispatch frontier size (can be 1, 10)')
 parser.add_argument('-s', '--subtree-focus-threshold', type=float, required=True)
 parser.add_argument('--time_expansions', type=int, default=1000,
                     help='Time based on expansions per second (can be 10, 25, 50, 100, 200, 300, 500, 1000)')
@@ -25,6 +27,7 @@ args = parser.parse_args()
 TIME_BASED_ON_EXPANSIONS_PER_SECOND = args.time_expansions
 DISPATCH_THRESHOLD = args.dispatch_threshold
 SUBTREE_FOCUS_THRESHOLD = args.subtree_focus_threshold
+dispatch_frontier_size = args.dispatch_frontier_size
 
 # Other constants
 PLAN_SEARCH_TIMEOUT_SECONDS = 600
@@ -58,6 +61,8 @@ for i, (start, end) in enumerate(ranges, 1):
                 file.write(f"subtree_focus_threshold = {SUBTREE_FOCUS_THRESHOLD}\n")
             elif line.strip().startswith('dispatch_threshold ='):
                 file.write(f"dispatch_threshold = {DISPATCH_THRESHOLD}\n")
+            elif line.strip().startswith('dispatch_frontier_size ='):
+                file.write(f"dispatch_frontier_size = {dispatch_frontier_size}\n")
             else:
                 file.write(line)
 
