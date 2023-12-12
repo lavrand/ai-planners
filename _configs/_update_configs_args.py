@@ -2,8 +2,8 @@ import math
 import argparse
 
 # Constants
-TOTAL_INPUT = 8  # Total input value
-N = 8              # Number of configuration files
+TOTAL_INPUT = 100  # Total input value
+N = 10              # Number of configuration files
 
 # Function to calculate the range for each file
 def calculate_ranges(total_input, num_files):
@@ -31,7 +31,7 @@ dispatch_frontier_size = args.dispatch_frontier_size
 
 # Other constants
 PLAN_SEARCH_TIMEOUT_SECONDS = 600
-DOMAIN = "domain_no_adl_1.pddl"
+DOMAIN = "rcll_domain_production_durations_time_windows.pddl"
 
 # Calculate ranges
 ranges = calculate_ranges(TOTAL_INPUT, N)
