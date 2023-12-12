@@ -11,28 +11,30 @@
 	(localised kenny)
 
     (dock_at dock-station)
-    (nocarrying_papers kenny)
+    (carrying_papers kenny)
 
     (delivery_destination phdarea)
-	(at 1074.453 (not (delivery_destination phdarea)))
-
-	(at 274.453 (delivery_destination meeting-room))
-	(at 874.453 (not (delivery_destination meeting-room)))
+	(at 1037.747 (not (delivery_destination phdarea)))
 
     (delivery_destination coffee)
-	(at 774.453 (not (delivery_destination coffee)))
+	(at 737.747 (not (delivery_destination coffee)))
 
     (delivery_destination dan-office)
-	(at 274.453 (not (delivery_destination dan-office)))
+	(at 237.747 (not (delivery_destination dan-office)))
+
+	(at 237.747 (delivery_destination meeting-room))
+	(at 837.747 (not (delivery_destination meeting-room)))
 
 	(bailout_available)	
 	(bailout_location dock-station)	
-	(= (bailout_distance) 19.69)
-	(at 17 (= (bailout_distance) 18.77))
-	(at 34 (= (bailout_distance) 15.49))
-	(at 51 (= (bailout_distance) 12.49))
-	(at 68 (= (bailout_distance) 9.49))
-	(at 72 (= (bailout_distance) 9.48))
+	(= (bailout_distance) 9.66)
+	(at 16.1 (= (bailout_distance) 6.44))
+	(at 32.2 (= (bailout_distance) 3.22))
+	(at 50.3 (= (bailout_distance) 4.9))
+	(at 68.4 (= (bailout_distance) 7.9))
+	(at 86.5 (= (bailout_distance) 13.9))
+	(at 104.6 (= (bailout_distance) 14.9))
+	(at 122.7 (= (bailout_distance) 18.13))
 
 	(= (distance entrance dock-station) 6.865)
 	(= (distance entrance meeting-room) 5.399)
@@ -127,7 +129,7 @@
 )
 (:goal (and
     ;; (papers_delivered kenny dan-office)
-    ;; (papers_delivered kenny phdarea)
+    (papers_delivered kenny phdarea)
     (papers_delivered kenny coffee)
     (papers_delivered kenny meeting-room)
     (docked kenny)
