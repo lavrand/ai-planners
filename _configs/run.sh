@@ -77,7 +77,7 @@ do
 
         # Store the job ID and parameters in the arrays
         job_ids[$i]=$job_id
-        final_parameters[$i]="${time_expansions[$i]},${subtree_focus_threshold[$i]},${dispatch_threshold[$i],${dispatch_frontier_size[$i]}"
+        final_parameters[$i]="${time_expansions[$i]},${subtree_focus_threshold[$i]},${dispatch_threshold[$i]},${dispatch_frontier_size[$i]}"
 
         # Print the mapping of folder number to job ID
         echo "$i - $job_id"
