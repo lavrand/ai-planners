@@ -58,9 +58,9 @@ do
     # Change directory to _configs within the cloned repository
     cd $i/_configs
 
-    echo "Running Python script with parameters --dispatch_frontier_size${dispatch_frontier_size[$i]} --subtree-focus-threshold ${subtree_focus_threshold[$i]} --time_expansions=${time_expansions[$i]} --dispatch_threshold=${dispatch_threshold[$i]} "
+    echo "Running Python script with parameters --dispatch-frontier-size=${dispatch_frontier_size[$i]} --subtree-focus-threshold=${subtree_focus_threshold[$i]} --time-expansions=${time_expansions[$i]} --dispatch-threshold=${dispatch_threshold[$i]} "
     # Run the python script with the specified parameters
-    python3 _update_configs_args.py --dispatch_frontier_size${dispatch_frontier_size[$i]} --subtree-focus-threshold ${subtree_focus_threshold[$i]} --time_expansions ${time_expansions[$i]} --dispatch_threshold ${dispatch_threshold[$i]}
+    python3 _update_configs_args.py --dispatch_frontier_size ${dispatch_frontier_size[$i]} --subtree-focus-threshold ${subtree_focus_threshold[$i]} --time_expansions ${time_expansions[$i]} --dispatch_threshold ${dispatch_threshold[$i]}
 
     # Go one level up before running sbatch
     echo "Going one level up from $i/_configs"
