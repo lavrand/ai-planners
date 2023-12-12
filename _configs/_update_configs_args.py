@@ -15,9 +15,9 @@ parser = argparse.ArgumentParser(description='Update configuration files.')
 parser.add_argument('--dispatch-frontier-size', type=int, default=10,
                     help='Dispatch frontier size (can be 1, 10)')
 parser.add_argument('-s', '--subtree-focus-threshold', type=float, required=True)
-parser.add_argument('--time_expansions', type=int, default=1000,
+parser.add_argument('--time-expansions', type=int, default=1000,
                     help='Time based on expansions per second (can be 10, 25, 50, 100, 200, 300, 500, 1000)')
-parser.add_argument('--dispatch_threshold', type=float, default=0.025,
+parser.add_argument('--dispatch-threshold', type=float, default=0.025,
                     help='Dispatch threshold (can be 0.025, 0.1, 0.25)')
 
 # Parse arguments
