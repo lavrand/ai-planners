@@ -1,0 +1,25 @@
+Experiment #,Domain,EPS (Expansions per second),Subtree focus threshold ,Dispatch frontier size,Dispatch threshold ,Total number of problems solved by disp,Total number of problems solved by nodisp
+1,RCLL (3 robots),10,1,10,0.25,1,0
+2,RCLL (3 robots),25,1,10,0.25,3,0
+3,RCLL (3 robots),50,1,10,0.25,7,0
+4,RCLL (3 robots),100,1,10,0.25,11,0
+5,RCLL (3 robots),200,1,10,0.25,20,0
+6,RCLL (3 robots),300,1,10,0.25,25,5
+7,RCLL (3 robots),500,1,10,0.25,22,8
+8,RCLL (3 robots),1000,1,10,0.25,34,16
+9,RCLL (3 robots),10,1,10,0.1,0,0
+10,RCLL (3 robots),25,1,10,0.1,4,0
+11,RCLL (3 robots),50,1,10,0.1,8,0
+12,RCLL (3 robots),100,1,10,0.1,8,0
+13,RCLL (3 robots),200,1,10,0.1,18,0
+14,RCLL (3 robots),300,1,10,0.1,23,5
+15,RCLL (3 robots),500,1,10,0.1,30,8
+16,RCLL (3 robots),1000,1,10,0.1,33,16
+17,RCLL (3 robots),10,1,10,0.025,0,0
+18,RCLL (3 robots),25,1,10,0.025,5,0
+19,RCLL (3 robots),50,1,10,0.025,8,0
+20,RCLL (3 robots),100,1,10,0.025,13,0
+21,RCLL (3 robots),200,1,10,0.025,25,0
+22,RCLL (3 robots),300,1,10,0.025,28,5
+23,RCLL (3 robots),500,1,10,0.025,27,8
+24,RCLL (3 robots),1000,1,10,0.025,20,9
