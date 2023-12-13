@@ -22,14 +22,15 @@ data2 = {
     'disp(0.25)': [2, 2, 2, 8, 14, 7, 7, 9]  # Updated values
 }
 
-
+# +
 data3 = {
     'EPS': [10, 25, 50, 100, 200, 300, 500, 1000],
-    'nodisp': [0, 0, 0, 0, 0, 5, 8, 16],  # Updated values
-    'disp(0.025)': [0, 5, 8, 13, 25, 28, 27, 31],  # Updated values
-    'disp(0.1)': [0, 4, 8, 8, 18, 23, 30, 33],  # Updated values
-    'disp(0.25)': [1, 3, 7, 11, 20, 25, 22, 34]  # Updated values
+    'nodisp': [0, 0, 0, 0, 3, 6, 3, 13],  # Updated values
+    'disp(0.025)': [0, 2, 2, 4, 3, 3, 1, 2],  # Updated values
+    'disp(0.1)': [0, 1, 1, 3, 3, 3, 3, 1],  # Updated values
+    'disp(0.25)': [0, 1, 0, 2, 3, 1, 5, 0]  # Updated values
 }
+
 # +
 data4 = {
     'EPS': [10, 25, 50, 100, 200, 300, 500, 1000],
